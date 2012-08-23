@@ -1,4 +1,4 @@
 teeble
 ======
 
-A tiny table plugin
+A teeny table plugin
