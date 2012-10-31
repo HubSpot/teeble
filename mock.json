@@ -1,401 +1,401 @@
 [
-        {
-            "platform": "Trident",
-            "name": "Internet Explorer 4.0",
-            "os": "Win 95+",
-            "version": "4",
-            "grade": "X"
-        },
-        {
-            "platform": "Trident",
-            "name": "Internet Explorer 5.0",
-            "os": "Win 95+",
-            "version": "5",
-            "grade": "C"
-        },
-        {
-            "platform": "Trident",
-            "name": "Internet Explorer 5.5",
-            "os": "Win 95+",
-            "version": "5.5",
-            "grade": "A"
-        },
-        {
-            "platform": "Trident",
-            "name": "Internet Explorer 6",
-            "os": "Win 98+",
-            "version": "6",
-            "grade": "A"
-        },
-        {
-            "platform": "Trident",
-            "name": "Internet Explorer 7",
-            "os": "Win XP SP2+",
-            "version": "7",
-            "grade": "A"
-        },
-        {
-            "platform": "Trident",
-            "name": "AOL browser (AOL desktop)",
-            "os": "Win XP",
-            "version": "6",
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Firefox 1.0",
-            "os": "Win 98+ / OSX.2+",
-            "version": "1.7",
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Firefox 1.5",
-            "os": "Win 98+ / OSX.2+",
-            "version": "1.8",
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Firefox 2.0",
-            "os": "Win 98+ / OSX.2+",
-            "version": "1.8",
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Firefox 3.0",
-            "os": "Win 2k+ / OSX.3+",
-            "version": "1.9",
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Camino 1.0",
-            "os": "OSX.2+",
-            "version": "1.8",
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Camino 1.5",
-            "os": "OSX.3+",
-            "version": "1.8",
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Netscape 7.2",
-            "os": "Win 95+ / Mac OS 8.6-9.2",
-            "version": "1.7",
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Netscape Browser 8",
-            "os": "Win 98SE+",
-            "version": "1.7",
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Netscape Navigator 9",
-            "os": "Win 98+ / OSX.2+",
-            "version": "1.8",
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Mozilla 1.0",
-            "os": "Win 95+ / OSX.1+",
-            "version": 1,
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Mozilla 1.1",
-            "os": "Win 95+ / OSX.1+",
-            "version": 1.1,
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Mozilla 1.2",
-            "os": "Win 95+ / OSX.1+",
-            "version": 1.2,
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Mozilla 1.3",
-            "os": "Win 95+ / OSX.1+",
-            "version": 1.3,
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Mozilla 1.4",
-            "os": "Win 95+ / OSX.1+",
-            "version": 1.4,
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Mozilla 1.5",
-            "os": "Win 95+ / OSX.1+",
-            "version": 1.5,
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Mozilla 1.6",
-            "os": "Win 95+ / OSX.1+",
-            "version": 1.6,
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Mozilla 1.7",
-            "os": "Win 98+ / OSX.1+",
-            "version": 1.7,
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Mozilla 1.8",
-            "os": "Win 98+ / OSX.1+",
-            "version": 1.8,
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Seamonkey 1.1",
-            "os": "Win 98+ / OSX.2+",
-            "version": "1.8",
-            "grade": "A"
-        },
-        {
-            "platform": "Gecko",
-            "name": "Epiphany 2.20",
-            "os": "Gnome",
-            "version": "1.8",
-            "grade": "A"
-        },
-        {
-            "platform": "Webkit",
-            "name": "Safari 1.2",
-            "os": "OSX.3",
-            "version": "125.5",
-            "grade": "A"
-        },
-        {
-            "platform": "Webkit",
-            "name": "Safari 1.3",
-            "os": "OSX.3",
-            "version": "312.8",
-            "grade": "A"
-        },
-        {
-            "platform": "Webkit",
-            "name": "Safari 2.0",
-            "os": "OSX.4+",
-            "version": "419.3",
-            "grade": "A"
-        },
-        {
-            "platform": "Webkit",
-            "name": "Safari 3.0",
-            "os": "OSX.4+",
-            "version": "522.1",
-            "grade": "A"
-        },
-        {
-            "platform": "Webkit",
-            "name": "OmniWeb 5.5",
-            "os": "OSX.4+",
-            "version": "420",
-            "grade": "A"
-        },
-        {
-            "platform": "Webkit",
-            "name": "iPod Touch / iPhone",
-            "os": "iPod",
-            "version": "420.1",
-            "grade": "A"
-        },
-        {
-            "platform": "Webkit",
-            "name": "S60",
-            "os": "S60",
-            "version": "413",
-            "grade": "A"
-        },
-        {
-            "platform": "Presto",
-            "name": "Opera 7.0",
-            "os": "Win 95+ / OSX.1+",
-            "version": "-",
-            "grade": "A"
-        },
-        {
-            "platform": "Presto",
-            "name": "Opera 7.5",
-            "os": "Win 95+ / OSX.2+",
-            "version": "-",
-            "grade": "A"
-        },
-        {
-            "platform": "Presto",
-            "name": "Opera 8.0",
-            "os": "Win 95+ / OSX.2+",
-            "version": "-",
-            "grade": "A"
-        },
-        {
-            "platform": "Presto",
-            "name": "Opera 8.5",
-            "os": "Win 95+ / OSX.2+",
-            "version": "-",
-            "grade": "A"
-        },
-        {
-            "platform": "Presto",
-            "name": "Opera 9.0",
-            "os": "Win 95+ / OSX.3+",
-            "version": "-",
-            "grade": "A"
-        },
-        {
-            "platform": "Presto",
-            "name": "Opera 9.2",
-            "os": "Win 88+ / OSX.3+",
-            "version": "-",
-            "grade": "A"
-        },
-        {
-            "platform": "Presto",
-            "name": "Opera 9.5",
-            "os": "Win 88+ / OSX.3+",
-            "version": "-",
-            "grade": "A"
-        },
-        {
-            "platform": "Presto",
-            "name": "Opera for Wii",
-            "os": "Wii",
-            "version": "-",
-            "grade": "A"
-        },
-        {
-            "platform": "Presto",
-            "name": "Nokia N800",
-            "os": "N800",
-            "version": "-",
-            "grade": "A"
-        },
-        {
-            "platform": "Presto",
-            "name": "Nintendo DS browser",
-            "os": "Nintendo DS",
-            "version": "8.5",
-            "grade": "C/A<sup>1</sup>"
-        }
-        {
-            "platform": "KHTML",
-            "name": "Konqureror 3.1",
-            "os": "KDE 3.1",
-            "version": "3.1",
-            "grade": "C"
-        },
-        {
-            "platform": "KHTML",
-            "name": "Konqureror 3.3",
-            "os": "KDE 3.3",
-            "version": "3.3",
-            "grade": "A"
-        },
-        {
-            "platform": "KHTML",
-            "name": "Konqureror 3.5",
-            "os": "KDE 3.5",
-            "version": "3.5",
-            "grade": "A"
-        },
-        {
-            "platform": "Tasman",
-            "name": "Internet Explorer 4.5",
-            "os": "Mac OS 8-9",
-            "version": "-",
-            "grade": "X"
-        },
-        {
-            "platform": "Tasman",
-            "name": "Internet Explorer 5.1",
-            "os": "Mac OS 7.6-9",
-            "version": "1",
-            "grade": "C"
-        },
-        {
-            "platform": "Tasman",
-            "name": "Internet Explorer 5.2",
-            "os": "Mac OS 8-X",
-            "version": "1",
-            "grade": "C"
-        },
-        {
-            "platform": "Misc",
-            "name": "NetFront 3.1",
-            "os": "Embedded devices",
-            "version": "-",
-            "grade": "C"
-        },
-        {
-            "platform": "Misc",
-            "name": "NetFront 3.4",
-            "os": "Embedded devices",
-            "version": "-",
-            "grade": "A"
-        },
-        {
-            "platform": "Misc",
-            "name": "Dillo 0.8",
-            "os": "Embedded devices",
-            "version": "-",
-            "grade": "X"
-        },
-        {
-            "platform": "Misc",
-            "name": "Links",
-            "os": "Text only",
-            "version": "-",
-            "grade": "X"
-        },
-        {
-            "platform": "Misc",
-            "name": "Lynx",
-            "os": "Text only",
-            "version": "-",
-            "grade": "X"
-        },
-        {
-            "platform": "Misc",
-            "name": "IE Mobile",
-            "os": "Windows Mobile 6",
-            "version": "-",
-            "grade": "C"
-        },
-        {
-            "platform": "Misc",
-            "name": "PSP browser",
-            "os": "PSP",
-            "version": "-",
-            "grade": "C"
-        },
-        {
-            "platform": "Other browsers",
-            "name": "All others",
-            "os": "-",
-            "version": "-",
-            "grade": "U"
-        }
+    {
+        "platform": "Trident",
+        "name": "Internet Explorer 4.0",
+        "os": "Win 95+",
+        "version": "4",
+        "grade": "X"
+    },
+    {
+        "platform": "Trident",
+        "name": "Internet Explorer 5.0",
+        "os": "Win 95+",
+        "version": "5",
+        "grade": "C"
+    },
+    {
+        "platform": "Trident",
+        "name": "Internet Explorer 5.5",
+        "os": "Win 95+",
+        "version": "5.5",
+        "grade": "A"
+    },
+    {
+        "platform": "Trident",
+        "name": "Internet Explorer 6",
+        "os": "Win 98+",
+        "version": "6",
+        "grade": "A"
+    },
+    {
+        "platform": "Trident",
+        "name": "Internet Explorer 7",
+        "os": "Win XP SP2+",
+        "version": "7",
+        "grade": "A"
+    },
+    {
+        "platform": "Trident",
+        "name": "AOL browser (AOL desktop)",
+        "os": "Win XP",
+        "version": "6",
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Firefox 1.0",
+        "os": "Win 98+ / OSX.2+",
+        "version": "1.7",
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Firefox 1.5",
+        "os": "Win 98+ / OSX.2+",
+        "version": "1.8",
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Firefox 2.0",
+        "os": "Win 98+ / OSX.2+",
+        "version": "1.8",
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Firefox 3.0",
+        "os": "Win 2k+ / OSX.3+",
+        "version": "1.9",
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Camino 1.0",
+        "os": "OSX.2+",
+        "version": "1.8",
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Camino 1.5",
+        "os": "OSX.3+",
+        "version": "1.8",
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Netscape 7.2",
+        "os": "Win 95+ / Mac OS 8.6-9.2",
+        "version": "1.7",
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Netscape Browser 8",
+        "os": "Win 98SE+",
+        "version": "1.7",
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Netscape Navigator 9",
+        "os": "Win 98+ / OSX.2+",
+        "version": "1.8",
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Mozilla 1.0",
+        "os": "Win 95+ / OSX.1+",
+        "version": 1,
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Mozilla 1.1",
+        "os": "Win 95+ / OSX.1+",
+        "version": 1.1,
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Mozilla 1.2",
+        "os": "Win 95+ / OSX.1+",
+        "version": 1.2,
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Mozilla 1.3",
+        "os": "Win 95+ / OSX.1+",
+        "version": 1.3,
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Mozilla 1.4",
+        "os": "Win 95+ / OSX.1+",
+        "version": 1.4,
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Mozilla 1.5",
+        "os": "Win 95+ / OSX.1+",
+        "version": 1.5,
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Mozilla 1.6",
+        "os": "Win 95+ / OSX.1+",
+        "version": 1.6,
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Mozilla 1.7",
+        "os": "Win 98+ / OSX.1+",
+        "version": 1.7,
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Mozilla 1.8",
+        "os": "Win 98+ / OSX.1+",
+        "version": 1.8,
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Seamonkey 1.1",
+        "os": "Win 98+ / OSX.2+",
+        "version": "1.8",
+        "grade": "A"
+    },
+    {
+        "platform": "Gecko",
+        "name": "Epiphany 2.20",
+        "os": "Gnome",
+        "version": "1.8",
+        "grade": "A"
+    },
+    {
+        "platform": "Webkit",
+        "name": "Safari 1.2",
+        "os": "OSX.3",
+        "version": "125.5",
+        "grade": "A"
+    },
+    {
+        "platform": "Webkit",
+        "name": "Safari 1.3",
+        "os": "OSX.3",
+        "version": "312.8",
+        "grade": "A"
+    },
+    {
+        "platform": "Webkit",
+        "name": "Safari 2.0",
+        "os": "OSX.4+",
+        "version": "419.3",
+        "grade": "A"
+    },
+    {
+        "platform": "Webkit",
+        "name": "Safari 3.0",
+        "os": "OSX.4+",
+        "version": "522.1",
+        "grade": "A"
+    },
+    {
+        "platform": "Webkit",
+        "name": "OmniWeb 5.5",
+        "os": "OSX.4+",
+        "version": "420",
+        "grade": "A"
+    },
+    {
+        "platform": "Webkit",
+        "name": "iPod Touch / iPhone",
+        "os": "iPod",
+        "version": "420.1",
+        "grade": "A"
+    },
+    {
+        "platform": "Webkit",
+        "name": "S60",
+        "os": "S60",
+        "version": "413",
+        "grade": "A"
+    },
+    {
+        "platform": "Presto",
+        "name": "Opera 7.0",
+        "os": "Win 95+ / OSX.1+",
+        "version": "-",
+        "grade": "A"
+    },
+    {
+        "platform": "Presto",
+        "name": "Opera 7.5",
+        "os": "Win 95+ / OSX.2+",
+        "version": "-",
+        "grade": "A"
+    },
+    {
+        "platform": "Presto",
+        "name": "Opera 8.0",
+        "os": "Win 95+ / OSX.2+",
+        "version": "-",
+        "grade": "A"
+    },
+    {
+        "platform": "Presto",
+        "name": "Opera 8.5",
+        "os": "Win 95+ / OSX.2+",
+        "version": "-",
+        "grade": "A"
+    },
+    {
+        "platform": "Presto",
+        "name": "Opera 9.0",
+        "os": "Win 95+ / OSX.3+",
+        "version": "-",
+        "grade": "A"
+    },
+    {
+        "platform": "Presto",
+        "name": "Opera 9.2",
+        "os": "Win 88+ / OSX.3+",
+        "version": "-",
+        "grade": "A"
+    },
+    {
+        "platform": "Presto",
+        "name": "Opera 9.5",
+        "os": "Win 88+ / OSX.3+",
+        "version": "-",
+        "grade": "A"
+    },
+    {
+        "platform": "Presto",
+        "name": "Opera for Wii",
+        "os": "Wii",
+        "version": "-",
+        "grade": "A"
+    },
+    {
+        "platform": "Presto",
+        "name": "Nokia N800",
+        "os": "N800",
+        "version": "-",
+        "grade": "A"
+    },
+    {
+        "platform": "Presto",
+        "name": "Nintendo DS browser",
+        "os": "Nintendo DS",
+        "version": "8.5",
+        "grade": "C/A<sup>1</sup>"
+    }
+    {
+        "platform": "KHTML",
+        "name": "Konqureror 3.1",
+        "os": "KDE 3.1",
+        "version": "3.1",
+        "grade": "C"
+    },
+    {
+        "platform": "KHTML",
+        "name": "Konqureror 3.3",
+        "os": "KDE 3.3",
+        "version": "3.3",
+        "grade": "A"
+    },
+    {
+        "platform": "KHTML",
+        "name": "Konqureror 3.5",
+        "os": "KDE 3.5",
+        "version": "3.5",
+        "grade": "A"
+    },
+    {
+        "platform": "Tasman",
+        "name": "Internet Explorer 4.5",
+        "os": "Mac OS 8-9",
+        "version": "-",
+        "grade": "X"
+    },
+    {
+        "platform": "Tasman",
+        "name": "Internet Explorer 5.1",
+        "os": "Mac OS 7.6-9",
+        "version": "1",
+        "grade": "C"
+    },
+    {
+        "platform": "Tasman",
+        "name": "Internet Explorer 5.2",
+        "os": "Mac OS 8-X",
+        "version": "1",
+        "grade": "C"
+    },
+    {
+        "platform": "Misc",
+        "name": "NetFront 3.1",
+        "os": "Embedded devices",
+        "version": "-",
+        "grade": "C"
+    },
+    {
+        "platform": "Misc",
+        "name": "NetFront 3.4",
+        "os": "Embedded devices",
+        "version": "-",
+        "grade": "A"
+    },
+    {
+        "platform": "Misc",
+        "name": "Dillo 0.8",
+        "os": "Embedded devices",
+        "version": "-",
+        "grade": "X"
+    },
+    {
+        "platform": "Misc",
+        "name": "Links",
+        "os": "Text only",
+        "version": "-",
+        "grade": "X"
+    },
+    {
+        "platform": "Misc",
+        "name": "Lynx",
+        "os": "Text only",
+        "version": "-",
+        "grade": "X"
+    },
+    {
+        "platform": "Misc",
+        "name": "IE Mobile",
+        "os": "Windows Mobile 6",
+        "version": "-",
+        "grade": "C"
+    },
+    {
+        "platform": "Misc",
+        "name": "PSP browser",
+        "os": "PSP",
+        "version": "-",
+        "grade": "C"
+    },
+    {
+        "platform": "Other browsers",
+        "name": "All others",
+        "os": "-",
+        "version": "-",
+        "grade": "U"
+    }
 ]
