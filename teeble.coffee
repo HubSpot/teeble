@@ -3,9 +3,6 @@
 safeParseInt = (value) ->
     parseInt value, 10
 
-testPrint = (input) ->
-    $('div').html JSON.stringify input
-
 
 class Backbone.Teeble extends Backbone.View
 
@@ -50,13 +47,22 @@ class Backbone.Teeble extends Backbone.View
         return @
 
     render: =>
-        # Draw/redraw the table
-        # marc.render @data
+        # Draw/redraw the table. Replace this with your own render function.
 
-        testPrint @data
+    sort: (sortOp, reverse) =>
+        if not reverse
+            if @sortDir is 'asc'
+                return @
+        else
+            if @sortDir is 'desc'
+                return @
 
-    sort: (sortOp) =>
-        @set _(@collection).sortBy sortOp
+        data = _(@collection).sortBy sortOp
+
+        if reverse
+            @set data.reverse
+        else
+            @set data
 
         return @
 
@@ -67,12 +73,18 @@ class Backbone.Teeble extends Backbone.View
         @set @collection.slice (pageIndex * @size), (pageIndex + 1) * @size
         @page = pageIndex
 
+        return @
+
     nextPage: =>
         @toPage @page + 1
+
+        return @
 
     prevPage: =>
         if @page > 0
             @toPage @page - 1
+
+        return @
 
     destroy: =>
         # marc.destroy()
