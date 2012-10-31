@@ -1,70 +1,79 @@
 # Teeble: a teeny table plugin
 
+safeParseInt = (value) ->
+    parseInt value, 10
+
+testPrint = (input) ->
+    $('div').html JSON.stringify input
+
+
 class Backbone.Teeble extends Backbone.View
 
     initialize: ->
-        # Render the table when the data changes. We could use a backbone model here in the future.
-        @onUpdate = @render
+        if not @options.collection?
+            throw "Sorry bro, we can't render a table without a collection."
 
-        _setOptions()
-        @data = _.extend {}, @initialData
-
-        if @pagination
-            @data.page = parseInt(@data.page) or @page ? 1
-            @data.size = parseInt(@data.size) or @size ? 10
+        @setOptions()
 
         return @
 
-    _setOptions: ->
-        for key, val in @options
-            @[key] = val
+    setOptions: ->
+        validOptions = [
+            'title'  # Table title
+            'collection'  # The canonical data model
+            'pagination'  # Boolean
+            'page'  # Pagination control
+            'size'  # Number of rows to display
+        ]
 
-    data: (newData) ->
+        for option in validOptions
+            @[option] = @options[option]
+
+        # @data is the subset of data displayed in the table
+        @data = @collection
+
+        if @pagination
+            @page ?= 1
+            @size ?= 10
+            @numPages = _.size(@collection) / @size
+
+        return @
+
+    set: (newData, silent=false) =>
         if newData?
             @data = newData
 
-        return @data
+        # Re-render every time the data changes unless told otherwise
+        if not silent
+            @render()
 
-    filter: (input) ->
+        return @
 
-    create: ->
-        # Build the table
-
-    draw: ->
+    render: =>
         # Draw/redraw the table
+        # marc.render @data
 
-    destroy: (target) ->
+        testPrint @data
 
+    sort: (sortOp) =>
+        @set _(@collection).sortBy sortOp
 
-# Usage
+        return @
 
-MOCK_DATA = $.getJSON('mock.json')
+    toPage: (pageIndex) =>
+        if pageIndex < 1
+            pageIndex = 0
 
-class MyTable extends Backbone.Teeble
+        @set @collection.slice (pageIndex * @size), (pageIndex + 1) * @size
+        @page = pageIndex
 
-    title: 'My Awesome Table'
-    data: MOCK_DATA
+    nextPage: =>
+        @toPage @page + 1
 
-    columns:
-        platform:
-            header: "Platform"
-            template: handlebar_template
-        name:
-            header: "Name"
-            template: handlebar_template
-        os:
-            header: "Operating System"
-            template: handlebar_template
+    prevPage: =>
+        if @page > 0
+            @toPage @page - 1
 
-        version:
-            header: "Version"
-            template: handlebar_template
-
-        grade:
-            header: "Grade"
-            template: handlebar_template
-
-
-
-
-
+    destroy: =>
+        # marc.destroy()
+        return
