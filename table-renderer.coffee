@@ -1,46 +1,63 @@
-class TableFormatters
+class @TableFormatters
     value_cell: (value, display) ->
-        header: display or value
+        header: """<th class="#{value}">{{#{display or value}}}</th>"""
         template: """<td class="#{value}">{{#{value}}}</td>"""
 
-class TableRenderer
+class @TableRenderer
     debug: false
+    log: []
     key: 'rows'
+    hasFooter: false
     data: null
     header_template: null
     row_template: null
+    table_class: null
     table_template: null
     table_template_compiled: null
 
     _initialize: (options) =>
         @start = Date.now()
         @options = options
-        if options.debug
-            @debug = options.debug
-            @log = []
 
-        if options.key
-            @key = options.key
+        validOptions = [
+            'table_class'
+            'debug'
+            'key'
+            'partials'
+            'data'
+            'hasFooter'
+        ]
+
+        for option in validOptions
+            if @options[option]
+                @[option] = @options[option]
 
         @_log_time("start")
 
-        if options.partials
+        if @partials
             @_log_time("generate partials")
-            @update_template(options.partials)
+            @update_template(@partials)
 
-        if options.data
-            @render(options.data)
+        if @data
+            @render(@data)
 
-    _parse_data: (data = @data) =>
+    _parse_data: (data) =>
         if data
-            if data[@key]
+            if Backbone and data instanceof Backbone.Collection
+                new_data = {}
+                new_data[@key] = data.toJSON()
+                @data = new_data
+
+            else if data[@key]
                 @data = data
-                return true
+
             else if data instanceof Array
                 new_data = {}
                 new_data[@key] = data
                 @data = new_data
-                return true
+
+        if @data
+            return true
 
         console.log('could not parse data')
         return false
@@ -81,13 +98,20 @@ class TableRenderer
         @_log_time("generate master template")
         header = ""
         row = ""
+        footer = ""
         i = 0
 
         for partial_name, partial of partials
 
-            header_partial_name = "header#{i}"
-            Handlebars.registerPartial(header_partial_name, partial.header)
-            header += "<th>{{> #{header_partial_name} }}</th>"
+            if partial.header
+                header_partial_name = "header#{i}"
+                Handlebars.registerPartial(header_partial_name, partial.header)
+                header += "{{> #{header_partial_name} }}"
+
+            if partial.footer
+                footer_partial_name = "footer#{i}"
+                Handlebars.registerPartial(footer_partial_name, partial.footer)
+                footer += "{{> #{footer_partial_name} }}"
 
             row_partial_name = "partial#{i}"
             Handlebars.registerPartial(row_partial_name, partial.template)
@@ -96,14 +120,18 @@ class TableRenderer
             i++
 
         @header_template = header
+        @footer_template = footer
         @row_template = "{{#each #{@key}}}<tr>#{row}</tr>{{/each}}"
 
         if not @table_template
             @table_template =
                 """
-                    <table>
+                    <table class="#{@table_class}">
                     <thead>#{@header_template}</thead>
                     <tbody>#{@row_template}</tbody>
+                    {{#if #{@hasFooter}}}
+                    <tfoot>#{@footer_template}</tfoot>
+                    {{/if}}
                     </table>
                 """
 
