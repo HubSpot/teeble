@@ -1,6 +1,9 @@
 class @TableFormatters
     value_cell: (value, display) ->
-        header: """<th class="#{value}">{{#{display or value}}}</th>"""
+        header: """<th>#{display}</th>"""
+        template: """<td class="#{value}">{{#{value}}}</td>"""
+    sortable_cell: (value, display, sorting_class) ->
+        header: """<th class="#{sorting_class}" data-sort="#{value}">#{display}</th>"""
         template: """<td class="#{value}">{{#{value}}}</td>"""
 
 class @TableRenderer
