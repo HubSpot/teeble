@@ -29,6 +29,7 @@ class @TableRenderer
             'partials'
             'data'
             'hasFooter'
+            'pagination_template'
         ]
 
         for option in validOptions
@@ -56,6 +57,11 @@ class @TableRenderer
 
             else if data instanceof Array
                 new_data = {}
+                data = for item in data
+                    if Backbone and item instanceof Backbone.Model
+                        item.toJSON()
+                    else
+                        item
                 new_data[@key] = data
                 @data = new_data
 
@@ -140,3 +146,28 @@ class @TableRenderer
 
         @row_template_compiled = Handlebars.compile(@row_template)
         @table_template_compiled = Handlebars.compile(@table_template)
+
+
+    pagination_template_compiled: null
+    pagination_template: """
+        <div class="{{pagination_class}}">
+            <ul>
+                <li><a href="#" class="pagination-previous previous {{#if prev_disabled}}{{pagination_disabled}}{{/if}}">Previous</a></li>
+                {{#each pages}}
+                <li><a href="#" class="pagination-page {{#if active}}{{active}}{{/if}}" data-page="{{number}}">{{label}}</a></li>
+                {{/each}}
+                <li><a href="#" class="pagination-next next {{#if next_disabled}}{{pagination_disabled}}{{/if}}">Next</a></li>
+            </ul>
+        </div>
+    """
+
+    render_pagination: (options) =>
+        if not @pagination_template_compiled
+            @pagination_template_compiled = Handlebars.compile(@pagination_template)
+
+        return @pagination_template_compiled(options)
+
+
+
+
+
