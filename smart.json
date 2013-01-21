@@ -1,0 +1,9 @@
+{
+    "name": "teeble",
+    "description": "A tiny table plugin.",
+    "homepage": "https://github.com/hijonathan/teeble",
+    "author": "Marc Neuwirth, Jonathan Kim",
+    "version": "0.1.0",
+    "git": "https://github.com/hijonathan/teeble.git",
+    "packages": {}
+}
