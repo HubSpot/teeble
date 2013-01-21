@@ -26,6 +26,7 @@ class @Teeble.TableRenderer
             'hasFooter'
             'pagination_template'
             'empty_message'
+            'cid'
         ]
 
         for option in validOptions
@@ -154,6 +155,8 @@ class @Teeble.TableRenderer
                     if not partial.header.attributes.class
                         partial.header.attributes.class = [@sortable_class]
                     else
+                        if typeof partial.header.attributes.class is 'string'
+                            partial.header.attributes.class = [partial.header.attributes.class]
                         partial.header.attributes.class.push(@sortable_class)
 
                 for attribute, value of partial.header.attributes
@@ -162,7 +165,7 @@ class @Teeble.TableRenderer
                     header_cell += """ #{attribute}="#{value}" """
 
                 if partial.header.template
-                    header_partial_name = "header#{i}"
+                    header_partial_name = "#{@cid}-header#{i}"
                     Handlebars.registerPartial(header_partial_name, partial.header.template)
                     header_cell += ">{{> #{header_partial_name} }}"
                 else
@@ -182,7 +185,7 @@ class @Teeble.TableRenderer
                     footer_cell += """ #{attribute}="#{value}" """
 
                 if partial.footer.template
-                    footer_partial_name = "footer#{i}"
+                    footer_partial_name = "#{@cid}-footer#{i}"
                     Handlebars.registerPartial(footer_partial_name, partial.footer.template)
 
                     footer_cell += ">{{> #{footer_partial_name} }}"
@@ -208,7 +211,7 @@ class @Teeble.TableRenderer
                     row_cell += """ #{attribute}="#{value}" """
 
                 if partial.cell.template
-                    row_partial_name = "partial#{i}"
+                    row_partial_name = "#{@cid}-partial#{i}"
                     Handlebars.registerPartial(row_partial_name, partial.cell.template)
                     row_cell += ">{{> #{row_partial_name} }}"
                 else
@@ -245,11 +248,11 @@ class @Teeble.TableRenderer
     pagination_template: """
         <div class="{{pagination_class}}">
             <ul>
-                <li><a href="#" class="pagination-previous previous {{#if prev_disabled}}{{pagination_disabled}}{{/if}}"><span class="left"></span>Previous</a></li>
+                <li><a href="#" class="pagination-previous previous {{#if prev_disabled}}{{pagination_disabled}}{{/if}}">Previous</a></li>
                 {{#each pages}}
                 <li><a href="#" class="pagination-page {{#if active}}{{active}}{{/if}}" data-page="{{number}}">{{number}}</a></li>
                 {{/each}}
-                <li><a href="#" class="pagination-next next {{#if next_disabled}}{{pagination_disabled}}{{/if}}">Next<span class="right"></span></a></li>
+                <li><a href="#" class="pagination-next next {{#if next_disabled}}{{pagination_disabled}}{{/if}}">Next</a></li>
             </ul>
         </div>
     """

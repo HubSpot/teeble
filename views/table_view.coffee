@@ -19,24 +19,16 @@ class @Teeble.TableView extends Backbone.View
             pagination_active: 'active'
             pagination_disabled: 'disabled'
 
-    defaults:
-        partials: {}
+    subviews:
+        header: Teeble.HeaderView
+        row: Teeble.RowView
+        footer: Teeble.FooterView
+        pagination: Teeble.PaginationView
+        renderer: Teeble.TableRenderer
+        empty: Teeble.EmptyView
 
 
     initialize : =>
-        super
-
-        @options = _.extend( {}, @defaults, @options)
-
-        @renderer = new Teeble.TableRenderer
-            partials: @options.partials
-            table_class: @options.table_class
-
-        @collection.pager()
-        @collection.on('add', @addOne, @)
-        @collection.on('reset', @renderPagination, @)
-        @collection.on('reset', @renderBody, @)
-
         @events = _.extend {}, @events,
             'click a.first': 'gotoFirst'
             'click a.previous': 'gotoPrev'
@@ -48,7 +40,22 @@ class @Teeble.TableView extends Backbone.View
             'click .sorting.sorting_asc': 'sortByDescending'
             'click .sorting.sorting_desc': 'sortByAscending'
 
-    afterRender: =>
+        @setOptions()
+
+        super
+
+        @collection.on('add', @addOne, @)
+        @collection.on('reset', @renderBody, @)
+        @collection.on('reset', @renderPagination, @)
+
+        @renderer = new @subviews.renderer
+            partials: @options.partials
+            table_class: @options.table_class
+            cid: @cid
+
+    setOptions: =>
+        @
+
 
     render: =>
         @$el.empty().append("<table><tbody></tbody></table")
@@ -59,13 +66,12 @@ class @Teeble.TableView extends Backbone.View
         @renderBody()
         @renderFooter()
         @renderPagination()
-        @afterRender()
         @
 
     renderPagination : =>
         if @options.pagination
             @pagination?.remove()
-            @pagination = new Teeble.PaginationView
+            @pagination = new @subviews.pagination
                 renderer: @renderer
                 collection: @collection
                 pagination: @classes.pagination
@@ -74,7 +80,7 @@ class @Teeble.TableView extends Backbone.View
 
     renderHeader : =>
         @header?.remove()
-        @header = new Teeble.HeaderView
+        @header = new @subviews.header
             renderer: @renderer
             collection: @collection
 
@@ -83,26 +89,24 @@ class @Teeble.TableView extends Backbone.View
     renderFooter : =>
         if @options.footer
             @footer?.remove()
-            @footer = new Teeble.FooterView
-                renderer: @renderer
-                collection: @collection
 
-            @table.append(@footer.render().el)
+            if @collection.length > 0
+                @footer = new @subviews.footer
+                    renderer: @renderer
+                    collection: @collection
+
+                @table.append(@footer.render().el)
 
     renderBody : =>
         @body.empty()
+
         if @collection.length > 0
             @collection.each(@addOne)
         else
             @renderEmpty()
 
-        @afterRenderBody()
-
-    afterRenderBody : =>
-
-
     renderEmpty : =>
-        @empty = new Teeble.EmptyView
+        @empty = new @subviews.empty
             renderer: @renderer
             collection: @collection
 
@@ -110,7 +114,7 @@ class @Teeble.TableView extends Backbone.View
 
 
     addOne : ( item ) =>
-        view = new Teeble.RowView
+        view = new @subviews.row
             model: item
             renderer: @renderer
 
@@ -147,6 +151,9 @@ class @Teeble.TableView extends Backbone.View
         $this.addClass("sorting_#{direction}")
         currentSort = $this.attr('data-sort')
         @collection.setSort(currentSort, direction)
+        @collection.pager()
+        @renderBody()
+        @renderPagination()
 
     sortByAscending: (e) =>
         @_sort(e, 'asc')
