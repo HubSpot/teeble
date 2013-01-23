@@ -1,3 +1,4 @@
 *.coffee.js
 *.test.js
+.npmignore
 /node_modules/
