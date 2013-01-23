@@ -1,4 +1,4 @@
-/*! teeble - v0.1.0 - 2013-01-22
+/*! teeble - v0.1.0 - 2013-01-23
 * https://github.com/hijonathan/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim; Licensed MIT */
 
@@ -31,19 +31,28 @@
 
     TableRenderer.prototype.table_class = null;
 
-    TableRenderer.prototype.sortable_class = 'sorting';
-
     TableRenderer.prototype.table_template = null;
 
     TableRenderer.prototype.table_template_compiled = null;
 
     TableRenderer.prototype.empty_message = "No data to display";
 
+    TableRenderer.prototype.classes = {
+      sorting: {
+        sortable_class: 'sorting'
+      },
+      pagination: {
+        pagination_class: 'pagination',
+        pagination_active: 'active',
+        pagination_disabled: 'disabled'
+      }
+    };
+
     TableRenderer.prototype._initialize = function(options) {
       var option, validOptions, _i, _len;
       this.start = Date.now();
       this.options = options;
-      validOptions = ['table_class', 'debug', 'key', 'partials', 'data', 'hasFooter', 'pagination_template', 'empty_message', 'cid'];
+      validOptions = ['table_class', 'debug', 'key', 'partials', 'data', 'hasFooter', 'pagination_template', 'empty_message', 'cid', 'classes'];
       for (_i = 0, _len = validOptions.length; _i < _len; _i++) {
         option = validOptions[_i];
         if (this.options[option]) {
@@ -120,6 +129,8 @@
 
     function TableRenderer(options) {
       this.render_pagination = __bind(this.render_pagination, this);
+
+      this.pagination_template = __bind(this.pagination_template, this);
 
       this.update_template = __bind(this.update_template, this);
 
@@ -214,99 +225,137 @@
     };
 
     TableRenderer.prototype.update_template = function(partials) {
-      var attribute, footer, footer_cell, footer_partial_name, header, header_cell, header_partial_name, i, partial, partial_name, row, row_cell, row_partial_name, value, _ref, _ref1, _ref2;
+      var attribute, footer, footer_cell, footer_partial_name, header, header_cell, header_partial_name, i, partial, row, row_cell, row_partial_name, template, value, _i, _len, _ref, _ref1, _ref2;
       this._log_time("generate master template");
       header = "";
       row = "";
       footer = "";
       i = 0;
-      for (partial_name in partials) {
-        partial = partials[partial_name];
+      for (_i = 0, _len = partials.length; _i < _len; _i++) {
+        partial = partials[_i];
+        /* Header
+        */
+
         if (partial.header) {
-          header_cell = "<th";
-          if (!partial.header.attributes) {
-            partial.header.attributes = {};
-          }
-          if (partial.sortable) {
-            if (partial_name) {
-              partial.header.attributes['data-sort'] = partial_name;
+          template = void 0;
+          if (typeof partial.header === 'string') {
+            template = partial.header;
+            header_cell = '';
+          } else {
+            if (partial.header.template) {
+              template = partial.header.template;
             }
-            if (!partial.header.attributes["class"]) {
-              partial.header.attributes["class"] = [this.sortable_class];
-            } else {
-              if (typeof partial.header.attributes["class"] === 'string') {
-                partial.header.attributes["class"] = [partial.header.attributes["class"]];
+            header_cell = "<th";
+            if (!partial.header.attributes) {
+              partial.header.attributes = {};
+            }
+            if (partial.sortable) {
+              partial.header.attributes['data-sort'] = partial.sortable;
+              if (!partial.header.attributes["class"]) {
+                partial.header.attributes["class"] = [this.classes.sorting.sortable_class];
+              } else {
+                if (typeof partial.header.attributes["class"] === 'string') {
+                  partial.header.attributes["class"] = [partial.header.attributes["class"]];
+                }
+                partial.header.attributes["class"].push(this.classes.sorting.sortable_class);
               }
-              partial.header.attributes["class"].push(this.sortable_class);
+            }
+            _ref = partial.header.attributes;
+            for (attribute in _ref) {
+              value = _ref[attribute];
+              if (value instanceof Array) {
+                value = value.join(' ');
+              }
+              header_cell += " " + attribute + "=\"" + value + "\" ";
             }
           }
-          _ref = partial.header.attributes;
-          for (attribute in _ref) {
-            value = _ref[attribute];
-            if (value instanceof Array) {
-              value = value.join(' ');
-            }
-            header_cell += " " + attribute + "=\"" + value + "\" ";
-          }
-          if (partial.header.template) {
+          if (template) {
             header_partial_name = "" + this.cid + "-header" + i;
-            Handlebars.registerPartial(header_partial_name, partial.header.template);
+            Handlebars.registerPartial(header_partial_name, template);
             header_cell += ">{{> " + header_partial_name + " }}";
           } else {
             header_cell += ">";
           }
-          header_cell += "</th>";
+          if (partial.header !== template) {
+            header_cell += "</th>";
+          }
           header += header_cell;
         }
+        /* Footer
+        */
+
         if (partial.footer) {
-          footer_cell = "<td";
-          if (!partial.footer.attributes) {
-            partial.footer.attributes = {};
-          }
-          _ref1 = partial.footer.attributes;
-          for (attribute in _ref1) {
-            value = _ref1[attribute];
-            if (value instanceof Array) {
-              value = value.join(' ');
+          template = void 0;
+          if (typeof partial.footer === 'string') {
+            template = partial.footer;
+            footer_cell = "";
+          } else {
+            if (partial.footer.template) {
+              template = partial.footer.template;
             }
-            footer_cell += " " + attribute + "=\"" + value + "\" ";
+            footer_cell = "<td";
+            if (!partial.footer.attributes) {
+              partial.footer.attributes = {};
+            }
+            _ref1 = partial.footer.attributes;
+            for (attribute in _ref1) {
+              value = _ref1[attribute];
+              if (value instanceof Array) {
+                value = value.join(' ');
+              }
+              footer_cell += " " + attribute + "=\"" + value + "\" ";
+            }
           }
-          if (partial.footer.template) {
+          if (template) {
             footer_partial_name = "" + this.cid + "-footer" + i;
-            Handlebars.registerPartial(footer_partial_name, partial.footer.template);
+            Handlebars.registerPartial(footer_partial_name, template);
             footer_cell += ">{{> " + footer_partial_name + " }}";
           } else {
             footer_cell += ">";
           }
-          footer_cell += "</td>";
+          if (partial.footer !== template) {
+            footer_cell += "</td>";
+          }
           footer += footer_cell;
         }
+        /* Cell
+        */
+
         if (partial.cell) {
-          row_cell = "<td";
-          if (!partial.cell.attributes) {
-            partial.cell.attributes = {};
-          }
-          if (partial.sortable) {
-            if (partial_name) {
-              partial.cell.attributes['data-sort'] = partial_name;
+          template = void 0;
+          if (typeof partial.cell === 'string') {
+            template = partial.cell;
+            row_cell = "";
+          } else {
+            if (partial.cell.template) {
+              template = partial.cell.template;
+            }
+            row_cell = "<td";
+            if (!partial.cell.attributes) {
+              partial.cell.attributes = {};
+            }
+            if (partial.sortable) {
+              partial.cell.attributes['data-sort'] = partial.sortable;
+            }
+            _ref2 = partial.cell.attributes;
+            for (attribute in _ref2) {
+              value = _ref2[attribute];
+              if (value instanceof Array) {
+                value = value.join(' ');
+              }
+              row_cell += " " + attribute + "=\"" + value + "\" ";
             }
           }
-          _ref2 = partial.cell.attributes;
-          for (attribute in _ref2) {
-            value = _ref2[attribute];
-            if (value instanceof Array) {
-              value = value.join(' ');
-            }
-            row_cell += " " + attribute + "=\"" + value + "\" ";
-          }
-          if (partial.cell.template) {
+          if (template) {
             row_partial_name = "" + this.cid + "-partial" + i;
-            Handlebars.registerPartial(row_partial_name, partial.cell.template);
+            Handlebars.registerPartial(row_partial_name, template);
             row_cell += ">{{> " + row_partial_name + " }}";
           } else {
             row_cell += ">";
           }
-          row_cell += "</td>";
+          if (partial.cell !== template) {
+            row_cell += "</td>";
+          }
           row += row_cell;
         }
         i++;
@@ -324,11 +373,13 @@
 
     TableRenderer.prototype.pagination_template_compiled = null;
 
-    TableRenderer.prototype.pagination_template = "<div class=\"{{pagination_class}}\">\n    <ul>\n        <li><a href=\"#\" class=\"pagination-previous previous {{#if prev_disabled}}{{pagination_disabled}}{{/if}}\">Previous</a></li>\n        {{#each pages}}\n        <li><a href=\"#\" class=\"pagination-page {{#if active}}{{active}}{{/if}}\" data-page=\"{{number}}\">{{number}}</a></li>\n        {{/each}}\n        <li><a href=\"#\" class=\"pagination-next next {{#if next_disabled}}{{pagination_disabled}}{{/if}}\">Next</a></li>\n    </ul>\n</div>";
+    TableRenderer.prototype.pagination_template = function() {
+      return "<div class=\"{{pagination_class}}\">\n    <ul>\n        <li><a href=\"#\" class=\"pagination-previous previous {{#if prev_disabled}}" + this.classes.pagination.pagination_disabled + "{{/if}}\">Previous</a></li>\n        {{#each pages}}\n        <li><a href=\"#\" class=\"pagination-page {{#if active}}" + this.classes.pagination.active + "{{/if}}\" data-page=\"{{number}}\">{{number}}</a></li>\n        {{/each}}\n        <li><a href=\"#\" class=\"pagination-next next {{#if next_disabled}}" + this.classes.pagination.pagination_disabled + "{{/if}}\">Next</a></li>\n    </ul>\n</div>";
+    };
 
     TableRenderer.prototype.render_pagination = function(options) {
       if (!this.pagination_template_compiled) {
-        this.pagination_template_compiled = Handlebars.compile(this.pagination_template);
+        this.pagination_template_compiled = Handlebars.compile(this.pagination_template());
       }
       return this.pagination_template_compiled(options);
     };
@@ -614,6 +665,8 @@
     };
 
     TableView.prototype.initialize = function() {
+      this.subviews = _.extend({}, this.subviews, this.options.subviews);
+      this.classes = $.extend(true, {}, this.classes, this.options.classes);
       this.events = _.extend({}, this.events, {
         'click a.first': 'gotoFirst',
         'click a.previous': 'gotoPrev',
@@ -630,7 +683,8 @@
       return this.renderer = new this.subviews.renderer({
         partials: this.options.partials,
         table_class: this.options.table_class,
-        cid: this.cid
+        cid: this.cid,
+        classes: this.classes
       });
     };
 
@@ -746,14 +800,15 @@
     };
 
     TableView.prototype._sort = function(e, direction) {
-      var $this, currentSort;
+      var $this, classDirection, currentSort;
       e.preventDefault();
-      this.$el.find('.sorting').removeClass('sorting_desc sorting_asc');
+      this.$el.find("." + this.classes.sorting.sortable_class).removeClass("" + this.classes.sorting.sorted_desc_class + " " + this.classes.sorting.sorted_asc_class);
       $this = this.$(e.target);
-      if (!$this.hasClass('sorting')) {
-        $this = $this.parents('.sorting');
+      if (!$this.hasClass(this.classes.sorting.sortable_class)) {
+        $this = $this.parents("." + this.classes.sorting.sortable_class);
       }
-      $this.addClass("sorting_" + direction);
+      classDirection = "sorted_" + direction + "_class";
+      $this.addClass("" + this.classes.sorting[classDirection]);
       currentSort = $this.attr('data-sort');
       this.collection.setSort(currentSort, direction);
       this.renderBody();
@@ -763,7 +818,7 @@
     TableView.prototype.sort = function(e) {
       var $this;
       $this = $(e.currentTarget);
-      if ($this.hasClass('sorting_desc')) {
+      if ($this.hasClass(this.classes.sorting.sorted_desc_class)) {
         return this._sort(e, 'asc');
       } else {
         return this._sort(e, 'desc');

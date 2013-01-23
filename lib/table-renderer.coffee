@@ -8,10 +8,17 @@ class @Teeble.TableRenderer
     row_template: null
     rows_template: null
     table_class: null
-    sortable_class: 'sorting'
     table_template: null
     table_template_compiled: null
     empty_message: "No data to display"
+
+    classes:
+        sorting:
+            sortable_class: 'sorting'
+        pagination:
+            pagination_class: 'pagination'
+            pagination_active: 'active'
+            pagination_disabled: 'disabled'
 
     _initialize: (options) =>
         @start = Date.now()
@@ -27,6 +34,7 @@ class @Teeble.TableRenderer
             'pagination_template'
             'empty_message'
             'cid'
+            'classes'
         ]
 
         for option in validOptions
@@ -140,84 +148,115 @@ class @Teeble.TableRenderer
         footer = ""
         i = 0
 
-        for partial_name, partial of partials
+        for partial in partials
 
+            ### Header ###
             if partial.header
+                template = undefined
+                if typeof partial.header is 'string'
+                    template = partial.header
+                    header_cell = ''
 
-                header_cell = "<th"
-                if not partial.header.attributes
-                    partial.header.attributes = {}
+                else
+                    if partial.header.template
+                        template = partial.header.template
 
-                if partial.sortable
-                    if partial_name
-                        partial.header.attributes['data-sort'] = partial_name
+                    header_cell = "<th"
+                    if not partial.header.attributes
+                        partial.header.attributes = {}
 
-                    if not partial.header.attributes.class
-                        partial.header.attributes.class = [@sortable_class]
-                    else
-                        if typeof partial.header.attributes.class is 'string'
-                            partial.header.attributes.class = [partial.header.attributes.class]
-                        partial.header.attributes.class.push(@sortable_class)
+                    if partial.sortable
+                        partial.header.attributes['data-sort'] = partial.sortable
 
-                for attribute, value of partial.header.attributes
-                    if value instanceof Array
-                        value = value.join(' ')
-                    header_cell += """ #{attribute}="#{value}" """
+                        if not partial.header.attributes.class
+                            partial.header.attributes.class = [@classes.sorting.sortable_class]
+                        else
+                            if typeof partial.header.attributes.class is 'string'
+                                partial.header.attributes.class = [partial.header.attributes.class]
+                            partial.header.attributes.class.push(@classes.sorting.sortable_class)
 
-                if partial.header.template
+                    for attribute, value of partial.header.attributes
+                        if value instanceof Array
+                            value = value.join(' ')
+                        header_cell += """ #{attribute}="#{value}" """
+
+                if template
                     header_partial_name = "#{@cid}-header#{i}"
-                    Handlebars.registerPartial(header_partial_name, partial.header.template)
+                    Handlebars.registerPartial(header_partial_name, template)
                     header_cell += ">{{> #{header_partial_name} }}"
                 else
                     header_cell += ">"
 
-                header_cell += "</th>"
+                if partial.header isnt template
+                    header_cell += "</th>"
                 header += header_cell
 
+
+            ### Footer ###
             if partial.footer
-                footer_cell = "<td"
-                if not partial.footer.attributes
-                    partial.footer.attributes = {}
+                template = undefined
+                if typeof partial.footer is 'string'
+                    template = partial.footer
+                    footer_cell = ""
 
-                for attribute, value of partial.footer.attributes
-                    if value instanceof Array
-                        value = value.join(' ')
-                    footer_cell += """ #{attribute}="#{value}" """
+                else
+                    if partial.footer.template
+                        template = partial.footer.template
 
-                if partial.footer.template
+                    footer_cell = "<td"
+                    if not partial.footer.attributes
+                        partial.footer.attributes = {}
+
+                    for attribute, value of partial.footer.attributes
+                        if value instanceof Array
+                            value = value.join(' ')
+                        footer_cell += """ #{attribute}="#{value}" """
+
+                if template
                     footer_partial_name = "#{@cid}-footer#{i}"
-                    Handlebars.registerPartial(footer_partial_name, partial.footer.template)
+                    Handlebars.registerPartial(footer_partial_name, template)
 
                     footer_cell += ">{{> #{footer_partial_name} }}"
                 else
                     footer_cell += ">"
 
-                footer_cell += "</td>"
+                if partial.footer isnt template
+                    footer_cell += "</td>"
                 footer += footer_cell
 
+
+            ### Cell ###
             if partial.cell
+                template = undefined
+                if typeof partial.cell is 'string'
+                    template = partial.cell
+                    row_cell = ""
 
-                row_cell = "<td"
-                if not partial.cell.attributes
-                    partial.cell.attributes = {}
+                else
+                    if partial.cell.template
+                        template = partial.cell.template
 
-                if partial.sortable
-                    if partial_name
-                        partial.cell.attributes['data-sort'] = partial_name
+                    row_cell = "<td"
+                    if not partial.cell.attributes
+                        partial.cell.attributes = {}
 
-                for attribute, value of partial.cell.attributes
-                    if value instanceof Array
-                        value = value.join(' ')
-                    row_cell += """ #{attribute}="#{value}" """
+                    if partial.sortable
+                        partial.cell.attributes['data-sort'] = partial.sortable
 
-                if partial.cell.template
+                    for attribute, value of partial.cell.attributes
+                        if value instanceof Array
+                            value = value.join(' ')
+                        row_cell += """ #{attribute}="#{value}" """
+
+                if template
                     row_partial_name = "#{@cid}-partial#{i}"
-                    Handlebars.registerPartial(row_partial_name, partial.cell.template)
+                    Handlebars.registerPartial(row_partial_name, template)
                     row_cell += ">{{> #{row_partial_name} }}"
                 else
                     row_cell += ">"
 
-                row_cell += "</td>"
+                if partial.cell isnt template
+                    row_cell += "</td>"
                 row += row_cell
 
             i++
@@ -245,21 +284,22 @@ class @Teeble.TableRenderer
 
 
     pagination_template_compiled: null
-    pagination_template: """
+    pagination_template: =>
+        """
         <div class="{{pagination_class}}">
             <ul>
-                <li><a href="#" class="pagination-previous previous {{#if prev_disabled}}{{pagination_disabled}}{{/if}}">Previous</a></li>
+                <li><a href="#" class="pagination-previous previous {{#if prev_disabled}}#{@classes.pagination.pagination_disabled}{{/if}}">Previous</a></li>
                 {{#each pages}}
-                <li><a href="#" class="pagination-page {{#if active}}{{active}}{{/if}}" data-page="{{number}}">{{number}}</a></li>
+                <li><a href="#" class="pagination-page {{#if active}}#{@classes.pagination.active}{{/if}}" data-page="{{number}}">{{number}}</a></li>
                 {{/each}}
-                <li><a href="#" class="pagination-next next {{#if next_disabled}}{{pagination_disabled}}{{/if}}">Next</a></li>
+                <li><a href="#" class="pagination-next next {{#if next_disabled}}#{@classes.pagination.pagination_disabled}{{/if}}">Next</a></li>
             </ul>
         </div>
-    """
+        """
 
     render_pagination: (options) =>
         if not @pagination_template_compiled
-            @pagination_template_compiled = Handlebars.compile(@pagination_template)
+            @pagination_template_compiled = Handlebars.compile(@pagination_template())
 
         return @pagination_template_compiled(options)
 

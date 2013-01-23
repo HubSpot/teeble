@@ -16,9 +16,9 @@
                     collection: app.collections.paginatedItems,
                     pagination: true,
                     table_class: 'table table-bordered',
-                    partials: {
-                        Name: {
-                            sortable: true,
+                    partials: [
+                        {
+                            sortable: 'Name',
                             header: {
                                 template: "Title"
                             },
@@ -26,25 +26,35 @@
                                 template: "{{Name}}"
                             }
                         },
-                        Runtime: {
-                            sortable: true,
+                        {
+                            sortable: 'Runtime',
                             header: {
                                 template: "Runtime"
                             },
                             cell: {
-                                template: "{{RuntimeMinutes}}"
+                                template: "{{RuntimeMinutes}}",
+                                attributes: {
+                                    'data-run-time': "{{RuntimeMinutes}}"
+                                }
                             }
                         },
-                        ReleaseYear: {
-                            sortable: true,
+                        {
+                            sortable: 'ReleaseYear',
                             header: {
-                                template: "Release Year"
+                                template: "Release Year",
+                                attributes: {
+                                    class: ["release-year", "release-year-header"]
+                                }
                             },
                             cell: {
-                                template: "{{ReleaseYear}}"
+                                template: "{{ReleaseYear}}",
+                                attributes: {
+                                    class: "release-year",
+                                    'data-release-year': "{{ReleaseYear}}"
+                                }
                             }
                         }
-                    }
+                    ]
                 });
 
                 $('#content').html(app.views.table.render().el);

@@ -29,6 +29,8 @@ class @Teeble.TableView extends Backbone.View
 
 
     initialize : =>
+        @subviews = _.extend {}, @subviews, @options.subviews
+        @classes = $.extend true, {}, @classes, @options.classes
         @events = _.extend {}, @events,
             'click a.first': 'gotoFirst'
             'click a.previous': 'gotoPrev'
@@ -50,6 +52,7 @@ class @Teeble.TableView extends Backbone.View
             partials: @options.partials
             table_class: @options.table_class
             cid: @cid
+            classes: @classes
 
     setOptions: =>
         @
@@ -141,12 +144,14 @@ class @Teeble.TableView extends Backbone.View
 
     _sort: (e, direction) =>
         e.preventDefault()
-        @$el.find('.sorting').removeClass('sorting_desc sorting_asc')
-        $this = @$(e.target)
-        if not $this.hasClass('sorting')
-            $this = $this.parents('.sorting')
 
-        $this.addClass("sorting_#{direction}")
+        @$el.find(".#{@classes.sorting.sortable_class}").removeClass("#{@classes.sorting.sorted_desc_class} #{@classes.sorting.sorted_asc_class}")
+        $this = @$(e.target)
+        if not $this.hasClass(@classes.sorting.sortable_class)
+            $this = $this.parents(".#{@classes.sorting.sortable_class}")
+
+        classDirection = "sorted_#{direction}_class"
+        $this.addClass("#{@classes.sorting[classDirection]}")
         currentSort = $this.attr('data-sort')
         @collection.setSort(currentSort, direction)
         @renderBody()
@@ -154,7 +159,7 @@ class @Teeble.TableView extends Backbone.View
 
     sort: (e) =>
         $this = $(e.currentTarget)
-        if $this.hasClass('sorting_desc')
+        if $this.hasClass(@classes.sorting.sorted_desc_class)
             @_sort(e, 'asc')
         else
             @_sort(e, 'desc')

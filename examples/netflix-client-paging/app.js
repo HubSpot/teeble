@@ -17,35 +17,20 @@
                     collection: app.collections.paginatedItems,
                     pagination: true,
                     table_class: 'table table-bordered',
-                    partials: {
-                        Name: {
-                            sortable: true,
-                            header: {
-                                template: "Title"
-                            },
-                            cell: {
-                                template: "{{Name}}"
-                            }
+                    partials: [
+                        {
+                            header: '<th class="sorting" data-sort="Name">Title</th>',
+                            cell: "<td>{{Name}}</td>"
                         },
-                        Runtime: {
-                            sortable: true,
-                            header: {
-                                template: "Runtime"
-                            },
-                            cell: {
-                                template: "{{RuntimeMinutes}}"
-                            }
+                        {
+                            header: '<th class="sorting" data-sort="Runtime">Runtime</th>',
+                            cell: "<td>{{RuntimeMinutes}}</td>"
                         },
-                        ReleaseYear: {
-                            sortable: true,
-                            header: {
-                                template: "Release Year"
-                            },
-                            cell: {
-                                template: "{{ReleaseYear}}"
-                            }
+                        {
+                            header: '<th class="sorting" data-sort="ReleaseYear">Release Year</th>',
+                            cell: "<td>{{ReleaseYear}}</td>"
                         }
-                    }
+                    ]
                 });
 
                 $('#content').html(app.views.table.render().el);
