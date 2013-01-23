@@ -1,5 +1,5 @@
- # teeble
- # https://github.com/hijonathan/teeble
-
- # Copyright (c) 2013 HubSpot
- # Licensed under the MIT license.
+# = require './setup'
+# = require './lib/backbone.paginator'
+# = require './lib/handlebars'
+# = require './table-renderer'
+# = require './views/table_view'
