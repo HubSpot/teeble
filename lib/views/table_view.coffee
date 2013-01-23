@@ -1,9 +1,9 @@
-//= require '/../table-renderer'
-//= require './row_view'
-//= require './header_view'
-//= require './footer_view'
-//= require './pagination_view'
-//= require './empty_view'
+# =require '/../table-renderer'
+# =require './row_view'
+# =require './header_view'
+# =require './footer_view'
+# =require './pagination_view'
+# =require './empty_view'
 
 class @Teeble.TableView extends Backbone.View
 

@@ -1,0 +1,42 @@
+{
+  "name": "teeble",
+  "description": "A tiny table",
+  "version": "0.1.0",
+  "homepage": "https://github.com/hijonathan/teeble",
+  "author": {
+    "name": "HubSpot, Marc Neuwirth, Jonathan Kim",
+    "email": "mneuwirth@hubspot.com",
+    "url": "http://marcneuwirth.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hijonathan/teeble.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hijonathan/teeble/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/hijonathan/teeble/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "lib/teeble",
+  "engines": {
+    "node": "*"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {
+    "handlebars": "*",
+    "backbone": "*"
+  },
+  "devDependencies": {
+    "grunt": "~0.3.17",
+    "grunt-coffee": "*",
+    "handlebars": "*",
+    "backbone": "*"
+  },
+  "keywords": []
+}

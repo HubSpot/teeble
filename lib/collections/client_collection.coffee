@@ -1,4 +1,4 @@
-//= require '../backbone.paginator'
+# =require '../backbone.paginator'
 
 class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
 
