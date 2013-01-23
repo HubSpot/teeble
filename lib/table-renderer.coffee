@@ -222,7 +222,7 @@ class @Teeble.TableRenderer
 
             i++
 
-        @header_template = header
+        @header_template = "<tr>#{header}</tr>"
         @footer_template = footer
         @row_template = row
         @rows_template = "{{#each #{@key}}}<tr>#{@row_template}</tr>{{/each}}"

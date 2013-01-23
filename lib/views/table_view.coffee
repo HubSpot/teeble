@@ -15,7 +15,7 @@ class @Teeble.TableView extends Backbone.View
             sorted_desc_class: 'sorting_desc'
             sorted_asc_class: 'sorting_asc'
         pagination:
-            pagination_class: 'hs-pagination'
+            pagination_class: 'pagination'
             pagination_active: 'active'
             pagination_disabled: 'disabled'
 
@@ -36,9 +36,7 @@ class @Teeble.TableView extends Backbone.View
             'click a.last': 'gotoLast'
             'click a.pagination-page': 'gotoPage'
 
-            'click .sorting': 'sortByAscending'
-            'click .sorting.sorting_asc': 'sortByDescending'
-            'click .sorting.sorting_desc': 'sortByAscending'
+            'click .sorting': 'sort'
 
         @setOptions()
 
@@ -84,7 +82,7 @@ class @Teeble.TableView extends Backbone.View
             renderer: @renderer
             collection: @collection
 
-        @table.append(@header.render().el)
+        @table.prepend(@header.render().el)
 
     renderFooter : =>
         if @options.footer
@@ -151,12 +149,13 @@ class @Teeble.TableView extends Backbone.View
         $this.addClass("sorting_#{direction}")
         currentSort = $this.attr('data-sort')
         @collection.setSort(currentSort, direction)
-        @collection.pager()
         @renderBody()
         @renderPagination()
 
-    sortByAscending: (e) =>
-        @_sort(e, 'asc')
+    sort: (e) =>
+        $this = $(e.currentTarget)
+        if $this.hasClass('sorting_desc')
+            @_sort(e, 'asc')
+        else
+            @_sort(e, 'desc')
 
-    sortByDescending: (e) =>
-        @_sort(e, 'desc')

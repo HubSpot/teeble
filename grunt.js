@@ -3,6 +3,10 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: '<json:package.json>',
+        server: {
+          port: 3000,
+          base: '.'
+        },
         meta: {
             banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
                 '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -24,6 +28,7 @@ module.exports = function(grunt) {
             test: {
               src: [
                   '<banner:meta.banner>',
+                  'vendor/jquery.js',
                   'vendor/underscore.js',
                   'vendor/backbone.js',
                   'vendor/backbone.paginator.js',
@@ -55,7 +60,10 @@ module.exports = function(grunt) {
         coffee: {
             build: {
                 src: ['lib/**/*.coffee'],
-                extension: ".coffee.js"
+                extension: ".coffee.js",
+                options: {
+                    bare: false
+                }
             }
         }
     });

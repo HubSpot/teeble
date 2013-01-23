@@ -23,7 +23,7 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
 
     initialize: =>
         @paginator_ui = _.extend( {}, @default_paginator_ui, @paginator_ui )
-        @paginator_core = _.extend( {}, @default_paginator_core, @paginator_ui )
+        @paginator_core = _.extend( {}, @default_paginator_core, @paginator_core )
         @server_api = _.extend( {}, @default_server_api, @server_api )
         super
 
@@ -34,3 +34,19 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
     previousPage: ( options ) =>
         if @currentPage > 1
             @promise = @requestPreviousPage(options)
+
+    setSort: ( column, direction ) =>
+        if column isnt undefined && direction isnt undefined
+            @lastSortColumn = @sortColumn
+            @sortColumn = column
+            @sortDirection = direction
+            @pager()
+            @info()
+
+    pager: =>
+        if @lastSortColumn isnt @sortColumn
+            @currentPage = 1;
+
+            @lastSortColumn = @sortColumn
+
+        super

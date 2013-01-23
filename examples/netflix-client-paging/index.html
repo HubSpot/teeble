@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <title>Backbone.js table with client pagination</title>
+        <link rel="stylesheet" href="../css/bootstrap.css">
+        <link rel="stylesheet" href="../css/pagination.css">
+        <link rel="stylesheet" href="../css/sorting.css">
+    </head>
+
+    <body>
+
+        <div class="container">
+
+          <p>&nbsp;</p>
+          <div class="page-header">
+            <h1>Teeble Client Paging</h1>
+          </div>
+
+            <h3>NetFlix movies</h3>
+
+            <ul id="content">
+
+            </ul>
+
+        </div>
+
+        <!-- scripts-->
+        <script src="../../vendor/jquery.js"></script>
+        <script src="../../vendor/underscore.js"></script>
+        <script src="../../vendor/backbone.js"></script>
+        <script src="../../vendor/backbone.paginator.js"></script>
+        <script src="../../vendor/handlebars.js"></script>
+        <script src="../../dist/teeble.js"></script>
+
+        <!-- main app -->
+        <script src="app.js"></script>
+        <script src="models/Item.js"></script>
+        <script src="collections/PaginatedCollection.js"></script>
+        <script src="views/NetflixTable.js"></script>
+
+
+
+    </body>
+</html>

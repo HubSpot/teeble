@@ -18,5 +18,5 @@ class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
 
     initialize: =>
         @paginator_ui = _.extend( {}, @default_paginator_ui, @paginator_ui )
-        @paginator_core = _.extend( {}, @default_paginator_core, @paginator_ui )
+        @paginator_core = _.extend( {}, @default_paginator_core, @paginator_core )
         super

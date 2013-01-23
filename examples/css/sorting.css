@@ -1,0 +1,43 @@
+thead th.sorting,
+thead th.sorting_desc,
+thead th.sorting_asc {
+    cursor: pointer;
+}
+
+thead th.sorting:hover:after,
+thead th.sorting_desc:after,
+thead th.sorting_asc:after {
+    content: "";
+    float: right;
+    border-style: solid;
+    position: relative;
+    top: 6px;
+}
+
+thead th.sorting_desc,
+thead th.sorting_asc {
+    color: #222222;
+}
+
+thead th.sorting_desc:after,
+thead th.sorting_asc:after {
+    border-color: #222222 transparent;
+}
+
+thead th.sorting:after {
+    border-color: #777777 transparent;
+    border-width: 4px 4px 0 4px;
+}
+
+thead th.sorting_desc:after {
+    border-width: 4px 4px 0 4px;
+}
+
+thead th.sorting_asc:after {
+    border-width: 0 4px 4px 4px;
+}
+
+thead th:nth-child(2),
+thead th:nth-child(3){
+    width: 100px;
+}
