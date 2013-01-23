@@ -8,11 +8,17 @@ module.exports = function(grunt) {
           base: '.'
         },
         meta: {
-            banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+            banner: '/*!\n* <%= pkg.name %> - v<%= pkg.version %> - ' +
                 '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
                 '<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %>' +
-                '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-                ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
+                '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;\n' +
+                '* Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> \n*/',
+
+            coffee: '#! <%= pkg.name %> - v<%= pkg.version %> - ' +
+                '# <%= grunt.template.today("yyyy-mm-dd") %>\n' +
+                '# <%= pkg.homepage ? " " + pkg.homepage + "\n" : "" %>' +
+                '# Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;\n' +
+                '# Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>'
         },
         concat: {
             dist: {
@@ -24,6 +30,16 @@ module.exports = function(grunt) {
                     'lib/collections/*.coffee.js'
                 ],
                 dest: 'dist/<%= pkg.name %>.js'
+            },
+            coffee: {
+                src: [
+                    '<banner:meta.coffee>',
+                    'lib/setup.coffee',
+                    'lib/table-renderer.coffee',
+                    'lib/views/*.coffee',
+                    'lib/collections/*.coffee'
+                ],
+                dest: 'dist/<%= pkg.name %>.coffee'
             },
             test: {
               src: [
