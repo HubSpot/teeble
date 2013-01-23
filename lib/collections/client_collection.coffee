@@ -20,3 +20,12 @@ class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
         @paginator_ui = _.extend( {}, @default_paginator_ui, @paginator_ui )
         @paginator_core = _.extend( {}, @default_paginator_core, @paginator_core )
         super
+
+    whereAll: (attrs) =>
+        if _.isEmpty(attrs)
+            return []
+        return _.filter @origModels, (model) ->
+            for key, value of attrs
+                if value isnt model.get(key)
+                    return false
+            return true

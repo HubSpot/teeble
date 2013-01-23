@@ -225,14 +225,14 @@
     };
 
     TableRenderer.prototype.update_template = function(partials) {
-      var attribute, footer, footer_cell, footer_partial_name, header, header_cell, header_partial_name, i, partial, row, row_cell, row_partial_name, template, value, _i, _len, _ref, _ref1, _ref2;
+      var attribute, footer, footer_cell, footer_partial_name, header, header_cell, header_partial_name, i, partial, partial_name, row, row_cell, row_partial_name, template, value, _ref, _ref1, _ref2;
       this._log_time("generate master template");
       header = "";
       row = "";
       footer = "";
       i = 0;
-      for (_i = 0, _len = partials.length; _i < _len; _i++) {
-        partial = partials[_i];
+      for (partial_name in partials) {
+        partial = partials[partial_name];
         /* Header
         */
 
@@ -666,7 +666,7 @@
 
     TableView.prototype.initialize = function() {
       this.subviews = _.extend({}, this.subviews, this.options.subviews);
-      this.classes = $.extend(true, {}, this.classes, this.options.classes);
+      this.classes = jQuery.extend(true, {}, this.classes, this.options.classes);
       this.events = _.extend({}, this.events, {
         'click a.first': 'gotoFirst',
         'click a.previous': 'gotoPrev',
@@ -841,6 +841,8 @@
     __extends(ClientCollection, _super);
 
     function ClientCollection() {
+      this.whereAll = __bind(this.whereAll, this);
+
       this.initialize = __bind(this.initialize, this);
       return ClientCollection.__super__.constructor.apply(this, arguments);
     }
@@ -865,6 +867,22 @@
       this.paginator_ui = _.extend({}, this.default_paginator_ui, this.paginator_ui);
       this.paginator_core = _.extend({}, this.default_paginator_core, this.paginator_core);
       return ClientCollection.__super__.initialize.apply(this, arguments);
+    };
+
+    ClientCollection.prototype.whereAll = function(attrs) {
+      if (_.isEmpty(attrs)) {
+        return [];
+      }
+      return _.filter(this.origModels, function(model) {
+        var key, value;
+        for (key in attrs) {
+          value = attrs[key];
+          if (value !== model.get(key)) {
+            return false;
+          }
+        }
+        return true;
+      });
     };
 
     return ClientCollection;

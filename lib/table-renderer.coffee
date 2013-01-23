@@ -148,7 +148,7 @@ class @Teeble.TableRenderer
         footer = ""
         i = 0
 
-        for partial in partials
+        for partial_name, partial of partials
 
             ### Header ###
             if partial.header

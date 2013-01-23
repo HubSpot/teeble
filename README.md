@@ -36,6 +36,7 @@ Teeble's main controller is the `TableView`. This view contains all of the major
 * `partials`
 * `classes`
 * `collection`
+* `footer`
 
 ##### Teeble Subviews
 * `HeaderView`: view that renders the header

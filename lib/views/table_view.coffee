@@ -30,7 +30,7 @@ class @Teeble.TableView extends Backbone.View
 
     initialize : =>
         @subviews = _.extend {}, @subviews, @options.subviews
-        @classes = $.extend true, {}, @classes, @options.classes
+        @classes = jQuery.extend true, {}, @classes, @options.classes
         @events = _.extend {}, @events,
             'click a.first': 'gotoFirst'
             'click a.previous': 'gotoPrev'
