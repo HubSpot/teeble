@@ -2,7 +2,7 @@
 * teeble - v0.1.0 - 2013-01-23
 * https://github.com/hijonathan/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
-* Licensed MIT 
+* Licensed MIT
 */
 
 (function() {
@@ -377,7 +377,7 @@
     TableRenderer.prototype.pagination_template_compiled = null;
 
     TableRenderer.prototype.pagination_template = function() {
-      return "<div class=\"{{pagination_class}}\">\n    <ul>\n        <li><a href=\"#\" class=\"pagination-previous previous {{#if prev_disabled}}" + this.classes.pagination.pagination_disabled + "{{/if}}\">Previous</a></li>\n        {{#each pages}}\n        <li><a href=\"#\" class=\"pagination-page {{#if active}}" + this.classes.pagination.active + "{{/if}}\" data-page=\"{{number}}\">{{number}}</a></li>\n        {{/each}}\n        <li><a href=\"#\" class=\"pagination-next next {{#if next_disabled}}" + this.classes.pagination.pagination_disabled + "{{/if}}\">Next</a></li>\n    </ul>\n</div>";
+      return "<div class=\"{{pagination_class}}\">\n    <ul>\n        <li><a href=\"#\" class=\"pagination-previous previous {{#if prev_disabled}}" + this.classes.pagination.pagination_disabled + "{{/if}}\">Previous</a></li>\n        {{#each pages}}\n        <li><a href=\"#\" class=\"pagination-page {{#if active}}" + this.classes.pagination.pagination_active + "{{/if}}\" data-page=\"{{number}}\">{{number}}</a></li>\n        {{/each}}\n        <li><a href=\"#\" class=\"pagination-next next {{#if next_disabled}}" + this.classes.pagination.pagination_disabled + "{{/if}}\">Next</a></li>\n    </ul>\n</div>";
     };
 
     TableRenderer.prototype.render_pagination = function(options) {
@@ -669,7 +669,6 @@
 
     TableView.prototype.initialize = function() {
       this.subviews = _.extend({}, this.subviews, this.options.subviews);
-      this.classes = jQuery.extend(true, {}, this.classes, this.options.classes);
       this.events = _.extend({}, this.events, {
         'click a.first': 'gotoFirst',
         'click a.previous': 'gotoPrev',

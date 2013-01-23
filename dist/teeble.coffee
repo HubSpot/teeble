@@ -296,7 +296,7 @@ class @Teeble.TableRenderer
             <ul>
                 <li><a href="#" class="pagination-previous previous {{#if prev_disabled}}#{@classes.pagination.pagination_disabled}{{/if}}">Previous</a></li>
                 {{#each pages}}
-                <li><a href="#" class="pagination-page {{#if active}}#{@classes.pagination.active}{{/if}}" data-page="{{number}}">{{number}}</a></li>
+                <li><a href="#" class="pagination-page {{#if active}}#{@classes.pagination.pagination_active}{{/if}}" data-page="{{number}}">{{number}}</a></li>
                 {{/each}}
                 <li><a href="#" class="pagination-next next {{#if next_disabled}}#{@classes.pagination.pagination_disabled}{{/if}}">Next</a></li>
             </ul>
@@ -427,7 +427,7 @@ class @Teeble.TableView extends Backbone.View
 
     initialize : =>
         @subviews = _.extend {}, @subviews, @options.subviews
-        @classes = jQuery.extend true, {}, @classes, @options.classes
+
         @events = _.extend {}, @events,
             'click a.first': 'gotoFirst'
             'click a.previous': 'gotoPrev'
