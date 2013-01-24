@@ -14,12 +14,6 @@ Download the [production version][min] or the [development version][max].
 [min]: https://raw.github.com/hijonathan/teeble/master/dist/teeble.min.js
 [max]: https://raw.github.com/hijonathan/teeble/master/dist/teeble.js
 
-Include it in your web page:
-
-```html
-<script src="dist/teeble.min.js"></script>
-```
-
 ## Documentation
 
 ### Collections
@@ -59,12 +53,12 @@ In lieu of a formal style-guide, take care to maintain the existing coding style
 _Also, please don't edit files in the "dist" subdirectory as they are generated via grunt. You'll find source code in the "lib" subdirectory!_
 
 ## TODOs
-* Test
+* Tests
 * Simpler templating option for less complex tables
 * Abstract the table renderer for other templating languages
 
-
 ## Release History
+0.2.0: Documentation, grunt, bug fixes
 0.1.0: Initial Release
 
 ## License
