@@ -1,8 +1,8 @@
 {
   "name": "teeble",
   "description": "A tiny table",
-  "version": "0.1.0",
-  "homepage": "https://github.com/hijonathan/teeble",
+  "version": "0.2.0",
+  "homepage": "https://github.com/HubSpot/teeble",
   "author": {
     "name": "HubSpot, Marc Neuwirth, Jonathan Kim",
     "email": "mneuwirth@hubspot.com",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/hijonathan/teeble.git"
+    "url": "git://github.com/HubSpot/teeble.git"
   },
   "bugs": {
-    "url": "https://github.com/hijonathan/teeble/issues"
+    "url": "https://github.com/HubSpot/teeble/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/hijonathan/teeble/blob/master/LICENSE-MIT"
+      "url": "https://github.com/HubSpot/teeble/blob/master/LICENSE-MIT"
     }
   ],
   "main": "lib/teeble",
