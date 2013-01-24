@@ -1,6 +1,14 @@
-# teeble
+```
+    .                        .o8       oooo
+  .o8                       "888       `888
+.o888oo  .ooooo.   .ooooo.   888oooo.   888   .ooooo.
+  888   d88' `88b d88' `88b  d88' `88b  888  d88' `88b
+  888   888ooo888 888ooo888  888   888  888  888ooo888
+  888 . 888    .o 888    .o  888   888  888  888    .o
+  "888" `Y8bod8P' `Y8bod8P'  `Y8bod8P' o888o `Y8bod8P'
 
-A tiny table
+  A tiny table
+```
 
 ## What is teeble?
 Teeble is a set of [Backbone](http://backbonejs.org/) views and collection abstractions around [backbone.paginator](https://github.com/addyosmani/backbone.paginator).
