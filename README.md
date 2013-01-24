@@ -58,8 +58,8 @@ _Also, please don't edit files in the "dist" subdirectory as they are generated 
 * Abstract the table renderer for other templating languages
 
 ## Release History
-0.2.0: Documentation, grunt, bug fixes
-0.1.0: Initial Release
+* 0.2.0: Documentation, grunt, bug fixes
+* 0.1.0: Initial Release
 
 ## License
 Copyright (c) 2013 HubSpot
