@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.0 - 2013-01-24
+* teeble - v0.2.0 - 2013-02-13
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -51,9 +51,17 @@
       }
     };
 
+    TableRenderer.prototype._now = function() {
+      if (!Date.now) {
+        return +(new Date);
+      } else {
+        return Date.now();
+      }
+    };
+
     TableRenderer.prototype._initialize = function(options) {
       var option, validOptions, _i, _len;
-      this.start = Date.now();
+      this.start = this._now();
       this.options = options;
       validOptions = ['table_class', 'debug', 'key', 'partials', 'data', 'hasFooter', 'pagination_template', 'empty_message', 'cid', 'classes'];
       for (_i = 0, _len = validOptions.length; _i < _len; _i++) {
@@ -165,7 +173,7 @@
 
     TableRenderer.prototype._log_time = function(label) {
       if (this.debug) {
-        return this.log.push("" + (Date.now() - this.start) + "ms: " + label);
+        return this.log.push("" + (this._now() - this.start) + "ms: " + label);
       }
     };
 
@@ -271,13 +279,12 @@
               }
               header_cell += " " + attribute + "=\"" + value + "\" ";
             }
+            header_cell += ">";
           }
           if (template) {
             header_partial_name = "" + this.cid + "-header" + i;
             Handlebars.registerPartial(header_partial_name, template);
-            header_cell += ">{{> " + header_partial_name + " }}";
-          } else {
-            header_cell += ">";
+            header_cell += "{{> " + header_partial_name + " }}";
           }
           if (partial.header !== template) {
             header_cell += "</th>";
@@ -308,13 +315,12 @@
               }
               footer_cell += " " + attribute + "=\"" + value + "\" ";
             }
+            footer_cell += ">";
           }
           if (template) {
             footer_partial_name = "" + this.cid + "-footer" + i;
             Handlebars.registerPartial(footer_partial_name, template);
-            footer_cell += ">{{> " + footer_partial_name + " }}";
-          } else {
-            footer_cell += ">";
+            footer_cell += "{{> " + footer_partial_name + " }}";
           }
           if (partial.footer !== template) {
             footer_cell += "</td>";
@@ -348,13 +354,12 @@
               }
               row_cell += " " + attribute + "=\"" + value + "\" ";
             }
+            row_cell += ">";
           }
           if (template) {
             row_partial_name = "" + this.cid + "-partial" + i;
             Handlebars.registerPartial(row_partial_name, template);
-            row_cell += ">{{> " + row_partial_name + " }}";
-          } else {
-            row_cell += ">";
+            row_cell += "{{> " + row_partial_name + " }}";
           }
           if (partial.cell !== template) {
             row_cell += "</td>";
@@ -819,7 +824,7 @@
 
     TableView.prototype.sort = function(e) {
       var $this;
-      $this = $(e.currentTarget);
+      $this = this.$(e.currentTarget);
       if ($this.hasClass(this.classes.sorting.sorted_desc_class)) {
         return this._sort(e, 'asc');
       } else {

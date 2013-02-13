@@ -158,7 +158,7 @@ class @Teeble.TableView extends Backbone.View
         @renderPagination()
 
     sort: (e) =>
-        $this = $(e.currentTarget)
+        $this = @$(e.currentTarget)
         if $this.hasClass(@classes.sorting.sorted_desc_class)
             @_sort(e, 'asc')
         else
