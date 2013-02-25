@@ -19,8 +19,8 @@ You are able to page, sort and filter your data easily by creating views that pa
 
 Download the [production version][min] or the [development version][max].
 
-[min]: https://raw.github.com/hijonathan/teeble/master/dist/teeble.min.js
-[max]: https://raw.github.com/hijonathan/teeble/master/dist/teeble.js
+[min]: https://raw.github.com/hubspot/teeble/master/dist/teeble.min.js
+[max]: https://raw.github.com/hubspot/teeble/master/dist/teeble.js
 
 ## Documentation
 
