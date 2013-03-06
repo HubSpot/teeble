@@ -48,6 +48,7 @@ class @Teeble.TableRenderer
             'empty_message'
             'cid'
             'classes'
+            'collection'
         ]
 
         for option in validOptions
@@ -154,7 +155,7 @@ class @Teeble.TableRenderer
                 data.message = @empty_message
             @_render(@table_empty_template_compiled, data)
 
-    update_template: (partials) =>
+    update_template: (partials = @partials) =>
         @_log_time("generate master template")
         header = ""
         row = ""
@@ -274,6 +275,28 @@ class @Teeble.TableRenderer
 
             i++
 
+        j = 0
+        if @collection.sortbarColumns
+            for column in @collection.sortbarColumns
+                header_cell = """<th><select data-column="#{j}" class="sortbar-column sortbar-column-#{j}">"""
+                k = 0
+                if @collection.sortbarColumnOptions
+                    for value, name of @collection.sortbarColumnOptions
+                        selected = ''
+                        if value is column
+                            selected = "selected"
+                            footer_cell = """<td>{{#{value}}}</td>"""
+                            row_cell = """<td>{{#{value}}}</td>"""
+
+                        header_cell += """<option value="#{value}" #{selected}>#{name}</option>"""
+                        k++
+
+                    header_cell += """</select></th>"""
+                    header += header_cell
+                    footer += footer_cell
+                    row += row_cell
+                    j++
+
         @header_template = "<tr>#{header}</tr>"
         @footer_template = footer
         @row_template = row
@@ -294,6 +317,12 @@ class @Teeble.TableRenderer
                 """
 
         @table_template_compiled = Handlebars.compile(@table_template)
+        @table_template_compiled = null
+        @rows_template_compiled = null
+        @row_template_compiled = null
+        @header_template_compiled = null
+        @footer_template_compiled = null
+        @table_empty_template_compiled = null
 
 
     pagination_template_compiled: null
@@ -489,6 +518,7 @@ class @Teeble.TableView extends Backbone.View
             'click a.last': 'gotoLast'
             'click a.pagination-page': 'gotoPage'
             'click .sorting': 'sort'
+            'change .sortbar-column': 'sortBarChange'
 
         @setOptions()
 
@@ -625,6 +655,16 @@ class @Teeble.TableView extends Backbone.View
             @_sort(e, 'asc')
         else
             @_sort(e, 'desc')
+
+    sortBarChange: (e) =>
+        $this = @$(e.currentTarget)
+        column = $this.attr('data-column')
+        value = $this.val()
+        @collection.sortbarColumns[~~column] = value
+        @renderer.update_template()
+        @render()
+
+
 
 # =require '../backbone.paginator'
 

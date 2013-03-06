@@ -37,6 +37,7 @@ class @Teeble.TableView extends Backbone.View
             'click a.last': 'gotoLast'
             'click a.pagination-page': 'gotoPage'
             'click .sorting': 'sort'
+            'change .sortbar-column': 'sortBarChange'
 
         @setOptions()
 
@@ -173,3 +174,13 @@ class @Teeble.TableView extends Backbone.View
             @_sort(e, 'asc')
         else
             @_sort(e, 'desc')
+
+    sortBarChange: (e) =>
+        $this = @$(e.currentTarget)
+        column = $this.attr('data-column')
+        value = $this.val()
+        @collection.sortbarColumns[~~column] = value
+        @renderer.update_template()
+        @render()
+
+

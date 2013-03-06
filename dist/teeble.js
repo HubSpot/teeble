@@ -63,7 +63,7 @@
       var option, validOptions, _i, _len;
       this.start = this._now();
       this.options = options;
-      validOptions = ['table_class', 'debug', 'key', 'partials', 'data', 'hasFooter', 'pagination_template', 'empty_message', 'cid', 'classes'];
+      validOptions = ['table_class', 'debug', 'key', 'partials', 'data', 'hasFooter', 'pagination_template', 'empty_message', 'cid', 'classes', 'collection'];
       for (_i = 0, _len = validOptions.length; _i < _len; _i++) {
         option = validOptions[_i];
         if (this.options[option]) {
@@ -236,7 +236,10 @@
     };
 
     TableRenderer.prototype.update_template = function(partials) {
-      var attribute, footer, footer_cell, footer_partial_name, header, header_cell, header_partial_name, i, partial, partial_name, row, row_cell, row_partial_name, template, value, _ref, _ref1, _ref2;
+      var attribute, column, footer, footer_cell, footer_partial_name, header, header_cell, header_partial_name, i, j, k, name, partial, partial_name, row, row_cell, row_partial_name, selected, template, value, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4;
+      if (partials == null) {
+        partials = this.partials;
+      }
       this._log_time("generate master template");
       header = "";
       row = "";
@@ -368,6 +371,34 @@
         }
         i++;
       }
+      j = 0;
+      if (this.collection.sortbarColumns) {
+        _ref3 = this.collection.sortbarColumns;
+        for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
+          column = _ref3[_i];
+          header_cell = "<th><select data-column=\"" + j + "\" class=\"sortbar-column sortbar-column-" + j + "\">";
+          k = 0;
+          if (this.collection.sortbarColumnOptions) {
+            _ref4 = this.collection.sortbarColumnOptions;
+            for (value in _ref4) {
+              name = _ref4[value];
+              selected = '';
+              if (value === column) {
+                selected = "selected";
+                footer_cell = "<td>{{" + value + "}}</td>";
+                row_cell = "<td>{{" + value + "}}</td>";
+              }
+              header_cell += "<option value=\"" + value + "\" " + selected + ">" + name + "</option>";
+              k++;
+            }
+            header_cell += "</select></th>";
+            header += header_cell;
+            footer += footer_cell;
+            row += row_cell;
+            j++;
+          }
+        }
+      }
       this.header_template = "<tr>" + header + "</tr>";
       this.footer_template = footer;
       this.row_template = row;
@@ -376,7 +407,13 @@
       if (!this.table_template) {
         this.table_template = "<table class=\"" + this.table_class + "\">\n<thead>" + this.header_template + "</thead>\n<tbody>" + this.row_template + "</tbody>\n{{#if " + this.hasFooter + "}}\n<tfoot>" + this.footer_template + "<tfoot>\n{{/if}}\n</table>";
       }
-      return this.table_template_compiled = Handlebars.compile(this.table_template);
+      this.table_template_compiled = Handlebars.compile(this.table_template);
+      this.table_template_compiled = null;
+      this.rows_template_compiled = null;
+      this.row_template_compiled = null;
+      this.header_template_compiled = null;
+      this.footer_template_compiled = null;
+      return this.table_empty_template_compiled = null;
     };
 
     TableRenderer.prototype.pagination_template_compiled = null;
@@ -675,6 +712,8 @@
     __extends(TableView, _super);
 
     function TableView() {
+      this.sortBarChange = __bind(this.sortBarChange, this);
+
       this.sort = __bind(this.sort, this);
 
       this._sort = __bind(this._sort, this);
@@ -741,7 +780,8 @@
         'click a.next': 'gotoNext',
         'click a.last': 'gotoLast',
         'click a.pagination-page': 'gotoPage',
-        'click .sorting': 'sort'
+        'click .sorting': 'sort',
+        'change .sortbar-column': 'sortBarChange'
       });
       this.setOptions();
       TableView.__super__.initialize.apply(this, arguments);
@@ -895,6 +935,16 @@
       } else {
         return this._sort(e, 'desc');
       }
+    };
+
+    TableView.prototype.sortBarChange = function(e) {
+      var $this, column, value;
+      $this = this.$(e.currentTarget);
+      column = $this.attr('data-column');
+      value = $this.val();
+      this.collection.sortbarColumns[~~column] = value;
+      this.renderer.update_template();
+      return this.render();
     };
 
     return TableView;
