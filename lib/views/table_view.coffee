@@ -177,9 +177,16 @@ class @Teeble.TableView extends Backbone.View
 
     sortBarChange: (e) =>
         $this = @$(e.currentTarget)
-        column = $this.attr('data-column')
+        column = ~~($this.attr('data-column'))
         value = $this.val()
-        @collection.sortbarColumns[~~column] = value
+
+        oldValue = @collection.sortbarColumns[column]
+        existing = _.indexOf(@collection.sortbarColumns, value)
+        if existing >= 0
+            @collection.sortbarColumns[existing] = oldValue
+
+        @collection.sortbarColumns[column] = value
+
         @renderer.update_template()
         @render()
 

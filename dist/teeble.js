@@ -938,11 +938,16 @@
     };
 
     TableView.prototype.sortBarChange = function(e) {
-      var $this, column, value;
+      var $this, column, existing, oldValue, value;
       $this = this.$(e.currentTarget);
-      column = $this.attr('data-column');
+      column = ~~($this.attr('data-column'));
       value = $this.val();
-      this.collection.sortbarColumns[~~column] = value;
+      oldValue = this.collection.sortbarColumns[column];
+      existing = _.indexOf(this.collection.sortbarColumns, value);
+      if (existing >= 0) {
+        this.collection.sortbarColumns[existing] = oldValue;
+      }
+      this.collection.sortbarColumns[column] = value;
       this.renderer.update_template();
       return this.render();
     };
