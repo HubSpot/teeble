@@ -111,15 +111,17 @@ class @Teeble.TableView extends Backbone.View
 
         if @collection.length > 0
             @collection.each(@addOne)
+            @trigger('body.render', @)
         else
             @renderEmpty()
 
-        @trigger('body.render', @)
-
     renderEmpty : =>
-        @empty = new @subviews.empty
+        options = _.extend({}, @options,
             renderer: @renderer
             collection: @collection
+        )
+        @empty = new @subviews.empty options
+
 
         @body.append(@empty.render().el)
 

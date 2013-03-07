@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.0 - 2013-03-06
+* teeble - v0.2.0 - 2013-03-07
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -824,17 +824,19 @@
       this.body.empty();
       if (this.collection.length > 0) {
         this.collection.each(this.addOne);
+        return this.trigger('body.render', this);
       } else {
-        this.renderEmpty();
+        return this.renderEmpty();
       }
-      return this.trigger('body.render', this);
     };
 
     TableView.prototype.renderEmpty = function() {
-      this.empty = new this.subviews.empty({
+      var options;
+      options = _.extend({}, this.options, {
         renderer: this.renderer,
         collection: this.collection
       });
+      this.empty = new this.subviews.empty(options);
       this.body.append(this.empty.render().el);
       return this.trigger('empty.render', this);
     };

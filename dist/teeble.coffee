@@ -1,4 +1,4 @@
-#! teeble - v0.2.0 - # 2013-03-06
+#! teeble - v0.2.0 - # 2013-03-07
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -418,38 +418,6 @@ class @Teeble.RowView extends Backbone.View
                 )
             ))
         @
-class @Teeble.SortbarView extends Backbone.View
-
-    tagName : 'thead'
-    template: """
-        <tr>
-            <% _.each(partials, function(partial) { %>
-                <%= partial.header %>
-            <% }); %>
-            <% for(var i = 0; i < sortbarColumns; i++) { %>
-                <th>
-                    <select class="column-<%= i %>" >
-                        <% _.each(sortbarColumnOptions, function(name, value) { %>
-                            <option value="<%= value %>" ><%= name %></option>
-                        <% }); %>
-                    </select>
-                </th>
-            <% } %>
-        </tr>
-    """
-
-    initialize: =>
-        @renderer = @options.renderer
-        @collection.bind('destroy', @remove, @);
-
-    render : =>
-        if @renderer
-            html = _.template @template,
-                partials: @options.renderer.partials
-                sortbarColumns: @options.collection.sortbarColumns
-                sortbarColumnOptions: @options.collection.sortbarColumnOptions
-            @$el.html(html)
-        @
 # =require '/../table-renderer'
 # =require './row_view'
 # =require './header_view'
@@ -563,15 +531,17 @@ class @Teeble.TableView extends Backbone.View
 
         if @collection.length > 0
             @collection.each(@addOne)
+            @trigger('body.render', @)
         else
             @renderEmpty()
 
-        @trigger('body.render', @)
-
     renderEmpty : =>
-        @empty = new @subviews.empty
+        options = _.extend({}, @options,
             renderer: @renderer
             collection: @collection
+        )
+        @empty = new @subviews.empty options
+
 
         @body.append(@empty.render().el)
 
