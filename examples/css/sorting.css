@@ -41,3 +41,60 @@ thead th:nth-child(2),
 thead th:nth-child(3){
     width: 100px;
 }
+
+.sort-reverser {
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+    border-radius: 4px;
+    background-color: #fff;
+    background-image: none;
+    background: #fff;
+    background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(0.5, #fff));
+    background: -webkit-linear-gradient(center bottom, #eee 0%, #fff 50%);
+    background: -moz-linear-gradient(center bottom, #eee 0%, #fff 50%);
+    border-width: 1px;
+    border-style: solid;
+    border-color: #cacaca #bdbdbd #aeaeae #bdbdbd;
+    display: inline-block;
+    float: left;
+    position: relative;
+    height: 17px;
+    width: 24px;
+    padding: 4px;
+    margin: 3px 48px 0px 5px;
+    cursor: pointer;
+}
+
+.sort-reverser .up,
+.sort-reverser .down {
+    content: "";
+    border-style: solid;
+    position: absolute;
+    right: 11px;
+}
+
+.sort-reverser .up {
+    border-width: 0 5px 5px 5px;
+    top: 5px;
+}
+
+.sort-reverser .down {
+    border-width: 5px 5px 0 5px;
+    top: 15px;
+}
+
+.sort-reverser .down,
+.sort-reverser.reverse:active .up,
+.sort-reverser.reverse .up,
+.sort-reverser:active .up {
+    border-color: #3288e6 transparent;
+}
+
+.sort-reverser .up,
+.sort-reverser.reverse:active .down,
+.sort-reverser.reverse .down,
+.sort-reverser:active .down {
+    border-color: #8dbdf1 transparent;
+}

@@ -277,6 +277,19 @@ class @Teeble.TableRenderer
 
         j = 0
         if @collection.sortbarColumns
+            header = """<th colspan="#{_.size(partials)}">Sorted by: <select class="sortbar-field-select">"""
+
+            if @collection.sortbarSortOptions
+                for value, name of @collection.sortbarSortOptions
+                    header += """<option value="#{value}" #{selected}>#{name}</option>"""
+
+            for value, name of @collection.sortbarColumnOptions
+                header += """<option value="#{value}" #{selected}>#{name}</option>"""
+
+
+            header += """</select><div class="sort-reverser"><div class="up"></div><div class="down"></div></div> Showing:</th>"""
+
+
             for column in @collection.sortbarColumns
                 header_cell = """<th><select data-column="#{j}" class="sortbar-column sortbar-column-#{j}">"""
                 k = 0

@@ -236,7 +236,7 @@
     };
 
     TableRenderer.prototype.update_template = function(partials) {
-      var attribute, column, footer, footer_cell, footer_partial_name, header, header_cell, header_partial_name, i, j, k, name, partial, partial_name, row, row_cell, row_partial_name, selected, template, value, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4;
+      var attribute, column, footer, footer_cell, footer_partial_name, header, header_cell, header_partial_name, i, j, k, name, partial, partial_name, row, row_cell, row_partial_name, selected, template, value, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
       if (partials == null) {
         partials = this.partials;
       }
@@ -373,15 +373,29 @@
       }
       j = 0;
       if (this.collection.sortbarColumns) {
-        _ref3 = this.collection.sortbarColumns;
-        for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
-          column = _ref3[_i];
+        header = "<th colspan=\"" + (_.size(partials)) + "\">Sorted by: <select class=\"sortbar-field-select\">";
+        if (this.collection.sortbarSortOptions) {
+          _ref3 = this.collection.sortbarSortOptions;
+          for (value in _ref3) {
+            name = _ref3[value];
+            header += "<option value=\"" + value + "\" " + selected + ">" + name + "</option>";
+          }
+        }
+        _ref4 = this.collection.sortbarColumnOptions;
+        for (value in _ref4) {
+          name = _ref4[value];
+          header += "<option value=\"" + value + "\" " + selected + ">" + name + "</option>";
+        }
+        header += "</select><div class=\"sort-reverser\"><div class=\"up\"></div><div class=\"down\"></div></div> Showing:</th>";
+        _ref5 = this.collection.sortbarColumns;
+        for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
+          column = _ref5[_i];
           header_cell = "<th><select data-column=\"" + j + "\" class=\"sortbar-column sortbar-column-" + j + "\">";
           k = 0;
           if (this.collection.sortbarColumnOptions) {
-            _ref4 = this.collection.sortbarColumnOptions;
-            for (value in _ref4) {
-              name = _ref4[value];
+            _ref6 = this.collection.sortbarColumnOptions;
+            for (value in _ref6) {
+              name = _ref6[value];
               selected = '';
               if (value === column) {
                 selected = "selected";

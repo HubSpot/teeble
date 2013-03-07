@@ -7,6 +7,9 @@
             "os",
             "version"
         ],
+        sortbarSortOptions: {
+            "name": "Name"
+        },
         sortbarColumnOptions: {
             "platform": "Platform",
             "os": "Operating System",
