@@ -14,12 +14,15 @@
                 app.collections.paginatedItems.pager();
                 app.views.table = new app.views.BrowserTableView({
                     collection: app.collections.paginatedItems,
+                    subviews: {
+                        renderer: Teeble.SortbarRenderer
+                    },
                     pagination: true,
                     table_class: 'table table-bordered',
                     partials: [
                         {
                             header: '<th class="sorting" data-sort="name">Name</th>',
-                            cell: "<td>{{name}}</td>"
+                            cell: "<td><%= name %></td>"
                         }
                     ]
                 });

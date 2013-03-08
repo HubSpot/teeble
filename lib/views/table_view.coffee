@@ -49,11 +49,11 @@ class @Teeble.TableView extends Backbone.View
 
         @renderer = new @subviews.renderer
             partials: @options.partials
-            collection: @collection
             table_class: @options.table_class
             cid: @cid
             classes: @classes
-
+            collection: @collection
+            compile: @options.compile
 
     setOptions: =>
         @
@@ -75,7 +75,6 @@ class @Teeble.TableView extends Backbone.View
         if @options.pagination
             @pagination?.remove()
             @pagination = new @subviews.pagination
-                renderer: @renderer
                 collection: @collection
                 pagination: @classes.pagination
 

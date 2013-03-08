@@ -16,10 +16,6 @@
 
   this.Teeble.TableRenderer = (function() {
 
-    TableRenderer.prototype.debug = false;
-
-    TableRenderer.prototype.log = [];
-
     TableRenderer.prototype.key = 'rows';
 
     TableRenderer.prototype.hasFooter = false;
@@ -43,86 +39,31 @@
     TableRenderer.prototype.classes = {
       sorting: {
         sortable_class: 'sorting'
-      },
-      pagination: {
-        pagination_class: 'pagination',
-        pagination_active: 'active',
-        pagination_disabled: 'disabled'
       }
     };
 
-    TableRenderer.prototype._now = function() {
-      if (!Date.now) {
-        return +(new Date);
-      } else {
-        return Date.now();
-      }
-    };
+    TableRenderer.prototype.compile = _.template;
 
     TableRenderer.prototype._initialize = function(options) {
       var option, validOptions, _i, _len;
-      this.start = this._now();
       this.options = options;
-      validOptions = ['table_class', 'debug', 'key', 'partials', 'data', 'hasFooter', 'pagination_template', 'empty_message', 'cid', 'classes', 'collection'];
+      validOptions = ['table_class', 'partials', 'hasFooter', 'empty_message', 'cid', 'classes', 'compile'];
       for (_i = 0, _len = validOptions.length; _i < _len; _i++) {
         option = validOptions[_i];
         if (this.options[option]) {
           this[option] = this.options[option];
         }
       }
-      this._log_time("start");
       if (this.partials) {
-        this._log_time("generate partials");
-        this.update_template(this.partials);
-      }
-      if (this.data) {
-        return this.render(this.data);
+        return this.update_template(this.partials);
       }
     };
 
-    TableRenderer.prototype._parse_data = function(data) {
-      var item, new_data;
-      if (data) {
-        if (Backbone && data instanceof Backbone.Collection) {
-          new_data = {};
-          new_data[this.key] = data.toJSON();
-          this.data = new_data;
-        } else if (data[this.key]) {
-          this.data = data;
-        } else if (data instanceof Array) {
-          new_data = {};
-          data = (function() {
-            var _i, _len, _results;
-            _results = [];
-            for (_i = 0, _len = data.length; _i < _len; _i++) {
-              item = data[_i];
-              if (Backbone && item instanceof Backbone.Model) {
-                _results.push(item.toJSON());
-              } else {
-                _results.push(item);
-              }
-            }
-            return _results;
-          })();
-          new_data[this.key] = data;
-          this.data = new_data;
-        } else {
-          new_data = {};
-          new_data[this.key] = [data];
-          this.data = new_data;
-        }
-      }
-      if (this.data) {
-        return true;
-      }
-      console.log('could not parse data');
-      return false;
+    TableRenderer.prototype._getExtraData = function() {
+      return {};
     };
 
     TableRenderer.prototype._render = function(template, data) {
-      if (data == null) {
-        data = this.data;
-      }
       if (!template) {
         console.log('no compiled template');
         return false;
@@ -131,19 +72,15 @@
         console.log('no data');
         return false;
       } else {
-        this._log_time("start compile");
-        this.rendered = template(data);
-        this._log_time("end compile");
-        return this.rendered;
+        data = _.extend({}, this._getExtraData(), data);
+        return template(data);
       }
     };
 
     function TableRenderer(options) {
-      this.render_pagination = __bind(this.render_pagination, this);
-
-      this.pagination_template = __bind(this.pagination_template, this);
-
       this.update_template = __bind(this.update_template, this);
+
+      this.generate_columns = __bind(this.generate_columns, this);
 
       this.render_empty = __bind(this.render_empty, this);
 
@@ -153,17 +90,9 @@
 
       this.render_row = __bind(this.render_row, this);
 
-      this.render_rows = __bind(this.render_rows, this);
-
-      this.render = __bind(this.render, this);
-
-      this.print_log = __bind(this.print_log, this);
-
-      this._log_time = __bind(this._log_time, this);
-
       this._render = __bind(this._render, this);
 
-      this._parse_data = __bind(this._parse_data, this);
+      this._getExtraData = __bind(this._getExtraData, this);
 
       this._initialize = __bind(this._initialize, this);
       this._initialize(options);
@@ -171,34 +100,9 @@
 
     }
 
-    TableRenderer.prototype._log_time = function(label) {
-      if (this.debug) {
-        return this.log.push("" + (this._now() - this.start) + "ms: " + label);
-      }
-    };
-
-    TableRenderer.prototype.print_log = function() {
-      return console.log(this.log);
-    };
-
-    TableRenderer.prototype.render = function(data) {
-      if (this._parse_data(data)) {
-        return this._render(this.table_template_compiled);
-      }
-    };
-
-    TableRenderer.prototype.render_rows = function(data) {
-      if (!this.rows_template_compiled) {
-        this.rows_template_compiled = Handlebars.compile(this.rows_template);
-      }
-      if (this._parse_data(data)) {
-        return this._render(this.rows_template_compiled);
-      }
-    };
-
     TableRenderer.prototype.render_row = function(data) {
       if (!this.row_template_compiled) {
-        this.row_template_compiled = Handlebars.compile(this.row_template);
+        this.row_template_compiled = this.compile(this.row_template);
       }
       if (data) {
         return this._render(this.row_template_compiled, data);
@@ -207,7 +111,7 @@
 
     TableRenderer.prototype.render_header = function(data) {
       if (!this.header_template_compiled) {
-        this.header_template_compiled = Handlebars.compile(this.header_template);
+        this.header_template_compiled = this.compile(this.header_template);
       }
       if (data) {
         return this._render(this.header_template_compiled, data);
@@ -216,7 +120,7 @@
 
     TableRenderer.prototype.render_footer = function(data) {
       if (!this.footer_template_compiled) {
-        this.footer_template_compiled = Handlebars.compile(this.footer_template);
+        this.footer_template_compiled = this.compile(this.footer_template);
       }
       if (data) {
         return this._render(this.footer_template_compiled, data);
@@ -225,7 +129,7 @@
 
     TableRenderer.prototype.render_empty = function(data) {
       if (!this.table_empty_template_compiled) {
-        this.table_empty_template_compiled = Handlebars.compile(this.table_empty_template);
+        this.table_empty_template_compiled = this.compile(this.table_empty_template);
       }
       if (data) {
         if (!data.message) {
@@ -236,7 +140,7 @@
     };
 
     TableRenderer.prototype._get_template_attributes = function(type, partial, i) {
-      var attribute, attributes, partial_name, section, sortable, template, value, wrap, _ref;
+      var attribute, attributes, section, sortable, template, value, wrap, _ref;
       sortable = partial.sortable;
       section = partial[type];
       wrap = false;
@@ -275,12 +179,10 @@
         });
       }
       if (template) {
-        partial_name = "" + this.cid + "-" + type + i;
-        Handlebars.registerPartial(partial_name, template);
         return {
           attributes: attributes,
-          name: partial_name,
-          wrap: wrap
+          wrap: wrap,
+          partial: template
         };
       } else {
         return void 0;
@@ -288,100 +190,86 @@
     };
 
     TableRenderer.prototype._generate_template = function(name, columns, wrap) {
-      var attribute, column, column_name, section, str, value, _i, _len, _ref, _ref1;
+      var attribute, attributes, column, column_name, column_template, section, str, value, _i, _len, _ref, _ref1;
       str = "";
       if (columns) {
-        if (wrap) {
-          str += "<" + wrap + ">";
-        }
         for (column_name in columns) {
           column = columns[column_name];
           section = column[name];
           if (section) {
+            column_template = "" + section.partial;
             if (section.wrap) {
-              str += '<td ';
+              attributes = '';
               if ((_ref = section.attributes) != null ? _ref.length : void 0) {
                 _ref1 = section.attributes;
                 for (value = _i = 0, _len = _ref1.length; _i < _len; value = ++_i) {
                   attribute = _ref1[value];
-                  str += "" + attribute + "=\"" + value + "\" ";
+                  attributes += "" + attribute + "=\"" + value + "\" ";
                 }
               }
-              str += '>';
+              column_template = "<td " + attributes + ">" + column_template + "</td>";
             }
-            str += "{{> " + section.name + " }}";
-            if (section.wrap) {
-              str += '</td>';
-            }
+            str += column_template;
           }
         }
         if (wrap) {
-          str += "</" + wrap + ">";
+          str = "<" + wrap + ">" + str + "</" + wrap + ">";
         }
       }
       return str;
     };
 
-    TableRenderer.prototype.update_template = function(partials) {
-      var column, columns, i, partial, partial_name;
+    TableRenderer.prototype.generate_columns = function(partials, clear) {
+      var column, i, partial, partial_name;
       if (partials == null) {
         partials = this.partials;
       }
-      this._log_time("generate master template");
-      i = 0;
-      columns = [];
-      for (partial_name in partials) {
-        partial = partials[partial_name];
-        column = {};
-        /* Header
-        */
-
-        if (partial.header) {
-          column.header = this._get_template_attributes('header', partial, i);
-        }
-        /* Footer
-        */
-
-        if (partial.footer) {
-          column.footer = this._get_template_attributes('footer', partial, i);
-        }
-        /* Cell
-        */
-
-        if (partial.cell) {
-          column.cell = this._get_template_attributes('cell', partial, i);
-        }
-        columns.push(column);
-        i++;
+      if (clear == null) {
+        clear = false;
       }
+      if (this.columns && !clear) {
+        return this.columns;
+      } else {
+        i = 0;
+        this.columns = [];
+        for (partial_name in partials) {
+          partial = partials[partial_name];
+          column = {};
+          /* Header
+          */
+
+          if (partial.header) {
+            column.header = this._get_template_attributes('header', partial, i);
+          }
+          /* Footer
+          */
+
+          if (partial.footer) {
+            column.footer = this._get_template_attributes('footer', partial, i);
+          }
+          /* Cell
+          */
+
+          if (partial.cell) {
+            column.cell = this._get_template_attributes('cell', partial, i);
+          }
+          this.columns.push(column);
+          i++;
+        }
+        return this.columns;
+      }
+    };
+
+    TableRenderer.prototype.update_template = function(partials) {
+      var columns;
+      if (partials == null) {
+        partials = this.partials;
+      }
+      columns = this.generate_columns();
       this.header_template = this._generate_template('header', columns, 'tr');
       this.footer_template = this._generate_template('footer', columns, 'tr');
       this.row_template = this._generate_template('cell', columns);
-      this.rows_template = "{{#each " + this.key + "}}<tr>" + this.row_template + "</tr>{{/each}}";
-      this.table_empty_template = "<td valign=\"top\" colspan=\"" + i + "\" class=\"teeble_empty\">{{message}}</td>";
-      if (!this.table_template) {
-        this.table_template = "<table class=\"" + this.table_class + "\">\n<thead><tr>" + this.header_template + "</tr></thead>\n<tbody>" + this.row_template + "</tbody>\n{{#if " + this.hasFooter + "}}\n<tfoot><tr>" + this.footer_template + "</tr><tfoot>\n{{/if}}\n</table>";
-      }
-      this.table_template_compiled = Handlebars.compile(this.table_template);
-      this.table_template_compiled = null;
-      this.rows_template_compiled = null;
-      this.row_template_compiled = null;
-      this.header_template_compiled = null;
-      this.footer_template_compiled = null;
-      return this.table_empty_template_compiled = null;
-    };
-
-    TableRenderer.prototype.pagination_template_compiled = null;
-
-    TableRenderer.prototype.pagination_template = function() {
-      return "<div class=\"{{pagination_class}}\">\n    <ul>\n        <li><a href=\"#\" class=\"pagination-previous previous {{#if prev_disabled}}" + this.classes.pagination.pagination_disabled + "{{/if}}\">Previous</a></li>\n        {{#each pages}}\n        <li><a href=\"#\" class=\"pagination-page {{#if active}}" + this.classes.pagination.pagination_active + "{{/if}}\" data-page=\"{{number}}\">{{number}}</a></li>\n        {{/each}}\n        <li><a href=\"#\" class=\"pagination-next next {{#if next_disabled}}" + this.classes.pagination.pagination_disabled + "{{/if}}\">Next</a></li>\n    </ul>\n</div>";
-    };
-
-    TableRenderer.prototype.render_pagination = function(options) {
-      if (!this.pagination_template_compiled) {
-        this.pagination_template_compiled = Handlebars.compile(this.pagination_template());
-      }
-      return this.pagination_template_compiled(options);
+      return this.table_empty_template = "<td valign=\"top\" colspan=\"" + columns.length + "\" class=\"teeble_empty\">{{message}}</td>";
     };
 
     return TableRenderer;
@@ -531,39 +419,39 @@
 
     PaginationView.prototype.tagName = 'div';
 
+    PaginationView.prototype.template = "<div class=\" <%= pagination_class %>\">\n    <ul>\n        <li>\n            <a href=\"#\" class=\"pagination-previous previous <% if (prev_disabled){ %><%= pagination_disabled %><% } %>\">Previous</a>\n        </li>\n        <% _.each(pages, function(page) { %>\n        <li>\n            <a href=\"#\" class=\"pagination-page <% if (page.active){ %><%= pagination_active %><% } %>\" data-page=\"<%= page.number %>\"><%= page.number %></a>\n        </li>\n        <% }); %>\n        <li>\n            <a href=\"#\" class=\"pagination-next next <% if(next_disabled){ %><%= pagination_disabled %><% } %>\">Next</a>\n        </li>\n    </ul>\n</div>";
+
     PaginationView.prototype.initialize = function() {
-      this.renderer = this.options.renderer;
       return this.collection.bind('destroy', this.remove, this);
     };
 
     PaginationView.prototype.render = function() {
-      var data, info, p, page, pages;
-      if (this.renderer) {
-        info = this.collection.info();
-        if (info.totalPages > 1) {
-          pages = (function() {
-            var _i, _len, _ref, _results;
-            _ref = info.pageSet;
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              page = _ref[_i];
-              p = {
-                active: page === info.currentPage ? this.options.pagination.pagination_active : void 0,
-                number: page
-              };
-              _results.push(p);
-            }
-            return _results;
-          }).call(this);
-          data = {
-            pagination_class: this.options.pagination.pagination_class,
-            pagination_disabled: this.options.pagination.pagination_disabled,
-            prev_disabled: info.previous === false || info.hasPrevious === false,
-            next_disabled: info.next === false || info.hasNext === false,
-            pages: pages
-          };
-          this.$el.html(this.renderer.render_pagination(data));
-        }
+      var html, info, p, page, pages;
+      info = this.collection.info();
+      if (info.totalPages > 1) {
+        pages = (function() {
+          var _i, _len, _ref, _results;
+          _ref = info.pageSet;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            page = _ref[_i];
+            p = {
+              active: page === info.currentPage ? this.options.pagination.pagination_active : void 0,
+              number: page
+            };
+            _results.push(p);
+          }
+          return _results;
+        }).call(this);
+        html = _.template(this.template, {
+          pagination_class: this.options.pagination.pagination_class,
+          pagination_disabled: this.options.pagination.pagination_disabled,
+          pagination_active: this.options.pagination.pagination_active,
+          prev_disabled: info.previous === false || info.hasPrevious === false,
+          next_disabled: info.next === false || info.hasNext === false,
+          pages: pages
+        });
+        this.$el.html(html);
       }
       return this;
     };
@@ -608,50 +496,6 @@
     };
 
     return RowView;
-
-  })(Backbone.View);
-
-}).call(this);
-
-(function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  this.Teeble.SortbarView = (function(_super) {
-
-    __extends(SortbarView, _super);
-
-    function SortbarView() {
-      this.render = __bind(this.render, this);
-
-      this.initialize = __bind(this.initialize, this);
-      return SortbarView.__super__.constructor.apply(this, arguments);
-    }
-
-    SortbarView.prototype.tagName = 'thead';
-
-    SortbarView.prototype.template = "<tr>\n    <% _.each(partials, function(partial) { %>\n        <%= partial.header %>\n    <% }); %>\n    <% for(var i = 0; i < sortbarColumns; i++) { %>\n        <th>\n            <select class=\"column-<%= i %>\" >\n                <% _.each(sortbarColumnOptions, function(name, value) { %>\n                    <option value=\"<%= value %>\" ><%= name %></option>\n                <% }); %>\n            </select>\n        </th>\n    <% } %>\n</tr>";
-
-    SortbarView.prototype.initialize = function() {
-      this.renderer = this.options.renderer;
-      return this.collection.bind('destroy', this.remove, this);
-    };
-
-    SortbarView.prototype.render = function() {
-      var html;
-      if (this.renderer) {
-        html = _.template(this.template, {
-          partials: this.options.renderer.partials,
-          sortbarColumns: this.options.collection.sortbarColumns,
-          sortbarColumnOptions: this.options.collection.sortbarColumnOptions
-        });
-        this.$el.html(html);
-      }
-      return this;
-    };
-
-    return SortbarView;
 
   })(Backbone.View);
 
@@ -745,10 +589,11 @@
       this.collection.on('reset', this.renderPagination, this);
       return this.renderer = new this.subviews.renderer({
         partials: this.options.partials,
-        collection: this.collection,
         table_class: this.options.table_class,
         cid: this.cid,
-        classes: this.classes
+        classes: this.classes,
+        collection: this.collection,
+        compile: this.options.compile
       });
     };
 
@@ -775,7 +620,6 @@
           _ref.remove();
         }
         this.pagination = new this.subviews.pagination({
-          renderer: this.renderer,
           collection: this.collection,
           pagination: this.classes.pagination
         });
@@ -1060,5 +904,68 @@
     return ServerCollection;
 
   })(Backbone.Paginator.requestPager);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  this.Teeble.SortbarRenderer = (function(_super) {
+
+    __extends(SortbarRenderer, _super);
+
+    function SortbarRenderer() {
+      this.update_template = __bind(this.update_template, this);
+
+      this._generate_template = __bind(this._generate_template, this);
+
+      this._getExtraData = __bind(this._getExtraData, this);
+      return SortbarRenderer.__super__.constructor.apply(this, arguments);
+    }
+
+    SortbarRenderer.prototype._getExtraData = function() {
+      return {
+        sortbarColumns: this.options.collection.sortbarColumns,
+        sortbarSortOptions: this.options.collection.sortbarSortOptions,
+        sortbarColumnOptions: this.options.collection.sortbarColumnOptions,
+        partials: this.partials
+      };
+    };
+
+    SortbarRenderer.prototype._generate_template = function(name, columns, wrap) {
+      var column, str, _i, _len, _ref;
+      str = SortbarRenderer.__super__._generate_template.call(this, name, columns);
+      _ref = this.options.collection.sortbarColumns;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        column = _ref[_i];
+        str += "<td><%= " + column + " %></td>";
+      }
+      if (wrap) {
+        str = "<" + wrap + ">" + str + "</" + wrap + ">";
+      }
+      return str;
+    };
+
+    SortbarRenderer.prototype.update_template = function(partials) {
+      var columns;
+      if (partials == null) {
+        partials = this.partials;
+      }
+      columns = this.generate_columns();
+      this.header_template = "<tr>\n    <th colspan=\"<% _.size(partials) %>\">\n        Sorted by:\n         <select class=\"sortbar-field-select\">\n            <% _.each(sortbarSortOptions, function(name, value) { %>\n                <option value=\"<%= value %>\"><%= name %></option>\n            <% }); %>\n            <% _.each(sortbarColumnOptions, function(name, value) { %>\n                <option value=\"<%= value %>\"><%= name %></option>\n            <% }); %>\n        </select>\n        <div class=\"sort-reverser\">\n            <div class=\"up\"></div>\n            <div class=\"down\"></div>\n        </div>\n         Showing:\n    </th>\n    <% for(var i = 0; i < sortbarColumns.length; i++) { %>\n        <th>\n            <select data-column=\"<%= i %>\" class=\"sortbar-column sortbar-column-<%= i %>\">\n            <% _.each(sortbarColumnOptions, function(name, value) { %>\n                <option value=\"<%= value %>\" <% if(value === sortbarColumns[i]){%>selected<%}%> ><%= name %></option>\n            <% }); %>\n        </th>\n    <% } %>\n</tr>";
+      this.footer_template = this._generate_template('footer', columns, 'tr');
+      this.row_template = this._generate_template('cell', columns);
+      this.table_empty_template = "<td valign=\"top\" colspan=\"" + columns.length + "\" class=\"teeble_empty\">{{message}}</td>";
+      this.row_template_compiled = null;
+      this.header_template_compiled = null;
+      this.footer_template_compiled = null;
+      return this.table_empty_template_compiled = null;
+    };
+
+    return SortbarRenderer;
+
+  })(this.Teeble.TableRenderer);
 
 }).call(this);
