@@ -21,21 +21,23 @@ class @Teeble.SortbarRenderer extends @Teeble.TableRenderer
 
         @header_template = """
             <tr>
-                <th colspan="<% _.size(partials) %>">
-                    Sorted by:
-                     <select class="sortbar-field-select">
-                        <% _.each(sortbarSortOptions, function(name, value) { %>
-                            <option value="<%= value %>"><%= name %></option>
-                        <% }); %>
-                        <% _.each(sortbarColumnOptions, function(name, value) { %>
-                            <option value="<%= value %>"><%= name %></option>
-                        <% }); %>
-                    </select>
+                <th colspan="#{_.size(partials)}">
+                    <div class="sort-label">Sorted by: </div>
+                    <div class="sort">
+                        <select class="sortbar-field-select">
+                            <% _.each(sortbarSortOptions, function(name, value) { %>
+                                <option value="<%= value %>"><%= name %></option>
+                            <% }); %>
+                            <% _.each(sortbarColumnOptions, function(name, value) { %>
+                                <option value="<%= value %>"><%= name %></option>
+                            <% }); %>
+                        </select>
+                    </div>
                     <div class="sort-reverser">
                         <div class="up"></div>
                         <div class="down"></div>
                     </div>
-                     Showing:
+                     <div class="columns-label">Showing:</div>
                 </th>
                 <% for(var i = 0; i < sortbarColumns.length; i++) { %>
                     <th>

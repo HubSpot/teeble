@@ -15,7 +15,8 @@
                 app.views.table = new app.views.BrowserTableView({
                     collection: app.collections.paginatedItems,
                     subviews: {
-                        renderer: Teeble.SortbarRenderer
+                        renderer: Teeble.SortbarRenderer,
+                        header: Teeble.SortbarHeaderView
                     },
                     pagination: true,
                     table_class: 'table table-bordered',
@@ -23,6 +24,10 @@
                         {
                             header: '<th class="sorting" data-sort="name">Name</th>',
                             cell: "<td><%= name %></td>"
+                        },
+                        {
+                            header: '<th class="sorting" data-sort="name">Version</th>',
+                            cell: "<td><%= version %></td>"
                         }
                     ]
                 });

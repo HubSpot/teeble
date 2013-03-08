@@ -217,6 +217,9 @@ class @Teeble.FooterView extends Backbone.View
         @
 class @Teeble.HeaderView extends Backbone.View
 
+    events:
+        'click .sorting': 'sort'
+
     tagName : 'thead'
 
     initialize: =>
@@ -230,6 +233,24 @@ class @Teeble.HeaderView extends Backbone.View
             @$el.html(@renderer.render_header(@options))
             @setSort()
         @
+
+    _sort: (e, direction) =>
+        e.preventDefault()
+
+        $this = @$(e.target)
+        if not $this.hasClass(@classes.sorting.sortable_class)
+            $this = $this.parents(".#{@classes.sorting.sortable_class}")
+
+        currentSort = $this.attr('data-sort')
+
+        @collection.setSort(currentSort, direction)
+
+    sort: (e) =>
+        $this = @$(e.currentTarget)
+        if $this.hasClass(@classes.sorting.sorted_desc_class)
+            @_sort(e, 'asc')
+        else
+            @_sort(e, 'desc')
 
     setSort: =>
         if @collection.sortColumn
@@ -246,6 +267,13 @@ class @Teeble.HeaderView extends Backbone.View
 class @Teeble.PaginationView extends Backbone.View
 
     tagName : 'div'
+
+    events:
+        'click a.first': 'gotoFirst'
+        'click a.previous': 'gotoPrev'
+        'click a.next': 'gotoNext'
+        'click a.last': 'gotoLast'
+        'click a.pagination-page': 'gotoPage'
 
     template: """
         <div class=" <%= pagination_class %>">
@@ -268,6 +296,8 @@ class @Teeble.PaginationView extends Backbone.View
     initialize: =>
         @collection.bind('destroy', @remove, @);
 
+        super
+
     render : =>
 
         info = @collection.info()
@@ -289,6 +319,27 @@ class @Teeble.PaginationView extends Backbone.View
 
             @$el.html(html)
         @
+
+    gotoFirst: (e) =>
+        e.preventDefault()
+        @collection.goTo(1)
+
+    gotoPrev: (e) =>
+        e.preventDefault()
+        @collection.previousPage()
+
+    gotoNext: (e) =>
+        e.preventDefault()
+        @collection.nextPage()
+
+    gotoLast: (e) =>
+        e.preventDefault()
+        @collection.goTo(this.collection.information.lastPage)
+
+    gotoPage: (e) =>
+        e.preventDefault()
+        page = @$(e.target).text()
+        @collection.goTo(page)
 class @Teeble.RowView extends Backbone.View
 
     tagName : 'tr'
@@ -337,15 +388,6 @@ class @Teeble.TableView extends Backbone.View
 
     initialize : =>
         @subviews = _.extend {}, @subviews, @options.subviews
-
-        @events = _.extend {}, @events,
-            'click a.first': 'gotoFirst'
-            'click a.previous': 'gotoPrev'
-            'click a.next': 'gotoNext'
-            'click a.last': 'gotoLast'
-            'click a.pagination-page': 'gotoPage'
-            'click .sorting': 'sort'
-            'change .sortbar-column': 'sortBarChange'
 
         @setOptions()
 
@@ -444,62 +486,6 @@ class @Teeble.TableView extends Backbone.View
         @body.append(view.render().el)
 
         @trigger('row.render', view)
-
-    gotoFirst: (e) =>
-        e.preventDefault()
-        @collection.goTo(1)
-
-    gotoPrev: (e) =>
-        e.preventDefault()
-        @collection.previousPage()
-
-    gotoNext: (e) =>
-        e.preventDefault()
-        @collection.nextPage()
-
-    gotoLast: (e) =>
-        e.preventDefault()
-        @collection.goTo(this.collection.information.lastPage)
-
-    gotoPage: (e) =>
-        e.preventDefault()
-        page = @$(e.target).text()
-        @collection.goTo(page)
-
-    _sort: (e, direction) =>
-        e.preventDefault()
-
-        $this = @$(e.target)
-        if not $this.hasClass(@classes.sorting.sortable_class)
-            $this = $this.parents(".#{@classes.sorting.sortable_class}")
-
-        currentSort = $this.attr('data-sort')
-
-        @collection.setSort(currentSort, direction)
-
-    sort: (e) =>
-        $this = @$(e.currentTarget)
-        if $this.hasClass(@classes.sorting.sorted_desc_class)
-            @_sort(e, 'asc')
-        else
-            @_sort(e, 'desc')
-
-    sortBarChange: (e) =>
-        $this = @$(e.currentTarget)
-        column = ~~($this.attr('data-column'))
-        value = $this.val()
-
-        oldValue = @collection.sortbarColumns[column]
-        existing = _.indexOf(@collection.sortbarColumns, value)
-        if existing >= 0
-            @collection.sortbarColumns[existing] = oldValue
-
-        @collection.sortbarColumns[column] = value
-
-        @renderer.update_template()
-        @render()
-
-
 
 # =require '../backbone.paginator'
 

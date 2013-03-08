@@ -2,6 +2,13 @@ class @Teeble.PaginationView extends Backbone.View
 
     tagName : 'div'
 
+    events:
+        'click a.first': 'gotoFirst'
+        'click a.previous': 'gotoPrev'
+        'click a.next': 'gotoNext'
+        'click a.last': 'gotoLast'
+        'click a.pagination-page': 'gotoPage'
+
     template: """
         <div class=" <%= pagination_class %>">
             <ul>
@@ -22,6 +29,8 @@ class @Teeble.PaginationView extends Backbone.View
 
     initialize: =>
         @collection.bind('destroy', @remove, @);
+
+        super
 
     render : =>
 
@@ -44,3 +53,24 @@ class @Teeble.PaginationView extends Backbone.View
 
             @$el.html(html)
         @
+
+    gotoFirst: (e) =>
+        e.preventDefault()
+        @collection.goTo(1)
+
+    gotoPrev: (e) =>
+        e.preventDefault()
+        @collection.previousPage()
+
+    gotoNext: (e) =>
+        e.preventDefault()
+        @collection.nextPage()
+
+    gotoLast: (e) =>
+        e.preventDefault()
+        @collection.goTo(this.collection.information.lastPage)
+
+    gotoPage: (e) =>
+        e.preventDefault()
+        page = @$(e.target).text()
+        @collection.goTo(page)

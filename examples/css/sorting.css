@@ -1,3 +1,7 @@
+thead select {
+    width: auto;
+}
+
 thead th.sorting,
 thead th.sorting_desc,
 thead th.sorting_asc {
@@ -97,4 +101,19 @@ thead th:nth-child(3){
 .sort-reverser.reverse .down,
 .sort-reverser:active .down {
     border-color: #8dbdf1 transparent;
+}
+.sort {
+    float: left;
+}
+
+.sort-label {
+    float: left;
+    padding: 8px 0px 7px 13px;
+    width: 72px;
+}
+
+.columns-label {
+    float: left;
+    padding: 8px 0px 7px;
+    width: 60px;
 }

@@ -360,11 +360,19 @@
     function HeaderView() {
       this.setSort = __bind(this.setSort, this);
 
+      this.sort = __bind(this.sort, this);
+
+      this._sort = __bind(this._sort, this);
+
       this.render = __bind(this.render, this);
 
       this.initialize = __bind(this.initialize, this);
       return HeaderView.__super__.constructor.apply(this, arguments);
     }
+
+    HeaderView.prototype.events = {
+      'click .sorting': 'sort'
+    };
 
     HeaderView.prototype.tagName = 'thead';
 
@@ -381,6 +389,27 @@
         this.setSort();
       }
       return this;
+    };
+
+    HeaderView.prototype._sort = function(e, direction) {
+      var $this, currentSort;
+      e.preventDefault();
+      $this = this.$(e.target);
+      if (!$this.hasClass(this.classes.sorting.sortable_class)) {
+        $this = $this.parents("." + this.classes.sorting.sortable_class);
+      }
+      currentSort = $this.attr('data-sort');
+      return this.collection.setSort(currentSort, direction);
+    };
+
+    HeaderView.prototype.sort = function(e) {
+      var $this;
+      $this = this.$(e.currentTarget);
+      if ($this.hasClass(this.classes.sorting.sorted_desc_class)) {
+        return this._sort(e, 'asc');
+      } else {
+        return this._sort(e, 'desc');
+      }
     };
 
     HeaderView.prototype.setSort = function() {
@@ -411,6 +440,16 @@
     __extends(PaginationView, _super);
 
     function PaginationView() {
+      this.gotoPage = __bind(this.gotoPage, this);
+
+      this.gotoLast = __bind(this.gotoLast, this);
+
+      this.gotoNext = __bind(this.gotoNext, this);
+
+      this.gotoPrev = __bind(this.gotoPrev, this);
+
+      this.gotoFirst = __bind(this.gotoFirst, this);
+
       this.render = __bind(this.render, this);
 
       this.initialize = __bind(this.initialize, this);
@@ -419,10 +458,19 @@
 
     PaginationView.prototype.tagName = 'div';
 
+    PaginationView.prototype.events = {
+      'click a.first': 'gotoFirst',
+      'click a.previous': 'gotoPrev',
+      'click a.next': 'gotoNext',
+      'click a.last': 'gotoLast',
+      'click a.pagination-page': 'gotoPage'
+    };
+
     PaginationView.prototype.template = "<div class=\" <%= pagination_class %>\">\n    <ul>\n        <li>\n            <a href=\"#\" class=\"pagination-previous previous <% if (prev_disabled){ %><%= pagination_disabled %><% } %>\">Previous</a>\n        </li>\n        <% _.each(pages, function(page) { %>\n        <li>\n            <a href=\"#\" class=\"pagination-page <% if (page.active){ %><%= pagination_active %><% } %>\" data-page=\"<%= page.number %>\"><%= page.number %></a>\n        </li>\n        <% }); %>\n        <li>\n            <a href=\"#\" class=\"pagination-next next <% if(next_disabled){ %><%= pagination_disabled %><% } %>\">Next</a>\n        </li>\n    </ul>\n</div>";
 
     PaginationView.prototype.initialize = function() {
-      return this.collection.bind('destroy', this.remove, this);
+      this.collection.bind('destroy', this.remove, this);
+      return PaginationView.__super__.initialize.apply(this, arguments);
     };
 
     PaginationView.prototype.render = function() {
@@ -454,6 +502,33 @@
         this.$el.html(html);
       }
       return this;
+    };
+
+    PaginationView.prototype.gotoFirst = function(e) {
+      e.preventDefault();
+      return this.collection.goTo(1);
+    };
+
+    PaginationView.prototype.gotoPrev = function(e) {
+      e.preventDefault();
+      return this.collection.previousPage();
+    };
+
+    PaginationView.prototype.gotoNext = function(e) {
+      e.preventDefault();
+      return this.collection.nextPage();
+    };
+
+    PaginationView.prototype.gotoLast = function(e) {
+      e.preventDefault();
+      return this.collection.goTo(this.collection.information.lastPage);
+    };
+
+    PaginationView.prototype.gotoPage = function(e) {
+      var page;
+      e.preventDefault();
+      page = this.$(e.target).text();
+      return this.collection.goTo(page);
     };
 
     return PaginationView;
@@ -511,22 +586,6 @@
     __extends(TableView, _super);
 
     function TableView() {
-      this.sortBarChange = __bind(this.sortBarChange, this);
-
-      this.sort = __bind(this.sort, this);
-
-      this._sort = __bind(this._sort, this);
-
-      this.gotoPage = __bind(this.gotoPage, this);
-
-      this.gotoLast = __bind(this.gotoLast, this);
-
-      this.gotoNext = __bind(this.gotoNext, this);
-
-      this.gotoPrev = __bind(this.gotoPrev, this);
-
-      this.gotoFirst = __bind(this.gotoFirst, this);
-
       this.addOne = __bind(this.addOne, this);
 
       this.renderEmpty = __bind(this.renderEmpty, this);
@@ -573,15 +632,6 @@
 
     TableView.prototype.initialize = function() {
       this.subviews = _.extend({}, this.subviews, this.options.subviews);
-      this.events = _.extend({}, this.events, {
-        'click a.first': 'gotoFirst',
-        'click a.previous': 'gotoPrev',
-        'click a.next': 'gotoNext',
-        'click a.last': 'gotoLast',
-        'click a.pagination-page': 'gotoPage',
-        'click .sorting': 'sort',
-        'change .sortbar-column': 'sortBarChange'
-      });
       this.setOptions();
       TableView.__super__.initialize.apply(this, arguments);
       this.collection.on('add', this.addOne, this);
@@ -688,69 +738,6 @@
       });
       this.body.append(view.render().el);
       return this.trigger('row.render', view);
-    };
-
-    TableView.prototype.gotoFirst = function(e) {
-      e.preventDefault();
-      return this.collection.goTo(1);
-    };
-
-    TableView.prototype.gotoPrev = function(e) {
-      e.preventDefault();
-      return this.collection.previousPage();
-    };
-
-    TableView.prototype.gotoNext = function(e) {
-      e.preventDefault();
-      return this.collection.nextPage();
-    };
-
-    TableView.prototype.gotoLast = function(e) {
-      e.preventDefault();
-      return this.collection.goTo(this.collection.information.lastPage);
-    };
-
-    TableView.prototype.gotoPage = function(e) {
-      var page;
-      e.preventDefault();
-      page = this.$(e.target).text();
-      return this.collection.goTo(page);
-    };
-
-    TableView.prototype._sort = function(e, direction) {
-      var $this, currentSort;
-      e.preventDefault();
-      $this = this.$(e.target);
-      if (!$this.hasClass(this.classes.sorting.sortable_class)) {
-        $this = $this.parents("." + this.classes.sorting.sortable_class);
-      }
-      currentSort = $this.attr('data-sort');
-      return this.collection.setSort(currentSort, direction);
-    };
-
-    TableView.prototype.sort = function(e) {
-      var $this;
-      $this = this.$(e.currentTarget);
-      if ($this.hasClass(this.classes.sorting.sorted_desc_class)) {
-        return this._sort(e, 'asc');
-      } else {
-        return this._sort(e, 'desc');
-      }
-    };
-
-    TableView.prototype.sortBarChange = function(e) {
-      var $this, column, existing, oldValue, value;
-      $this = this.$(e.currentTarget);
-      column = ~~($this.attr('data-column'));
-      value = $this.val();
-      oldValue = this.collection.sortbarColumns[column];
-      existing = _.indexOf(this.collection.sortbarColumns, value);
-      if (existing >= 0) {
-        this.collection.sortbarColumns[existing] = oldValue;
-      }
-      this.collection.sortbarColumns[column] = value;
-      this.renderer.update_template();
-      return this.render();
     };
 
     return TableView;
@@ -912,6 +899,46 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+  this.Teeble.SortbarHeaderView = (function(_super) {
+
+    __extends(SortbarHeaderView, _super);
+
+    function SortbarHeaderView() {
+      this.sortBarChange = __bind(this.sortBarChange, this);
+      return SortbarHeaderView.__super__.constructor.apply(this, arguments);
+    }
+
+    SortbarHeaderView.prototype.events = {
+      'change .sortbar-column': 'sortBarChange'
+    };
+
+    SortbarHeaderView.prototype.sortBarChange = function(e) {
+      var $this, column, existing, oldValue, value;
+      $this = this.$(e.currentTarget);
+      column = ~~($this.attr('data-column'));
+      value = $this.val();
+      oldValue = this.collection.sortbarColumns[column];
+      existing = _.indexOf(this.collection.sortbarColumns, value);
+      if (existing >= 0) {
+        this.collection.sortbarColumns[existing] = oldValue;
+      }
+      this.collection.sortbarColumns[column] = value;
+      this.renderer.update_template();
+      this.render();
+      return this.collection.trigger('reset');
+    };
+
+    return SortbarHeaderView;
+
+  })(this.Teeble.HeaderView);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
   this.Teeble.SortbarRenderer = (function(_super) {
 
     __extends(SortbarRenderer, _super);
@@ -954,7 +981,7 @@
         partials = this.partials;
       }
       columns = this.generate_columns();
-      this.header_template = "<tr>\n    <th colspan=\"<% _.size(partials) %>\">\n        Sorted by:\n         <select class=\"sortbar-field-select\">\n            <% _.each(sortbarSortOptions, function(name, value) { %>\n                <option value=\"<%= value %>\"><%= name %></option>\n            <% }); %>\n            <% _.each(sortbarColumnOptions, function(name, value) { %>\n                <option value=\"<%= value %>\"><%= name %></option>\n            <% }); %>\n        </select>\n        <div class=\"sort-reverser\">\n            <div class=\"up\"></div>\n            <div class=\"down\"></div>\n        </div>\n         Showing:\n    </th>\n    <% for(var i = 0; i < sortbarColumns.length; i++) { %>\n        <th>\n            <select data-column=\"<%= i %>\" class=\"sortbar-column sortbar-column-<%= i %>\">\n            <% _.each(sortbarColumnOptions, function(name, value) { %>\n                <option value=\"<%= value %>\" <% if(value === sortbarColumns[i]){%>selected<%}%> ><%= name %></option>\n            <% }); %>\n        </th>\n    <% } %>\n</tr>";
+      this.header_template = "<tr>\n    <th colspan=\"" + (_.size(partials)) + "\">\n        <div class=\"sort-label\">Sorted by: </div>\n        <div class=\"sort\">\n            <select class=\"sortbar-field-select\">\n                <% _.each(sortbarSortOptions, function(name, value) { %>\n                    <option value=\"<%= value %>\"><%= name %></option>\n                <% }); %>\n                <% _.each(sortbarColumnOptions, function(name, value) { %>\n                    <option value=\"<%= value %>\"><%= name %></option>\n                <% }); %>\n            </select>\n        </div>\n        <div class=\"sort-reverser\">\n            <div class=\"up\"></div>\n            <div class=\"down\"></div>\n        </div>\n         <div class=\"columns-label\">Showing:</div>\n    </th>\n    <% for(var i = 0; i < sortbarColumns.length; i++) { %>\n        <th>\n            <select data-column=\"<%= i %>\" class=\"sortbar-column sortbar-column-<%= i %>\">\n            <% _.each(sortbarColumnOptions, function(name, value) { %>\n                <option value=\"<%= value %>\" <% if(value === sortbarColumns[i]){%>selected<%}%> ><%= name %></option>\n            <% }); %>\n        </th>\n    <% } %>\n</tr>";
       this.footer_template = this._generate_template('footer', columns, 'tr');
       this.row_template = this._generate_template('cell', columns);
       this.table_empty_template = "<td valign=\"top\" colspan=\"" + columns.length + "\" class=\"teeble_empty\">{{message}}</td>";

@@ -30,15 +30,6 @@ class @Teeble.TableView extends Backbone.View
     initialize : =>
         @subviews = _.extend {}, @subviews, @options.subviews
 
-        @events = _.extend {}, @events,
-            'click a.first': 'gotoFirst'
-            'click a.previous': 'gotoPrev'
-            'click a.next': 'gotoNext'
-            'click a.last': 'gotoLast'
-            'click a.pagination-page': 'gotoPage'
-            'click .sorting': 'sort'
-            'change .sortbar-column': 'sortBarChange'
-
         @setOptions()
 
         super
@@ -136,59 +127,3 @@ class @Teeble.TableView extends Backbone.View
         @body.append(view.render().el)
 
         @trigger('row.render', view)
-
-    gotoFirst: (e) =>
-        e.preventDefault()
-        @collection.goTo(1)
-
-    gotoPrev: (e) =>
-        e.preventDefault()
-        @collection.previousPage()
-
-    gotoNext: (e) =>
-        e.preventDefault()
-        @collection.nextPage()
-
-    gotoLast: (e) =>
-        e.preventDefault()
-        @collection.goTo(this.collection.information.lastPage)
-
-    gotoPage: (e) =>
-        e.preventDefault()
-        page = @$(e.target).text()
-        @collection.goTo(page)
-
-    _sort: (e, direction) =>
-        e.preventDefault()
-
-        $this = @$(e.target)
-        if not $this.hasClass(@classes.sorting.sortable_class)
-            $this = $this.parents(".#{@classes.sorting.sortable_class}")
-
-        currentSort = $this.attr('data-sort')
-
-        @collection.setSort(currentSort, direction)
-
-    sort: (e) =>
-        $this = @$(e.currentTarget)
-        if $this.hasClass(@classes.sorting.sorted_desc_class)
-            @_sort(e, 'asc')
-        else
-            @_sort(e, 'desc')
-
-    sortBarChange: (e) =>
-        $this = @$(e.currentTarget)
-        column = ~~($this.attr('data-column'))
-        value = $this.val()
-
-        oldValue = @collection.sortbarColumns[column]
-        existing = _.indexOf(@collection.sortbarColumns, value)
-        if existing >= 0
-            @collection.sortbarColumns[existing] = oldValue
-
-        @collection.sortbarColumns[column] = value
-
-        @renderer.update_template()
-        @render()
-
-

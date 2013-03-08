@@ -1,5 +1,8 @@
 class @Teeble.HeaderView extends Backbone.View
 
+    events:
+        'click .sorting': 'sort'
+
     tagName : 'thead'
 
     initialize: =>
@@ -13,6 +16,24 @@ class @Teeble.HeaderView extends Backbone.View
             @$el.html(@renderer.render_header(@options))
             @setSort()
         @
+
+    _sort: (e, direction) =>
+        e.preventDefault()
+
+        $this = @$(e.target)
+        if not $this.hasClass(@classes.sorting.sortable_class)
+            $this = $this.parents(".#{@classes.sorting.sortable_class}")
+
+        currentSort = $this.attr('data-sort')
+
+        @collection.setSort(currentSort, direction)
+
+    sort: (e) =>
+        $this = @$(e.currentTarget)
+        if $this.hasClass(@classes.sorting.sorted_desc_class)
+            @_sort(e, 'asc')
+        else
+            @_sort(e, 'desc')
 
     setSort: =>
         if @collection.sortColumn
