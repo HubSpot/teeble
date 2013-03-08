@@ -1,4 +1,4 @@
-#! teeble - v0.2.0 - # 2013-01-24
+#! teeble - v0.2.0 - # 2013-03-07
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -26,8 +26,15 @@ class @Teeble.TableRenderer
             pagination_active: 'active'
             pagination_disabled: 'disabled'
 
+    _now: ->
+        if not Date.now
+            return +(new Date)
+        else
+            return Date.now()
+
+
     _initialize: (options) =>
-        @start = Date.now()
+        @start = @_now()
         @options = options
 
         validOptions = [
@@ -105,7 +112,7 @@ class @Teeble.TableRenderer
 
     _log_time: (label) =>
         if @debug
-            @log.push("#{Date.now() - @start}ms: #{label}")
+            @log.push("#{@_now() - @start}ms: #{label}")
 
     print_log: =>
         console.log(@log)
@@ -186,17 +193,16 @@ class @Teeble.TableRenderer
                             value = value.join(' ')
                         header_cell += """ #{attribute}="#{value}" """
 
+                    header_cell += ">"
+
                 if template
                     header_partial_name = "#{@cid}-header#{i}"
                     Handlebars.registerPartial(header_partial_name, template)
-                    header_cell += ">{{> #{header_partial_name} }}"
-                else
-                    header_cell += ">"
+                    header_cell += "{{> #{header_partial_name} }}"
 
                 if partial.header isnt template
                     header_cell += "</th>"
                 header += header_cell
-
 
             ### Footer ###
             if partial.footer
@@ -218,13 +224,13 @@ class @Teeble.TableRenderer
                             value = value.join(' ')
                         footer_cell += """ #{attribute}="#{value}" """
 
+                    footer_cell += ">"
+
                 if template
                     footer_partial_name = "#{@cid}-footer#{i}"
                     Handlebars.registerPartial(footer_partial_name, template)
 
-                    footer_cell += ">{{> #{footer_partial_name} }}"
-                else
-                    footer_cell += ">"
+                    footer_cell += "{{> #{footer_partial_name} }}"
 
                 if partial.footer isnt template
                     footer_cell += "</td>"
@@ -254,12 +260,13 @@ class @Teeble.TableRenderer
                             value = value.join(' ')
                         row_cell += """ #{attribute}="#{value}" """
 
+                    row_cell += ">"
+
                 if template
                     row_partial_name = "#{@cid}-partial#{i}"
                     Handlebars.registerPartial(row_partial_name, template)
-                    row_cell += ">{{> #{row_partial_name} }}"
-                else
-                    row_cell += ">"
+                    row_cell += "{{> #{row_partial_name} }}"
+
 
                 if partial.cell isnt template
                     row_cell += "</td>"
@@ -344,12 +351,28 @@ class @Teeble.HeaderView extends Backbone.View
 
     initialize: =>
         @renderer = @options.renderer
+        @classes = @options.classes
         @collection.bind('destroy', @remove, @);
+        @collection.bind('reset', @setSort, @);
 
     render : =>
         if @renderer
             @$el.html(@renderer.render_header(@options))
+            @setSort()
         @
+
+    setSort: =>
+        if @collection.sortColumn
+            direction = 'desc'
+
+            if @collection.sortDirection
+                direction = @collection.sortDirection
+
+            classDirection = "sorted_#{direction}_class"
+            @$el.find(".#{@classes.sorting.sortable_class}")
+                .removeClass("#{@classes.sorting.sorted_desc_class} #{@classes.sorting.sorted_asc_class}")
+                .filter(""".sorting[data-sort="#{@collection.sortColumn}"]""")
+                    .addClass("#{@classes.sorting[classDirection]}")
 class @Teeble.PaginationView extends Backbone.View
 
     tagName : 'div'
@@ -424,7 +447,6 @@ class @Teeble.TableView extends Backbone.View
         renderer: Teeble.TableRenderer
         empty: Teeble.EmptyView
 
-
     initialize : =>
         @subviews = _.extend {}, @subviews, @options.subviews
 
@@ -434,7 +456,6 @@ class @Teeble.TableView extends Backbone.View
             'click a.next': 'gotoNext'
             'click a.last': 'gotoLast'
             'click a.pagination-page': 'gotoPage'
-
             'click .sorting': 'sort'
 
         @setOptions()
@@ -447,9 +468,11 @@ class @Teeble.TableView extends Backbone.View
 
         @renderer = new @subviews.renderer
             partials: @options.partials
+            collection: @collection
             table_class: @options.table_class
             cid: @cid
             classes: @classes
+
 
     setOptions: =>
         @
@@ -464,6 +487,7 @@ class @Teeble.TableView extends Backbone.View
         @renderBody()
         @renderFooter()
         @renderPagination()
+        @trigger('teeble.render', @)
         @
 
     renderPagination : =>
@@ -476,13 +500,18 @@ class @Teeble.TableView extends Backbone.View
 
             @$el.append(@pagination.render().el)
 
+            @trigger('pagination.render', @)
+
     renderHeader : =>
         @header?.remove()
         @header = new @subviews.header
             renderer: @renderer
             collection: @collection
+            classes: @classes
 
         @table.prepend(@header.render().el)
+
+        @trigger('header.render', @)
 
     renderFooter : =>
         if @options.footer
@@ -495,20 +524,28 @@ class @Teeble.TableView extends Backbone.View
 
                 @table.append(@footer.render().el)
 
+                @trigger('footer.render', @)
+
     renderBody : =>
         @body.empty()
 
         if @collection.length > 0
             @collection.each(@addOne)
+            @trigger('body.render', @)
         else
             @renderEmpty()
 
     renderEmpty : =>
-        @empty = new @subviews.empty
+        options = _.extend({}, @options,
             renderer: @renderer
             collection: @collection
+        )
+        @empty = new @subviews.empty options
+
 
         @body.append(@empty.render().el)
+
+        @trigger('empty.render', @)
 
 
     addOne : ( item ) =>
@@ -517,6 +554,8 @@ class @Teeble.TableView extends Backbone.View
             renderer: @renderer
 
         @body.append(view.render().el)
+
+        @trigger('row.render', view)
 
     gotoFirst: (e) =>
         e.preventDefault()
@@ -542,25 +581,20 @@ class @Teeble.TableView extends Backbone.View
     _sort: (e, direction) =>
         e.preventDefault()
 
-        @$el.find(".#{@classes.sorting.sortable_class}").removeClass("#{@classes.sorting.sorted_desc_class} #{@classes.sorting.sorted_asc_class}")
         $this = @$(e.target)
         if not $this.hasClass(@classes.sorting.sortable_class)
             $this = $this.parents(".#{@classes.sorting.sortable_class}")
 
-        classDirection = "sorted_#{direction}_class"
-        $this.addClass("#{@classes.sorting[classDirection]}")
         currentSort = $this.attr('data-sort')
+
         @collection.setSort(currentSort, direction)
-        @renderBody()
-        @renderPagination()
 
     sort: (e) =>
-        $this = $(e.currentTarget)
+        $this = @$(e.currentTarget)
         if $this.hasClass(@classes.sorting.sorted_desc_class)
             @_sort(e, 'asc')
         else
             @_sort(e, 'desc')
-
 
 # =require '../backbone.paginator'
 

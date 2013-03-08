@@ -27,7 +27,6 @@ class @Teeble.TableView extends Backbone.View
         renderer: Teeble.TableRenderer
         empty: Teeble.EmptyView
 
-
     initialize : =>
         @subviews = _.extend {}, @subviews, @options.subviews
 
@@ -37,7 +36,6 @@ class @Teeble.TableView extends Backbone.View
             'click a.next': 'gotoNext'
             'click a.last': 'gotoLast'
             'click a.pagination-page': 'gotoPage'
-
             'click .sorting': 'sort'
 
         @setOptions()
@@ -50,9 +48,11 @@ class @Teeble.TableView extends Backbone.View
 
         @renderer = new @subviews.renderer
             partials: @options.partials
+            collection: @collection
             table_class: @options.table_class
             cid: @cid
             classes: @classes
+
 
     setOptions: =>
         @
@@ -67,6 +67,7 @@ class @Teeble.TableView extends Backbone.View
         @renderBody()
         @renderFooter()
         @renderPagination()
+        @trigger('teeble.render', @)
         @
 
     renderPagination : =>
@@ -79,13 +80,18 @@ class @Teeble.TableView extends Backbone.View
 
             @$el.append(@pagination.render().el)
 
+            @trigger('pagination.render', @)
+
     renderHeader : =>
         @header?.remove()
         @header = new @subviews.header
             renderer: @renderer
             collection: @collection
+            classes: @classes
 
         @table.prepend(@header.render().el)
+
+        @trigger('header.render', @)
 
     renderFooter : =>
         if @options.footer
@@ -98,20 +104,28 @@ class @Teeble.TableView extends Backbone.View
 
                 @table.append(@footer.render().el)
 
+                @trigger('footer.render', @)
+
     renderBody : =>
         @body.empty()
 
         if @collection.length > 0
             @collection.each(@addOne)
+            @trigger('body.render', @)
         else
             @renderEmpty()
 
     renderEmpty : =>
-        @empty = new @subviews.empty
+        options = _.extend({}, @options,
             renderer: @renderer
             collection: @collection
+        )
+        @empty = new @subviews.empty options
+
 
         @body.append(@empty.render().el)
+
+        @trigger('empty.render', @)
 
 
     addOne : ( item ) =>
@@ -120,6 +134,8 @@ class @Teeble.TableView extends Backbone.View
             renderer: @renderer
 
         @body.append(view.render().el)
+
+        @trigger('row.render', view)
 
     gotoFirst: (e) =>
         e.preventDefault()
@@ -145,22 +161,17 @@ class @Teeble.TableView extends Backbone.View
     _sort: (e, direction) =>
         e.preventDefault()
 
-        @$el.find(".#{@classes.sorting.sortable_class}").removeClass("#{@classes.sorting.sorted_desc_class} #{@classes.sorting.sorted_asc_class}")
         $this = @$(e.target)
         if not $this.hasClass(@classes.sorting.sortable_class)
             $this = $this.parents(".#{@classes.sorting.sortable_class}")
 
-        classDirection = "sorted_#{direction}_class"
-        $this.addClass("#{@classes.sorting[classDirection]}")
         currentSort = $this.attr('data-sort')
+
         @collection.setSort(currentSort, direction)
-        @renderBody()
-        @renderPagination()
 
     sort: (e) =>
-        $this = $(e.currentTarget)
+        $this = @$(e.currentTarget)
         if $this.hasClass(@classes.sorting.sorted_desc_class)
             @_sort(e, 'asc')
         else
             @_sort(e, 'desc')
-

@@ -20,8 +20,15 @@ class @Teeble.TableRenderer
             pagination_active: 'active'
             pagination_disabled: 'disabled'
 
+    _now: ->
+        if not Date.now
+            return +(new Date)
+        else
+            return Date.now()
+
+
     _initialize: (options) =>
-        @start = Date.now()
+        @start = @_now()
         @options = options
 
         validOptions = [
@@ -99,7 +106,7 @@ class @Teeble.TableRenderer
 
     _log_time: (label) =>
         if @debug
-            @log.push("#{Date.now() - @start}ms: #{label}")
+            @log.push("#{@_now() - @start}ms: #{label}")
 
     print_log: =>
         console.log(@log)
@@ -180,17 +187,16 @@ class @Teeble.TableRenderer
                             value = value.join(' ')
                         header_cell += """ #{attribute}="#{value}" """
 
+                    header_cell += ">"
+
                 if template
                     header_partial_name = "#{@cid}-header#{i}"
                     Handlebars.registerPartial(header_partial_name, template)
-                    header_cell += ">{{> #{header_partial_name} }}"
-                else
-                    header_cell += ">"
+                    header_cell += "{{> #{header_partial_name} }}"
 
                 if partial.header isnt template
                     header_cell += "</th>"
                 header += header_cell
-
 
             ### Footer ###
             if partial.footer
@@ -212,13 +218,13 @@ class @Teeble.TableRenderer
                             value = value.join(' ')
                         footer_cell += """ #{attribute}="#{value}" """
 
+                    footer_cell += ">"
+
                 if template
                     footer_partial_name = "#{@cid}-footer#{i}"
                     Handlebars.registerPartial(footer_partial_name, template)
 
-                    footer_cell += ">{{> #{footer_partial_name} }}"
-                else
-                    footer_cell += ">"
+                    footer_cell += "{{> #{footer_partial_name} }}"
 
                 if partial.footer isnt template
                     footer_cell += "</td>"
@@ -248,12 +254,13 @@ class @Teeble.TableRenderer
                             value = value.join(' ')
                         row_cell += """ #{attribute}="#{value}" """
 
+                    row_cell += ">"
+
                 if template
                     row_partial_name = "#{@cid}-partial#{i}"
                     Handlebars.registerPartial(row_partial_name, template)
-                    row_cell += ">{{> #{row_partial_name} }}"
-                else
-                    row_cell += ">"
+                    row_cell += "{{> #{row_partial_name} }}"
+
 
                 if partial.cell isnt template
                     row_cell += "</td>"

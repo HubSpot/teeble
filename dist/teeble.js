@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.0 - 2013-01-24
+* teeble - v0.2.0 - 2013-03-07
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -51,9 +51,17 @@
       }
     };
 
+    TableRenderer.prototype._now = function() {
+      if (!Date.now) {
+        return +(new Date);
+      } else {
+        return Date.now();
+      }
+    };
+
     TableRenderer.prototype._initialize = function(options) {
       var option, validOptions, _i, _len;
-      this.start = Date.now();
+      this.start = this._now();
       this.options = options;
       validOptions = ['table_class', 'debug', 'key', 'partials', 'data', 'hasFooter', 'pagination_template', 'empty_message', 'cid', 'classes'];
       for (_i = 0, _len = validOptions.length; _i < _len; _i++) {
@@ -165,7 +173,7 @@
 
     TableRenderer.prototype._log_time = function(label) {
       if (this.debug) {
-        return this.log.push("" + (Date.now() - this.start) + "ms: " + label);
+        return this.log.push("" + (this._now() - this.start) + "ms: " + label);
       }
     };
 
@@ -271,13 +279,12 @@
               }
               header_cell += " " + attribute + "=\"" + value + "\" ";
             }
+            header_cell += ">";
           }
           if (template) {
             header_partial_name = "" + this.cid + "-header" + i;
             Handlebars.registerPartial(header_partial_name, template);
-            header_cell += ">{{> " + header_partial_name + " }}";
-          } else {
-            header_cell += ">";
+            header_cell += "{{> " + header_partial_name + " }}";
           }
           if (partial.header !== template) {
             header_cell += "</th>";
@@ -308,13 +315,12 @@
               }
               footer_cell += " " + attribute + "=\"" + value + "\" ";
             }
+            footer_cell += ">";
           }
           if (template) {
             footer_partial_name = "" + this.cid + "-footer" + i;
             Handlebars.registerPartial(footer_partial_name, template);
-            footer_cell += ">{{> " + footer_partial_name + " }}";
-          } else {
-            footer_cell += ">";
+            footer_cell += "{{> " + footer_partial_name + " }}";
           }
           if (partial.footer !== template) {
             footer_cell += "</td>";
@@ -348,13 +354,12 @@
               }
               row_cell += " " + attribute + "=\"" + value + "\" ";
             }
+            row_cell += ">";
           }
           if (template) {
             row_partial_name = "" + this.cid + "-partial" + i;
             Handlebars.registerPartial(row_partial_name, template);
-            row_cell += ">{{> " + row_partial_name + " }}";
-          } else {
-            row_cell += ">";
+            row_cell += "{{> " + row_partial_name + " }}";
           }
           if (partial.cell !== template) {
             row_cell += "</td>";
@@ -473,6 +478,8 @@
     __extends(HeaderView, _super);
 
     function HeaderView() {
+      this.setSort = __bind(this.setSort, this);
+
       this.render = __bind(this.render, this);
 
       this.initialize = __bind(this.initialize, this);
@@ -483,14 +490,29 @@
 
     HeaderView.prototype.initialize = function() {
       this.renderer = this.options.renderer;
-      return this.collection.bind('destroy', this.remove, this);
+      this.classes = this.options.classes;
+      this.collection.bind('destroy', this.remove, this);
+      return this.collection.bind('reset', this.setSort, this);
     };
 
     HeaderView.prototype.render = function() {
       if (this.renderer) {
         this.$el.html(this.renderer.render_header(this.options));
+        this.setSort();
       }
       return this;
+    };
+
+    HeaderView.prototype.setSort = function() {
+      var classDirection, direction;
+      if (this.collection.sortColumn) {
+        direction = 'desc';
+        if (this.collection.sortDirection) {
+          direction = this.collection.sortDirection;
+        }
+        classDirection = "sorted_" + direction + "_class";
+        return this.$el.find("." + this.classes.sorting.sortable_class).removeClass("" + this.classes.sorting.sorted_desc_class + " " + this.classes.sorting.sorted_asc_class).filter(".sorting[data-sort=\"" + this.collection.sortColumn + "\"]").addClass("" + this.classes.sorting[classDirection]);
+      }
     };
 
     return HeaderView;
@@ -604,6 +626,50 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+  this.Teeble.SortbarView = (function(_super) {
+
+    __extends(SortbarView, _super);
+
+    function SortbarView() {
+      this.render = __bind(this.render, this);
+
+      this.initialize = __bind(this.initialize, this);
+      return SortbarView.__super__.constructor.apply(this, arguments);
+    }
+
+    SortbarView.prototype.tagName = 'thead';
+
+    SortbarView.prototype.template = "<tr>\n    <% _.each(partials, function(partial) { %>\n        <%= partial.header %>\n    <% }); %>\n    <% for(var i = 0; i < sortbarColumns; i++) { %>\n        <th>\n            <select class=\"column-<%= i %>\" >\n                <% _.each(sortbarColumnOptions, function(name, value) { %>\n                    <option value=\"<%= value %>\" ><%= name %></option>\n                <% }); %>\n            </select>\n        </th>\n    <% } %>\n</tr>";
+
+    SortbarView.prototype.initialize = function() {
+      this.renderer = this.options.renderer;
+      return this.collection.bind('destroy', this.remove, this);
+    };
+
+    SortbarView.prototype.render = function() {
+      var html;
+      if (this.renderer) {
+        html = _.template(this.template, {
+          partials: this.options.renderer.partials,
+          sortbarColumns: this.options.collection.sortbarColumns,
+          sortbarColumnOptions: this.options.collection.sortbarColumnOptions
+        });
+        this.$el.html(html);
+      }
+      return this;
+    };
+
+    return SortbarView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
   this.Teeble.TableView = (function(_super) {
 
     __extends(TableView, _super);
@@ -684,6 +750,7 @@
       this.collection.on('reset', this.renderPagination, this);
       return this.renderer = new this.subviews.renderer({
         partials: this.options.partials,
+        collection: this.collection,
         table_class: this.options.table_class,
         cid: this.cid,
         classes: this.classes
@@ -702,6 +769,7 @@
       this.renderBody();
       this.renderFooter();
       this.renderPagination();
+      this.trigger('teeble.render', this);
       return this;
     };
 
@@ -716,7 +784,8 @@
           collection: this.collection,
           pagination: this.classes.pagination
         });
-        return this.$el.append(this.pagination.render().el);
+        this.$el.append(this.pagination.render().el);
+        return this.trigger('pagination.render', this);
       }
     };
 
@@ -727,9 +796,11 @@
       }
       this.header = new this.subviews.header({
         renderer: this.renderer,
-        collection: this.collection
+        collection: this.collection,
+        classes: this.classes
       });
-      return this.table.prepend(this.header.render().el);
+      this.table.prepend(this.header.render().el);
+      return this.trigger('header.render', this);
     };
 
     TableView.prototype.renderFooter = function() {
@@ -743,7 +814,8 @@
             renderer: this.renderer,
             collection: this.collection
           });
-          return this.table.append(this.footer.render().el);
+          this.table.append(this.footer.render().el);
+          return this.trigger('footer.render', this);
         }
       }
     };
@@ -751,18 +823,22 @@
     TableView.prototype.renderBody = function() {
       this.body.empty();
       if (this.collection.length > 0) {
-        return this.collection.each(this.addOne);
+        this.collection.each(this.addOne);
+        return this.trigger('body.render', this);
       } else {
         return this.renderEmpty();
       }
     };
 
     TableView.prototype.renderEmpty = function() {
-      this.empty = new this.subviews.empty({
+      var options;
+      options = _.extend({}, this.options, {
         renderer: this.renderer,
         collection: this.collection
       });
-      return this.body.append(this.empty.render().el);
+      this.empty = new this.subviews.empty(options);
+      this.body.append(this.empty.render().el);
+      return this.trigger('empty.render', this);
     };
 
     TableView.prototype.addOne = function(item) {
@@ -771,7 +847,8 @@
         model: item,
         renderer: this.renderer
       });
-      return this.body.append(view.render().el);
+      this.body.append(view.render().el);
+      return this.trigger('row.render', view);
     };
 
     TableView.prototype.gotoFirst = function(e) {
@@ -802,24 +879,19 @@
     };
 
     TableView.prototype._sort = function(e, direction) {
-      var $this, classDirection, currentSort;
+      var $this, currentSort;
       e.preventDefault();
-      this.$el.find("." + this.classes.sorting.sortable_class).removeClass("" + this.classes.sorting.sorted_desc_class + " " + this.classes.sorting.sorted_asc_class);
       $this = this.$(e.target);
       if (!$this.hasClass(this.classes.sorting.sortable_class)) {
         $this = $this.parents("." + this.classes.sorting.sortable_class);
       }
-      classDirection = "sorted_" + direction + "_class";
-      $this.addClass("" + this.classes.sorting[classDirection]);
       currentSort = $this.attr('data-sort');
-      this.collection.setSort(currentSort, direction);
-      this.renderBody();
-      return this.renderPagination();
+      return this.collection.setSort(currentSort, direction);
     };
 
     TableView.prototype.sort = function(e) {
       var $this;
-      $this = $(e.currentTarget);
+      $this = this.$(e.currentTarget);
       if ($this.hasClass(this.classes.sorting.sorted_desc_class)) {
         return this._sort(e, 'asc');
       } else {

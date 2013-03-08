@@ -1,6 +1,14 @@
-# teeble
+```
+    .                        .o8       oooo
+  .o8                       "888       `888
+.o888oo  .ooooo.   .ooooo.   888oooo.   888   .ooooo.
+  888   d88' `88b d88' `88b  d88' `88b  888  d88' `88b
+  888   888ooo888 888ooo888  888   888  888  888ooo888
+  888 . 888    .o 888    .o  888   888  888  888    .o
+  "888" `Y8bod8P' `Y8bod8P'  `Y8bod8P' o888o `Y8bod8P'
 
-A tiny table
+  A tiny table
+```
 
 ## What is teeble?
 Teeble is a set of [Backbone](http://backbonejs.org/) views and collection abstractions around [backbone.paginator](https://github.com/addyosmani/backbone.paginator).
@@ -11,15 +19,15 @@ You are able to page, sort and filter your data easily by creating views that pa
 
 Download the [production version][min] or the [development version][max].
 
-[min]: https://raw.github.com/hijonathan/teeble/master/dist/teeble.min.js
-[max]: https://raw.github.com/hijonathan/teeble/master/dist/teeble.js
+[min]: https://raw.github.com/hubspot/teeble/master/dist/teeble.min.js
+[max]: https://raw.github.com/hubspot/teeble/master/dist/teeble.js
 
 ## Documentation
 
-### Collections
+#### Collections
 Currently you can choose from server-side processing of the pagination, filtering and sorting (`Teeble.ServerCollection`) or client-side (`Teeble.ClientCollection`). Extending your Backbone collection from one of these base collections will set it up to use all of the [backbone.paginator](https://github.com/addyosmani/backbone.paginator) methods
 
-### Views
+#### Views
 
 ##### TableView
 Teeble's main controller is the `TableView`. This view contains all of the major event bindings and is in charge of rendering all of the subviews. You can extend this view to provide additional options, methods, events, etc.
@@ -40,7 +48,7 @@ Teeble's main controller is the `TableView`. This view contains all of the major
 
 Each of these views can be extended or overridden completely by passing them using the `subviews` parameter to the `TableView` or setting them explicitly in your extended `TableView`
 
-### Table Renderer
+#### Table Renderer
 Teeble's table-renderer uses `Handlebars` partials to combine and render the different parts of the view. These partials are defined in the `partials` parameter which allows you to define templates (header, cell, footer) for each column of the table. This allows you to update your table templates on the fly to do things like add, remove and rearrange columns. The renderer can also be extended or overwritten in the same way as the subviews
 
 ## Examples
