@@ -1,4 +1,4 @@
-#! teeble - v0.2.0 - # 2013-03-06
+#! teeble - v0.2.0 - # 2013-03-08
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -155,176 +155,113 @@ class @Teeble.TableRenderer
                 data.message = @empty_message
             @_render(@table_empty_template_compiled, data)
 
+    _get_template_attributes: (type, partial, i) ->
+        sortable = partial.sortable
+        section = partial[type]
+        wrap = false
+
+        if typeof section is 'string'
+            template = section
+
+        else
+            wrap = true
+            if section.template
+                template = section.template
+
+            if not section.attributes
+                section.attributes = {}
+
+            if sortable
+                section.attributes['data-sort'] = sortable
+
+                if not section.attributes.class
+                    section.attributes.class = [@classes.sorting.sortable_class]
+                else
+                    if typeof section.attributes.class is 'string'
+                        section.attributes.class = [section.attributes.class]
+                    section.attributes.class.push(@classes.sorting.sortable_class)
+
+            attributes = []
+            for attribute, value of section.attributes
+                if value instanceof Array
+                    value = value.join(' ')
+               attributes.push
+                    name: attribute
+                    value: value
+
+        if template
+            partial_name = "#{@cid}-#{type}#{i}"
+            Handlebars.registerPartial(partial_name, template)
+
+            attributes: attributes
+            name: partial_name
+            wrap: wrap
+        else
+            return undefined
+
+    _generate_template: (name, columns, wrap) ->
+        str = ""
+        if columns
+            if wrap
+                str += "<#{wrap}>"
+            for column_name, column of columns
+                section = column[name]
+                if section
+                    if section.wrap
+                        str += '<td '
+                        if section.attributes?.length
+                            for attribute, value in section.attributes
+                                str += """#{attribute}="#{value}" """
+                        str += '>'
+
+                    str += "{{> #{section.name} }}"
+
+                    if section.wrap
+                        str += '</td>'
+
+            if wrap
+                str += "</#{wrap}>"
+        str
+
     update_template: (partials = @partials) =>
         @_log_time("generate master template")
-        header = ""
-        row = ""
-        footer = ""
         i = 0
 
+        columns = []
         for partial_name, partial of partials
+            column = {}
 
             ### Header ###
             if partial.header
-                template = undefined
-                if typeof partial.header is 'string'
-                    template = partial.header
-                    header_cell = ''
-
-                else
-                    if partial.header.template
-                        template = partial.header.template
-
-                    header_cell = "<th"
-                    if not partial.header.attributes
-                        partial.header.attributes = {}
-
-                    if partial.sortable
-                        partial.header.attributes['data-sort'] = partial.sortable
-
-                        if not partial.header.attributes.class
-                            partial.header.attributes.class = [@classes.sorting.sortable_class]
-                        else
-                            if typeof partial.header.attributes.class is 'string'
-                                partial.header.attributes.class = [partial.header.attributes.class]
-                            partial.header.attributes.class.push(@classes.sorting.sortable_class)
-
-                    for attribute, value of partial.header.attributes
-                        if value instanceof Array
-                            value = value.join(' ')
-                        header_cell += """ #{attribute}="#{value}" """
-
-                    header_cell += ">"
-
-                if template
-                    header_partial_name = "#{@cid}-header#{i}"
-                    Handlebars.registerPartial(header_partial_name, template)
-                    header_cell += "{{> #{header_partial_name} }}"
-
-                if partial.header isnt template
-                    header_cell += "</th>"
-                header += header_cell
+                column.header = @_get_template_attributes('header', partial, i)
 
             ### Footer ###
             if partial.footer
-                template = undefined
-                if typeof partial.footer is 'string'
-                    template = partial.footer
-                    footer_cell = ""
-
-                else
-                    if partial.footer.template
-                        template = partial.footer.template
-
-                    footer_cell = "<td"
-                    if not partial.footer.attributes
-                        partial.footer.attributes = {}
-
-                    for attribute, value of partial.footer.attributes
-                        if value instanceof Array
-                            value = value.join(' ')
-                        footer_cell += """ #{attribute}="#{value}" """
-
-                    footer_cell += ">"
-
-                if template
-                    footer_partial_name = "#{@cid}-footer#{i}"
-                    Handlebars.registerPartial(footer_partial_name, template)
-
-                    footer_cell += "{{> #{footer_partial_name} }}"
-
-                if partial.footer isnt template
-                    footer_cell += "</td>"
-                footer += footer_cell
-
+                column.footer = @_get_template_attributes('footer', partial, i)
 
             ### Cell ###
             if partial.cell
-                template = undefined
-                if typeof partial.cell is 'string'
-                    template = partial.cell
-                    row_cell = ""
+                column.cell = @_get_template_attributes('cell', partial, i)
 
-                else
-                    if partial.cell.template
-                        template = partial.cell.template
-
-                    row_cell = "<td"
-                    if not partial.cell.attributes
-                        partial.cell.attributes = {}
-
-                    if partial.sortable
-                        partial.cell.attributes['data-sort'] = partial.sortable
-
-                    for attribute, value of partial.cell.attributes
-                        if value instanceof Array
-                            value = value.join(' ')
-                        row_cell += """ #{attribute}="#{value}" """
-
-                    row_cell += ">"
-
-                if template
-                    row_partial_name = "#{@cid}-partial#{i}"
-                    Handlebars.registerPartial(row_partial_name, template)
-                    row_cell += "{{> #{row_partial_name} }}"
-
-
-                if partial.cell isnt template
-                    row_cell += "</td>"
-                row += row_cell
+            columns.push column
 
             i++
 
-        j = 0
-        if @collection.sortbarColumns
-            header = """<th colspan="#{_.size(partials)}">Sorted by: <select class="sortbar-field-select">"""
-
-            if @collection.sortbarSortOptions
-                for value, name of @collection.sortbarSortOptions
-                    header += """<option value="#{value}" #{selected}>#{name}</option>"""
-
-            for value, name of @collection.sortbarColumnOptions
-                header += """<option value="#{value}" #{selected}>#{name}</option>"""
-
-
-            header += """</select><div class="sort-reverser"><div class="up"></div><div class="down"></div></div> Showing:</th>"""
-
-
-            for column in @collection.sortbarColumns
-                header_cell = """<th><select data-column="#{j}" class="sortbar-column sortbar-column-#{j}">"""
-                k = 0
-                if @collection.sortbarColumnOptions
-                    for value, name of @collection.sortbarColumnOptions
-                        selected = ''
-                        if value is column
-                            selected = "selected"
-                            footer_cell = """<td>{{#{value}}}</td>"""
-                            row_cell = """<td>{{#{value}}}</td>"""
-
-                        header_cell += """<option value="#{value}" #{selected}>#{name}</option>"""
-                        k++
-
-                    header_cell += """</select></th>"""
-                    header += header_cell
-                    footer += footer_cell
-                    row += row_cell
-                    j++
-
-        @header_template = "<tr>#{header}</tr>"
-        @footer_template = footer
-        @row_template = row
+        @header_template = @_generate_template('header', columns, 'tr')
+        @footer_template = @_generate_template('footer', columns, 'tr')
+        @row_template = @_generate_template('cell', columns)
         @rows_template = "{{#each #{@key}}}<tr>#{@row_template}</tr>{{/each}}"
-        @table_empty_template = """<td valign="top" colspan="#{i}" class="teeble_empty">{{message}}</td>"""
 
+        @table_empty_template = """<td valign="top" colspan="#{i}" class="teeble_empty">{{message}}</td>"""
 
         if not @table_template
             @table_template =
                 """
                     <table class="#{@table_class}">
-                    <thead>#{@header_template}</thead>
+                    <thead><tr>#{@header_template}</tr></thead>
                     <tbody>#{@row_template}</tbody>
                     {{#if #{@hasFooter}}}
-                    <tfoot>#{@footer_template}<tfoot>
+                    <tfoot><tr>#{@footer_template}</tr><tfoot>
                     {{/if}}
                     </table>
                 """
@@ -606,15 +543,17 @@ class @Teeble.TableView extends Backbone.View
 
         if @collection.length > 0
             @collection.each(@addOne)
+            @trigger('body.render', @)
         else
             @renderEmpty()
 
-        @trigger('body.render', @)
-
     renderEmpty : =>
-        @empty = new @subviews.empty
+        options = _.extend({}, @options,
             renderer: @renderer
             collection: @collection
+        )
+        @empty = new @subviews.empty options
+
 
         @body.append(@empty.render().el)
 

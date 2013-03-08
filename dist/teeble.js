@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.0 - 2013-03-06
+* teeble - v0.2.0 - 2013-03-08
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -235,191 +235,132 @@
       }
     };
 
+    TableRenderer.prototype._get_template_attributes = function(type, partial, i) {
+      var attribute, attributes, partial_name, section, sortable, template, value, wrap, _ref;
+      sortable = partial.sortable;
+      section = partial[type];
+      wrap = false;
+      if (typeof section === 'string') {
+        template = section;
+      } else {
+        wrap = true;
+        if (section.template) {
+          template = section.template;
+        }
+        if (!section.attributes) {
+          section.attributes = {};
+        }
+        if (sortable) {
+          section.attributes['data-sort'] = sortable;
+          if (!section.attributes["class"]) {
+            section.attributes["class"] = [this.classes.sorting.sortable_class];
+          } else {
+            if (typeof section.attributes["class"] === 'string') {
+              section.attributes["class"] = [section.attributes["class"]];
+            }
+            section.attributes["class"].push(this.classes.sorting.sortable_class);
+          }
+        }
+        attributes = [];
+        _ref = section.attributes;
+        for (attribute in _ref) {
+          value = _ref[attribute];
+          if (value instanceof Array) {
+            value = value.join(' ');
+          }
+        }
+        attributes.push({
+          name: attribute,
+          value: value
+        });
+      }
+      if (template) {
+        partial_name = "" + this.cid + "-" + type + i;
+        Handlebars.registerPartial(partial_name, template);
+        return {
+          attributes: attributes,
+          name: partial_name,
+          wrap: wrap
+        };
+      } else {
+        return void 0;
+      }
+    };
+
+    TableRenderer.prototype._generate_template = function(name, columns, wrap) {
+      var attribute, column, column_name, section, str, value, _i, _len, _ref, _ref1;
+      str = "";
+      if (columns) {
+        if (wrap) {
+          str += "<" + wrap + ">";
+        }
+        for (column_name in columns) {
+          column = columns[column_name];
+          section = column[name];
+          if (section) {
+            if (section.wrap) {
+              str += '<td ';
+              if ((_ref = section.attributes) != null ? _ref.length : void 0) {
+                _ref1 = section.attributes;
+                for (value = _i = 0, _len = _ref1.length; _i < _len; value = ++_i) {
+                  attribute = _ref1[value];
+                  str += "" + attribute + "=\"" + value + "\" ";
+                }
+              }
+              str += '>';
+            }
+            str += "{{> " + section.name + " }}";
+            if (section.wrap) {
+              str += '</td>';
+            }
+          }
+        }
+        if (wrap) {
+          str += "</" + wrap + ">";
+        }
+      }
+      return str;
+    };
+
     TableRenderer.prototype.update_template = function(partials) {
-      var attribute, column, footer, footer_cell, footer_partial_name, header, header_cell, header_partial_name, i, j, k, name, partial, partial_name, row, row_cell, row_partial_name, selected, template, value, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
+      var column, columns, i, partial, partial_name;
       if (partials == null) {
         partials = this.partials;
       }
       this._log_time("generate master template");
-      header = "";
-      row = "";
-      footer = "";
       i = 0;
+      columns = [];
       for (partial_name in partials) {
         partial = partials[partial_name];
+        column = {};
         /* Header
         */
 
         if (partial.header) {
-          template = void 0;
-          if (typeof partial.header === 'string') {
-            template = partial.header;
-            header_cell = '';
-          } else {
-            if (partial.header.template) {
-              template = partial.header.template;
-            }
-            header_cell = "<th";
-            if (!partial.header.attributes) {
-              partial.header.attributes = {};
-            }
-            if (partial.sortable) {
-              partial.header.attributes['data-sort'] = partial.sortable;
-              if (!partial.header.attributes["class"]) {
-                partial.header.attributes["class"] = [this.classes.sorting.sortable_class];
-              } else {
-                if (typeof partial.header.attributes["class"] === 'string') {
-                  partial.header.attributes["class"] = [partial.header.attributes["class"]];
-                }
-                partial.header.attributes["class"].push(this.classes.sorting.sortable_class);
-              }
-            }
-            _ref = partial.header.attributes;
-            for (attribute in _ref) {
-              value = _ref[attribute];
-              if (value instanceof Array) {
-                value = value.join(' ');
-              }
-              header_cell += " " + attribute + "=\"" + value + "\" ";
-            }
-            header_cell += ">";
-          }
-          if (template) {
-            header_partial_name = "" + this.cid + "-header" + i;
-            Handlebars.registerPartial(header_partial_name, template);
-            header_cell += "{{> " + header_partial_name + " }}";
-          }
-          if (partial.header !== template) {
-            header_cell += "</th>";
-          }
-          header += header_cell;
+          column.header = this._get_template_attributes('header', partial, i);
         }
         /* Footer
         */
 
         if (partial.footer) {
-          template = void 0;
-          if (typeof partial.footer === 'string') {
-            template = partial.footer;
-            footer_cell = "";
-          } else {
-            if (partial.footer.template) {
-              template = partial.footer.template;
-            }
-            footer_cell = "<td";
-            if (!partial.footer.attributes) {
-              partial.footer.attributes = {};
-            }
-            _ref1 = partial.footer.attributes;
-            for (attribute in _ref1) {
-              value = _ref1[attribute];
-              if (value instanceof Array) {
-                value = value.join(' ');
-              }
-              footer_cell += " " + attribute + "=\"" + value + "\" ";
-            }
-            footer_cell += ">";
-          }
-          if (template) {
-            footer_partial_name = "" + this.cid + "-footer" + i;
-            Handlebars.registerPartial(footer_partial_name, template);
-            footer_cell += "{{> " + footer_partial_name + " }}";
-          }
-          if (partial.footer !== template) {
-            footer_cell += "</td>";
-          }
-          footer += footer_cell;
+          column.footer = this._get_template_attributes('footer', partial, i);
         }
         /* Cell
         */
 
         if (partial.cell) {
-          template = void 0;
-          if (typeof partial.cell === 'string') {
-            template = partial.cell;
-            row_cell = "";
-          } else {
-            if (partial.cell.template) {
-              template = partial.cell.template;
-            }
-            row_cell = "<td";
-            if (!partial.cell.attributes) {
-              partial.cell.attributes = {};
-            }
-            if (partial.sortable) {
-              partial.cell.attributes['data-sort'] = partial.sortable;
-            }
-            _ref2 = partial.cell.attributes;
-            for (attribute in _ref2) {
-              value = _ref2[attribute];
-              if (value instanceof Array) {
-                value = value.join(' ');
-              }
-              row_cell += " " + attribute + "=\"" + value + "\" ";
-            }
-            row_cell += ">";
-          }
-          if (template) {
-            row_partial_name = "" + this.cid + "-partial" + i;
-            Handlebars.registerPartial(row_partial_name, template);
-            row_cell += "{{> " + row_partial_name + " }}";
-          }
-          if (partial.cell !== template) {
-            row_cell += "</td>";
-          }
-          row += row_cell;
+          column.cell = this._get_template_attributes('cell', partial, i);
         }
+        columns.push(column);
         i++;
       }
-      j = 0;
-      if (this.collection.sortbarColumns) {
-        header = "<th colspan=\"" + (_.size(partials)) + "\">Sorted by: <select class=\"sortbar-field-select\">";
-        if (this.collection.sortbarSortOptions) {
-          _ref3 = this.collection.sortbarSortOptions;
-          for (value in _ref3) {
-            name = _ref3[value];
-            header += "<option value=\"" + value + "\" " + selected + ">" + name + "</option>";
-          }
-        }
-        _ref4 = this.collection.sortbarColumnOptions;
-        for (value in _ref4) {
-          name = _ref4[value];
-          header += "<option value=\"" + value + "\" " + selected + ">" + name + "</option>";
-        }
-        header += "</select><div class=\"sort-reverser\"><div class=\"up\"></div><div class=\"down\"></div></div> Showing:</th>";
-        _ref5 = this.collection.sortbarColumns;
-        for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
-          column = _ref5[_i];
-          header_cell = "<th><select data-column=\"" + j + "\" class=\"sortbar-column sortbar-column-" + j + "\">";
-          k = 0;
-          if (this.collection.sortbarColumnOptions) {
-            _ref6 = this.collection.sortbarColumnOptions;
-            for (value in _ref6) {
-              name = _ref6[value];
-              selected = '';
-              if (value === column) {
-                selected = "selected";
-                footer_cell = "<td>{{" + value + "}}</td>";
-                row_cell = "<td>{{" + value + "}}</td>";
-              }
-              header_cell += "<option value=\"" + value + "\" " + selected + ">" + name + "</option>";
-              k++;
-            }
-            header_cell += "</select></th>";
-            header += header_cell;
-            footer += footer_cell;
-            row += row_cell;
-            j++;
-          }
-        }
-      }
-      this.header_template = "<tr>" + header + "</tr>";
-      this.footer_template = footer;
-      this.row_template = row;
+      this.header_template = this._generate_template('header', columns, 'tr');
+      this.footer_template = this._generate_template('footer', columns, 'tr');
+      this.row_template = this._generate_template('cell', columns);
       this.rows_template = "{{#each " + this.key + "}}<tr>" + this.row_template + "</tr>{{/each}}";
       this.table_empty_template = "<td valign=\"top\" colspan=\"" + i + "\" class=\"teeble_empty\">{{message}}</td>";
       if (!this.table_template) {
-        this.table_template = "<table class=\"" + this.table_class + "\">\n<thead>" + this.header_template + "</thead>\n<tbody>" + this.row_template + "</tbody>\n{{#if " + this.hasFooter + "}}\n<tfoot>" + this.footer_template + "<tfoot>\n{{/if}}\n</table>";
+        this.table_template = "<table class=\"" + this.table_class + "\">\n<thead><tr>" + this.header_template + "</tr></thead>\n<tbody>" + this.row_template + "</tbody>\n{{#if " + this.hasFooter + "}}\n<tfoot><tr>" + this.footer_template + "</tr><tfoot>\n{{/if}}\n</table>";
       }
       this.table_template_compiled = Handlebars.compile(this.table_template);
       this.table_template_compiled = null;
@@ -878,17 +819,19 @@
       this.body.empty();
       if (this.collection.length > 0) {
         this.collection.each(this.addOne);
+        return this.trigger('body.render', this);
       } else {
-        this.renderEmpty();
+        return this.renderEmpty();
       }
-      return this.trigger('body.render', this);
     };
 
     TableView.prototype.renderEmpty = function() {
-      this.empty = new this.subviews.empty({
+      var options;
+      options = _.extend({}, this.options, {
         renderer: this.renderer,
         collection: this.collection
       });
+      this.empty = new this.subviews.empty(options);
       this.body.append(this.empty.render().el);
       return this.trigger('empty.render', this);
     };
