@@ -904,12 +904,18 @@
     __extends(SortbarHeaderView, _super);
 
     function SortbarHeaderView() {
+      this.sort = __bind(this.sort, this);
+
+      this.sortFieldChange = __bind(this.sortFieldChange, this);
+
       this.sortBarChange = __bind(this.sortBarChange, this);
       return SortbarHeaderView.__super__.constructor.apply(this, arguments);
     }
 
     SortbarHeaderView.prototype.events = {
-      'change .sortbar-column': 'sortBarChange'
+      'change .sortbar-column': 'sortBarChange',
+      'change .sortbar-field-select': 'sortFieldChange',
+      'click .sort-reverser': 'sort'
     };
 
     SortbarHeaderView.prototype.sortBarChange = function(e) {
@@ -926,6 +932,27 @@
       this.renderer.update_template();
       this.render();
       return this.collection.trigger('reset');
+    };
+
+    SortbarHeaderView.prototype.sortFieldChange = function(e) {
+      return this.sort(e, 'asc');
+    };
+
+    SortbarHeaderView.prototype.sort = function(e, direction) {
+      var $sortReverser, currentSort;
+      if (e != null) {
+        e.preventDefault();
+      }
+      $sortReverser = this.$('.sort-reverser');
+      if ($sortReverser.hasClass('reverse') || direction) {
+        $sortReverser.removeClass('reverse');
+        direction = 'asc';
+      } else {
+        $sortReverser.addClass('reverse');
+        direction = 'desc';
+      }
+      currentSort = this.$('.sortbar-field-select').val();
+      return this.collection.setSort(currentSort, direction);
     };
 
     return SortbarHeaderView;

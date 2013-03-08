@@ -24,10 +24,6 @@
                         {
                             header: '<th class="sorting" data-sort="name">Name</th>',
                             cell: "<td><%= name %></td>"
-                        },
-                        {
-                            header: '<th class="sorting" data-sort="name">Version</th>',
-                            cell: "<td><%= version %></td>"
                         }
                     ]
                 });
