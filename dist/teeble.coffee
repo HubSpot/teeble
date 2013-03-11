@@ -1,4 +1,4 @@
-#! teeble - v0.2.0 - # 2013-03-08
+#! teeble - v0.2.0 - # 2013-03-11
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -102,7 +102,6 @@ class @Teeble.TableRenderer
 
             if not section.attributes
                 section.attributes = {}
-
             if sortable
                 section.attributes['data-sort'] = sortable
 
@@ -117,7 +116,7 @@ class @Teeble.TableRenderer
             for attribute, value of section.attributes
                 if value instanceof Array
                     value = value.join(' ')
-               attributes.push
+                attributes.push
                     name: attribute
                     value: value
 
@@ -126,9 +125,11 @@ class @Teeble.TableRenderer
             wrap: wrap
             partial: template
         else
-            return undefined
+            attributes: {}
+            wrap: wrap
+            partial: ''
 
-    _generate_template: (name, columns, wrap) ->
+    _generate_template: (name, columns, wrap, td = 'td') ->
         str = ""
         if columns
             for column_name, column of columns
@@ -139,10 +140,10 @@ class @Teeble.TableRenderer
                     if section.wrap
                         attributes = ''
                         if section.attributes?.length
-                            for attribute, value in section.attributes
-                                attributes += """#{attribute}="#{value}" """
+                            for attribute in section.attributes
+                                attributes += """#{attribute.name}="#{attribute.value}" """
 
-                        column_template = "<td #{attributes}>#{column_template}</td>"
+                        column_template = "<#{td} #{attributes}>#{column_template}</#{td}>"
 
                     str += column_template
 
@@ -180,7 +181,7 @@ class @Teeble.TableRenderer
     update_template: (partials = @partials) =>
         columns = @generate_columns()
 
-        @header_template = @_generate_template('header', columns, 'tr')
+        @header_template = @_generate_template('header', columns, 'tr', 'th')
         @footer_template = @_generate_template('footer', columns, 'tr')
         @row_template = @_generate_template('cell', columns)
         @table_empty_template = """<td valign="top" colspan="#{columns.length}" class="teeble_empty">{{message}}</td>"""
@@ -213,7 +214,7 @@ class @Teeble.FooterView extends Backbone.View
 
     render : =>
         if @renderer
-            @$el.html(@renderer.render_footer({}))
+            @$el.html(@renderer.render_footer(@options))
         @
 class @Teeble.HeaderView extends Backbone.View
 

@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.0 - 2013-03-08
+* teeble - v0.2.0 - 2013-03-11
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -172,11 +172,11 @@
           if (value instanceof Array) {
             value = value.join(' ');
           }
+          attributes.push({
+            name: attribute,
+            value: value
+          });
         }
-        attributes.push({
-          name: attribute,
-          value: value
-        });
       }
       if (template) {
         return {
@@ -185,12 +185,19 @@
           partial: template
         };
       } else {
-        return void 0;
+        return {
+          attributes: {},
+          wrap: wrap,
+          partial: ''
+        };
       }
     };
 
-    TableRenderer.prototype._generate_template = function(name, columns, wrap) {
-      var attribute, attributes, column, column_name, column_template, section, str, value, _i, _len, _ref, _ref1;
+    TableRenderer.prototype._generate_template = function(name, columns, wrap, td) {
+      var attribute, attributes, column, column_name, column_template, section, str, _i, _len, _ref, _ref1;
+      if (td == null) {
+        td = 'td';
+      }
       str = "";
       if (columns) {
         for (column_name in columns) {
@@ -202,12 +209,12 @@
               attributes = '';
               if ((_ref = section.attributes) != null ? _ref.length : void 0) {
                 _ref1 = section.attributes;
-                for (value = _i = 0, _len = _ref1.length; _i < _len; value = ++_i) {
-                  attribute = _ref1[value];
-                  attributes += "" + attribute + "=\"" + value + "\" ";
+                for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+                  attribute = _ref1[_i];
+                  attributes += "" + attribute.name + "=\"" + attribute.value + "\" ";
                 }
               }
-              column_template = "<td " + attributes + ">" + column_template + "</td>";
+              column_template = "<" + td + " " + attributes + ">" + column_template + "</" + td + ">";
             }
             str += column_template;
           }
@@ -266,7 +273,7 @@
         partials = this.partials;
       }
       columns = this.generate_columns();
-      this.header_template = this._generate_template('header', columns, 'tr');
+      this.header_template = this._generate_template('header', columns, 'tr', 'th');
       this.footer_template = this._generate_template('footer', columns, 'tr');
       this.row_template = this._generate_template('cell', columns);
       return this.table_empty_template = "<td valign=\"top\" colspan=\"" + columns.length + "\" class=\"teeble_empty\">{{message}}</td>";
@@ -337,7 +344,7 @@
 
     FooterView.prototype.render = function() {
       if (this.renderer) {
-        this.$el.html(this.renderer.render_footer({}));
+        this.$el.html(this.renderer.render_footer(this.options));
       }
       return this;
     };
