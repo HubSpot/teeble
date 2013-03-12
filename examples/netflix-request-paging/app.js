@@ -13,6 +13,7 @@
                 app.collections.paginatedItems.pager();
 
                 app.views.table = new app.views.NetflixTable({
+                    compile: Handlebars.compile,
                     collection: app.collections.paginatedItems,
                     pagination: true,
                     table_class: 'table table-bordered',
