@@ -1,12 +1,10 @@
-#! teeble - v0.2.0 - # 2013-03-08
+#! teeble - v0.2.0 - # 2013-03-12
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
 
 @Teeble = {}
 class @Teeble.TableRenderer
-    debug: false
-    log: []
     key: 'rows'
     hasFooter: false
     data: null
@@ -21,79 +19,33 @@ class @Teeble.TableRenderer
     classes:
         sorting:
             sortable_class: 'sorting'
-        pagination:
-            pagination_class: 'pagination'
-            pagination_active: 'active'
-            pagination_disabled: 'disabled'
 
-    _now: ->
-        if not Date.now
-            return +(new Date)
-        else
-            return Date.now()
-
+    compile: _.template
 
     _initialize: (options) =>
-        @start = @_now()
         @options = options
 
         validOptions = [
             'table_class'
-            'debug'
-            'key'
             'partials'
-            'data'
             'hasFooter'
-            'pagination_template'
             'empty_message'
             'cid'
             'classes'
+            'compile'
         ]
 
         for option in validOptions
             if @options[option]
                 @[option] = @options[option]
 
-        @_log_time("start")
-
         if @partials
-            @_log_time("generate partials")
             @update_template(@partials)
 
-        if @data
-            @render(@data)
+    _getExtraData: =>
+        {}
 
-    _parse_data: (data) =>
-        if data
-            if Backbone and data instanceof Backbone.Collection
-                new_data = {}
-                new_data[@key] = data.toJSON()
-                @data = new_data
-
-            else if data[@key]
-                @data = data
-
-            else if data instanceof Array
-                new_data = {}
-                data = for item in data
-                    if Backbone and item instanceof Backbone.Model
-                        item.toJSON()
-                    else
-                        item
-                new_data[@key] = data
-                @data = new_data
-            else
-                new_data = {}
-                new_data[@key] = [data]
-                @data = new_data
-
-        if @data
-            return true
-
-        console.log('could not parse data')
-        return false
-
-    _render: (template, data = @data) =>
+    _render: (template, data) =>
         if not template
             console.log 'no compiled template'
             return false
@@ -101,54 +53,35 @@ class @Teeble.TableRenderer
             console.log 'no data'
             return false
         else
-            @_log_time("start compile")
-            @rendered = template(data)
-            @_log_time("end compile")
-            @rendered
+            data = _.extend {}, @_getExtraData(), data
+            return template(data)
 
     constructor: (options) ->
         @_initialize(options)
         @
 
-    _log_time: (label) =>
-        if @debug
-            @log.push("#{@_now() - @start}ms: #{label}")
-
-    print_log: =>
-        console.log(@log)
-
-    render: (data) =>
-        if @_parse_data(data)
-            @_render(@table_template_compiled)
-
-    render_rows: (data) =>
-        if not @rows_template_compiled
-            @rows_template_compiled = Handlebars.compile(@rows_template)
-        if @_parse_data(data)
-            @_render(@rows_template_compiled)
-
     render_row: (data) =>
         if not @row_template_compiled
-            @row_template_compiled = Handlebars.compile(@row_template)
+            @row_template_compiled = @compile(@row_template)
         if data
             @_render(@row_template_compiled, data)
 
     render_header: (data) =>
         if not @header_template_compiled
-            @header_template_compiled = Handlebars.compile(@header_template)
+            @header_template_compiled = @compile(@header_template)
         if data
             @_render(@header_template_compiled, data)
 
 
     render_footer: (data) =>
         if not @footer_template_compiled
-            @footer_template_compiled = Handlebars.compile(@footer_template)
+            @footer_template_compiled = @compile(@footer_template)
         if data
             @_render(@footer_template_compiled, data)
 
     render_empty: (data) =>
         if not @table_empty_template_compiled
-            @table_empty_template_compiled = Handlebars.compile(@table_empty_template)
+            @table_empty_template_compiled = @compile(@table_empty_template)
         if data
             if not data.message
                 data.message = @empty_message
@@ -169,7 +102,6 @@ class @Teeble.TableRenderer
 
             if not section.attributes
                 section.attributes = {}
-
             if sortable
                 section.attributes['data-sort'] = sortable
 
@@ -184,108 +116,76 @@ class @Teeble.TableRenderer
             for attribute, value of section.attributes
                 if value instanceof Array
                     value = value.join(' ')
-               attributes.push
+                attributes.push
                     name: attribute
                     value: value
 
         if template
-            partial_name = "#{@cid}-#{type}#{i}"
-            Handlebars.registerPartial(partial_name, template)
-
             attributes: attributes
-            name: partial_name
             wrap: wrap
+            partial: template
         else
-            return undefined
+            attributes: {}
+            wrap: wrap
+            partial: ''
 
-    _generate_template: (name, columns, wrap) ->
+    _generate_template: (name, columns, wrap, td = 'td') ->
         str = ""
         if columns
-            if wrap
-                str += "<#{wrap}>"
             for column_name, column of columns
                 section = column[name]
                 if section
+                    column_template = "#{section.partial}"
+
                     if section.wrap
-                        str += '<td '
+                        attributes = ''
                         if section.attributes?.length
-                            for attribute, value in section.attributes
-                                str += """#{attribute}="#{value}" """
-                        str += '>'
+                            for attribute in section.attributes
+                                attributes += """#{attribute.name}="#{attribute.value}" """
 
-                    str += "{{> #{section.name} }}"
+                        column_template = "<#{td} #{attributes}>#{column_template}</#{td}>"
 
-                    if section.wrap
-                        str += '</td>'
+                    str += column_template
+
             if wrap
-                str += "</#{wrap}>"
+                str = "<#{wrap}>#{str}</#{wrap}>"
         str
 
+    generate_columns: (partials = @partials, clear = false) =>
+        if @columns and not clear
+            return @columns
+        else
+            i = 0
+            @columns = []
+            for partial_name, partial of partials
+                column = {}
+
+                ### Header ###
+                if partial.header
+                    column.header = @_get_template_attributes('header', partial, i)
+
+                ### Footer ###
+                if partial.footer
+                    column.footer = @_get_template_attributes('footer', partial, i)
+
+                ### Cell ###
+                if partial.cell
+                    column.cell = @_get_template_attributes('cell', partial, i)
+
+                @columns.push column
+
+                i++
+            return @columns
+
+
     update_template: (partials = @partials) =>
-        @_log_time("generate master template")
-        i = 0
+        columns = @generate_columns()
 
-        columns = []
-        for partial_name, partial of partials
-            column = {}
-
-            ### Header ###
-            if partial.header
-                column.header = @_get_template_attributes('header', partial, i)
-
-            ### Footer ###
-            if partial.footer
-                column.footer = @_get_template_attributes('footer', partial, i)
-
-            ### Cell ###
-            if partial.cell
-                column.cell = @_get_template_attributes('cell', partial, i)
-
-            columns.push column
-
-            i++
-
-        @header_template = @_generate_template('header', columns, 'tr')
+        @header_template = @_generate_template('header', columns, 'tr', 'th')
         @footer_template = @_generate_template('footer', columns, 'tr')
         @row_template = @_generate_template('cell', columns)
-        @rows_template = "{{#each #{@key}}}<tr>#{@row_template}</tr>{{/each}}"
+        @table_empty_template = """<td valign="top" colspan="#{columns.length}" class="teeble_empty">{{message}}</td>"""
 
-        @table_empty_template = """<td valign="top" colspan="#{i}" class="teeble_empty">{{message}}</td>"""
-
-        if not @table_template
-            @table_template =
-                """
-                    <table class="#{@table_class}">
-                    <thead><tr>#{@header_template}</tr></thead>
-                    <tbody>#{@row_template}</tbody>
-                    {{#if #{@hasFooter}}}
-                    <tfoot><tr>#{@footer_template}</tr><tfoot>
-                    {{/if}}
-                    </table>
-                """
-
-        @table_template_compiled = Handlebars.compile(@table_template)
-
-
-    pagination_template_compiled: null
-    pagination_template: =>
-        """
-        <div class="{{pagination_class}}">
-            <ul>
-                <li><a href="#" class="pagination-previous previous {{#if prev_disabled}}#{@classes.pagination.pagination_disabled}{{/if}}">Previous</a></li>
-                {{#each pages}}
-                <li><a href="#" class="pagination-page {{#if active}}#{@classes.pagination.pagination_active}{{/if}}" data-page="{{number}}">{{number}}</a></li>
-                {{/each}}
-                <li><a href="#" class="pagination-next next {{#if next_disabled}}#{@classes.pagination.pagination_disabled}{{/if}}">Next</a></li>
-            </ul>
-        </div>
-        """
-
-    render_pagination: (options) =>
-        if not @pagination_template_compiled
-            @pagination_template_compiled = Handlebars.compile(@pagination_template())
-
-        return @pagination_template_compiled(options)
 
 
 
@@ -314,9 +214,12 @@ class @Teeble.FooterView extends Backbone.View
 
     render : =>
         if @renderer
-            @$el.html(@renderer.render_footer({}))
+            @$el.html(@renderer.render_footer(@options))
         @
 class @Teeble.HeaderView extends Backbone.View
+
+    events:
+        'click .sorting': 'sort'
 
     tagName : 'thead'
 
@@ -331,6 +234,24 @@ class @Teeble.HeaderView extends Backbone.View
             @$el.html(@renderer.render_header(@options))
             @setSort()
         @
+
+    _sort: (e, direction) =>
+        e.preventDefault()
+
+        $this = @$(e.target)
+        if not $this.hasClass(@classes.sorting.sortable_class)
+            $this = $this.parents(".#{@classes.sorting.sortable_class}")
+
+        currentSort = $this.attr('data-sort')
+
+        @collection.setSort(currentSort, direction)
+
+    sort: (e) =>
+        $this = @$(e.currentTarget)
+        if $this.hasClass(@classes.sorting.sorted_desc_class)
+            @_sort(e, 'asc')
+        else
+            @_sort(e, 'desc')
 
     setSort: =>
         if @collection.sortColumn
@@ -348,30 +269,78 @@ class @Teeble.PaginationView extends Backbone.View
 
     tagName : 'div'
 
+    events:
+        'click a.first': 'gotoFirst'
+        'click a.previous': 'gotoPrev'
+        'click a.next': 'gotoNext'
+        'click a.last': 'gotoLast'
+        'click a.pagination-page': 'gotoPage'
+
+    template: """
+        <div class=" <%= pagination_class %>">
+            <ul>
+                <li>
+                    <a href="#" class="pagination-previous previous <% if (prev_disabled){ %><%= pagination_disabled %><% } %>">Previous</a>
+                </li>
+                <% _.each(pages, function(page) { %>
+                <li>
+                    <a href="#" class="pagination-page <% if (page.active){ %><%= pagination_active %><% } %>" data-page="<%= page.number %>"><%= page.number %></a>
+                </li>
+                <% }); %>
+                <li>
+                    <a href="#" class="pagination-next next <% if(next_disabled){ %><%= pagination_disabled %><% } %>">Next</a>
+                </li>
+            </ul>
+        </div>
+        """
+
     initialize: =>
-        @renderer = @options.renderer
         @collection.bind('destroy', @remove, @);
 
+        super
+
     render : =>
-        if @renderer
 
-            info = @collection.info()
-            if info.totalPages > 1
-                pages = for page in info.pageSet
-                    p =
-                        active: if page is info.currentPage then @options.pagination.pagination_active
-                        number: page
-                    p
+        info = @collection.info()
+        if info.totalPages > 1
+            pages = for page in info.pageSet
+                p =
+                    active: if page is info.currentPage then @options.pagination.pagination_active
+                    number: page
+                p
 
-                data =
-                    pagination_class: @options.pagination.pagination_class
-                    pagination_disabled: @options.pagination.pagination_disabled
-                    prev_disabled: info.previous is false or info.hasPrevious is false
-                    next_disabled: info.next is false or info.hasNext is false
-                    pages: pages
 
-                @$el.html(@renderer.render_pagination(data))
+            html = _.template @template,
+                pagination_class: @options.pagination.pagination_class
+                pagination_disabled: @options.pagination.pagination_disabled
+                pagination_active: @options.pagination.pagination_active
+                prev_disabled: info.previous is false or info.hasPrevious is false
+                next_disabled: info.next is false or info.hasNext is false
+                pages: pages
+
+            @$el.html(html)
         @
+
+    gotoFirst: (e) =>
+        e.preventDefault()
+        @collection.goTo(1)
+
+    gotoPrev: (e) =>
+        e.preventDefault()
+        @collection.previousPage()
+
+    gotoNext: (e) =>
+        e.preventDefault()
+        @collection.nextPage()
+
+    gotoLast: (e) =>
+        e.preventDefault()
+        @collection.goTo(this.collection.information.lastPage)
+
+    gotoPage: (e) =>
+        e.preventDefault()
+        page = @$(e.target).text()
+        @collection.goTo(page)
 class @Teeble.RowView extends Backbone.View
 
     tagName : 'tr'
@@ -421,14 +390,6 @@ class @Teeble.TableView extends Backbone.View
     initialize : =>
         @subviews = _.extend {}, @subviews, @options.subviews
 
-        @events = _.extend {}, @events,
-            'click a.first': 'gotoFirst'
-            'click a.previous': 'gotoPrev'
-            'click a.next': 'gotoNext'
-            'click a.last': 'gotoLast'
-            'click a.pagination-page': 'gotoPage'
-            'click .sorting': 'sort'
-
         @setOptions()
 
         super
@@ -439,11 +400,11 @@ class @Teeble.TableView extends Backbone.View
 
         @renderer = new @subviews.renderer
             partials: @options.partials
-            collection: @collection
             table_class: @options.table_class
             cid: @cid
             classes: @classes
-
+            collection: @collection
+            compile: @options.compile
 
     setOptions: =>
         @
@@ -465,7 +426,6 @@ class @Teeble.TableView extends Backbone.View
         if @options.pagination
             @pagination?.remove()
             @pagination = new @subviews.pagination
-                renderer: @renderer
                 collection: @collection
                 pagination: @classes.pagination
 
@@ -527,45 +487,6 @@ class @Teeble.TableView extends Backbone.View
         @body.append(view.render().el)
 
         @trigger('row.render', view)
-
-    gotoFirst: (e) =>
-        e.preventDefault()
-        @collection.goTo(1)
-
-    gotoPrev: (e) =>
-        e.preventDefault()
-        @collection.previousPage()
-
-    gotoNext: (e) =>
-        e.preventDefault()
-        @collection.nextPage()
-
-    gotoLast: (e) =>
-        e.preventDefault()
-        @collection.goTo(this.collection.information.lastPage)
-
-    gotoPage: (e) =>
-        e.preventDefault()
-        page = @$(e.target).text()
-        @collection.goTo(page)
-
-    _sort: (e, direction) =>
-        e.preventDefault()
-
-        $this = @$(e.target)
-        if not $this.hasClass(@classes.sorting.sortable_class)
-            $this = $this.parents(".#{@classes.sorting.sortable_class}")
-
-        currentSort = $this.attr('data-sort')
-
-        @collection.setSort(currentSort, direction)
-
-    sort: (e) =>
-        $this = @$(e.currentTarget)
-        if $this.hasClass(@classes.sorting.sorted_desc_class)
-            @_sort(e, 'asc')
-        else
-            @_sort(e, 'desc')
 
 # =require '../backbone.paginator'
 

@@ -8,5 +8,5 @@ class @Teeble.FooterView extends Backbone.View
 
     render : =>
         if @renderer
-            @$el.html(@renderer.render_footer({}))
+            @$el.html(@renderer.render_footer(@options))
         @
