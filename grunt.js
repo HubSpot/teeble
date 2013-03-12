@@ -27,7 +27,8 @@ module.exports = function(grunt) {
                     'lib/setup.coffee.js',
                     'lib/table-renderer.coffee.js',
                     'lib/views/*.coffee.js',
-                    'lib/collections/*.coffee.js'
+                    'lib/collections/*.coffee.js',
+                    'lib/extensions/*/*.coffee.js'
                 ],
                 dest: 'dist/<%= pkg.name %>.js'
             },
@@ -37,7 +38,8 @@ module.exports = function(grunt) {
                     'lib/setup.coffee',
                     'lib/table-renderer.coffee',
                     'lib/views/*.coffee',
-                    'lib/collections/*.coffee'
+                    'lib/collections/*.coffee',
+                    'lib/extensions/*.coffee'
                 ],
                 dest: 'dist/<%= pkg.name %>.coffee'
             },
@@ -52,7 +54,8 @@ module.exports = function(grunt) {
                   'lib/setup.coffee.js',
                   'lib/table-renderer.coffee.js',
                   'lib/views/*.coffee.js',
-                  'lib/collections/*.coffee.js'
+                  'lib/collections/*.coffee.js',
+                  'lib/extensions/*.coffee.js'
               ],
               dest: 'dist/<%= pkg.name %>.test.js'
             }

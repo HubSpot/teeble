@@ -12,24 +12,18 @@
         app.collections.paginatedItems.fetch({
             success: function(){
                 app.collections.paginatedItems.pager();
-
-                app.views.table = new app.views.NetflixTable({
-                    compile: Handlebars.compile,
+                app.views.table = new app.views.BrowserTableView({
                     collection: app.collections.paginatedItems,
+                    subviews: {
+                        renderer: Teeble.SortbarRenderer,
+                        header: Teeble.SortbarHeaderView
+                    },
                     pagination: true,
                     table_class: 'table table-bordered',
                     partials: [
                         {
-                            header: '<th class="sorting" data-sort="Name">Title</th>',
-                            cell: "<td>{{Name}}</td>"
-                        },
-                        {
-                            header: '<th class="sorting" data-sort="Runtime">Runtime</th>',
-                            cell: "<td>{{RuntimeMinutes}}</td>"
-                        },
-                        {
-                            header: '<th class="sorting" data-sort="ReleaseYear">Release Year</th>',
-                            cell: "<td>{{ReleaseYear}}</td>"
+                            header: '<th class="sorting" data-sort="name">Name</th>',
+                            cell: "<td><%= name %></td>"
                         }
                     ]
                 });

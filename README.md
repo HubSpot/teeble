@@ -33,11 +33,12 @@ Currently you can choose from server-side processing of the pagination, filterin
 Teeble's main controller is the `TableView`. This view contains all of the major event bindings and is in charge of rendering all of the subviews. You can extend this view to provide additional options, methods, events, etc.
 
 ##### TableView Parameters
-* `table_class`
-* `subviews`
+* `table_class`: optional class on the table element
+* `subviews`: optional overrides
 * `partials`
 * `collection`
 * `footer`
+* `compile`
 
 ##### Teeble Subviews
 * `HeaderView`: view that renders the header
@@ -49,11 +50,12 @@ Teeble's main controller is the `TableView`. This view contains all of the major
 Each of these views can be extended or overridden completely by passing them using the `subviews` parameter to the `TableView` or setting them explicitly in your extended `TableView`
 
 #### Table Renderer
-Teeble's table-renderer uses `Handlebars` partials to combine and render the different parts of the view. These partials are defined in the `partials` parameter which allows you to define templates (header, cell, footer) for each column of the table. This allows you to update your table templates on the fly to do things like add, remove and rearrange columns. The renderer can also be extended or overwritten in the same way as the subviews
+Teeble's table-renderer builds templates from partial definitions and renders the different parts of the view. These partials are defined in the `partials` parameter which allows you to define templates (header, cell, footer) for each column of the table. This allows you to update your table templates on the fly to do things like add, remove and rearrange columns. The renderer can also be extended or overwritten in the same way as the subviews
 
 ## Examples
 * [Client-side paging](http://github.hubspot.com/teeble/examples/netflix-client-paging/index.html)
 * [Server-side paging](http://github.hubspot.com/teeble/examples/netflix-request-paging/index.html)
+* [Custom Extension example: Sortbar](http://github.hubspot.com/teeble/examples/sortbar/index.html)
 
 ## Contributing
 In lieu of a formal style-guide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [grunt](http://gruntjs.com/).
