@@ -4,6 +4,8 @@ class @Teeble.SortbarRenderer extends @Teeble.TableRenderer
         sortbarColumns: @options.collection.sortbarColumns
         sortbarSortOptions: @options.collection.sortbarSortOptions
         sortbarColumnOptions: @options.collection.sortbarColumnOptions
+        sortColumn: @options.collection.sortColumn
+        sortDirection: @options.collection.sortDirection
         partials: @partials
 
     _generate_template: (name, columns, wrap) =>
@@ -26,14 +28,14 @@ class @Teeble.SortbarRenderer extends @Teeble.TableRenderer
                     <div class="sort">
                         <select class="sortbar-field-select">
                             <% _.each(sortbarSortOptions, function(name, value) { %>
-                                <option value="<%= value %>"><%= name %></option>
+                                <option value="<%= value %>" <% if (sortColumn === value){ %>selected<% } %>><%= name %></option>
                             <% }); %>
                             <% _.each(sortbarColumnOptions, function(name, value) { %>
-                                <option value="<%= value %>"><%= name %></option>
+                                <option value="<%= value %>" <% if (sortColumn === value){ %>selected<% } %>><%= name %></option>
                             <% }); %>
                         </select>
                     </div>
-                    <div class="sort-reverser">
+                    <div class="sort-reverser <% if( sortDirection === 'desc' ){ %>reverse<% } %>">
                         <div class="up"></div>
                         <div class="down"></div>
                     </div>

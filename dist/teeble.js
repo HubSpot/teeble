@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.0 - 2013-03-11
+* teeble - v0.2.0 - 2013-03-12
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -991,6 +991,8 @@
         sortbarColumns: this.options.collection.sortbarColumns,
         sortbarSortOptions: this.options.collection.sortbarSortOptions,
         sortbarColumnOptions: this.options.collection.sortbarColumnOptions,
+        sortColumn: this.options.collection.sortColumn,
+        sortDirection: this.options.collection.sortDirection,
         partials: this.partials
       };
     };
@@ -1015,7 +1017,7 @@
         partials = this.partials;
       }
       columns = this.generate_columns();
-      this.header_template = "<tr>\n    <th colspan=\"" + (_.size(partials)) + "\">\n        <div class=\"sort-label\">Sorted by: </div>\n        <div class=\"sort\">\n            <select class=\"sortbar-field-select\">\n                <% _.each(sortbarSortOptions, function(name, value) { %>\n                    <option value=\"<%= value %>\"><%= name %></option>\n                <% }); %>\n                <% _.each(sortbarColumnOptions, function(name, value) { %>\n                    <option value=\"<%= value %>\"><%= name %></option>\n                <% }); %>\n            </select>\n        </div>\n        <div class=\"sort-reverser\">\n            <div class=\"up\"></div>\n            <div class=\"down\"></div>\n        </div>\n         <div class=\"columns-label\">Showing:</div>\n    </th>\n    <% for(var i = 0; i < sortbarColumns.length; i++) { %>\n        <th>\n            <select data-column=\"<%= i %>\" class=\"sortbar-column sortbar-column-<%= i %>\">\n            <% _.each(sortbarColumnOptions, function(name, value) { %>\n                <option value=\"<%= value %>\" <% if(value === sortbarColumns[i]){%>selected<%}%> ><%= name %></option>\n            <% }); %>\n        </th>\n    <% } %>\n</tr>";
+      this.header_template = "<tr>\n    <th colspan=\"" + (_.size(partials)) + "\">\n        <div class=\"sort-label\">Sorted by: </div>\n        <div class=\"sort\">\n            <select class=\"sortbar-field-select\">\n                <% _.each(sortbarSortOptions, function(name, value) { %>\n                    <option value=\"<%= value %>\" <% if (sortColumn === value){ %>selected<% } %>><%= name %></option>\n                <% }); %>\n                <% _.each(sortbarColumnOptions, function(name, value) { %>\n                    <option value=\"<%= value %>\" <% if (sortColumn === value){ %>selected<% } %>><%= name %></option>\n                <% }); %>\n            </select>\n        </div>\n        <div class=\"sort-reverser <% if( sortDirection === 'desc' ){ %>reverse<% } %>\">\n            <div class=\"up\"></div>\n            <div class=\"down\"></div>\n        </div>\n         <div class=\"columns-label\">Showing:</div>\n    </th>\n    <% for(var i = 0; i < sortbarColumns.length; i++) { %>\n        <th>\n            <select data-column=\"<%= i %>\" class=\"sortbar-column sortbar-column-<%= i %>\">\n            <% _.each(sortbarColumnOptions, function(name, value) { %>\n                <option value=\"<%= value %>\" <% if(value === sortbarColumns[i]){%>selected<%}%> ><%= name %></option>\n            <% }); %>\n        </th>\n    <% } %>\n</tr>";
       this.footer_template = this._generate_template('footer', columns, 'tr');
       this.row_template = this._generate_template('cell', columns);
       this.table_empty_template = "<td valign=\"top\" colspan=\"" + columns.length + "\" class=\"teeble_empty\">{{message}}</td>";
