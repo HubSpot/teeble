@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.0 - 2013-03-12
+* teeble - v0.2.0 - 2013-04-01
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -338,13 +338,31 @@
     FooterView.prototype.tagName = 'tfoot';
 
     FooterView.prototype.initialize = function() {
+      var _this = this;
       this.renderer = this.options.renderer;
-      return this.collection.bind('destroy', this.remove, this);
+      this.collection.bind('destroy', this.remove, this);
+      if (this.collection.footer) {
+        if (this.collection.footer instanceof Backbone.Model) {
+          this.collection.footer.on('change', function() {
+            return _this.render();
+          });
+        }
+        this.data = this.collection.footer;
+      } else {
+        this.data = this.options;
+      }
+      return this.collection.footer;
     };
 
     FooterView.prototype.render = function() {
+      var data;
       if (this.renderer) {
-        this.$el.html(this.renderer.render_footer(this.options));
+        if (this.data.toJSON) {
+          data = this.data.toJSON();
+        } else {
+          data = this.data;
+        }
+        this.$el.html(this.renderer.render_footer(data));
       }
       return this;
     };
