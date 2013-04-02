@@ -500,7 +500,10 @@
 
     PaginationView.prototype.render = function() {
       var html, info, p, page, pages;
-      info = this.collection.info();
+      if (!this.collection.information) {
+        this.collection.pager();
+      }
+      info = this.collection.information;
       if (info.totalPages > 1) {
         pages = (function() {
           var _i, _len, _ref, _results;
@@ -692,6 +695,9 @@
     };
 
     TableView.prototype.render = function() {
+      if (!this.collection.origModels) {
+        this.collection.pager();
+      }
       this.$el.empty().append("<table><tbody></tbody></table");
       this.table = this.$('table').addClass(this.options.table_class);
       this.body = this.$('tbody');
