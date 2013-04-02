@@ -491,7 +491,7 @@
       'click a.pagination-page': 'gotoPage'
     };
 
-    PaginationView.prototype.template = "<div class=\" <%= pagination_class %>\">\n    <ul>\n        <li>\n            <a href=\"#\" class=\"pagination-previous previous <% if (prev_disabled){ %><%= pagination_disabled %><% } %>\">Previous</a>\n        </li>\n        <% _.each(pages, function(page) { %>\n        <li>\n            <a href=\"#\" class=\"pagination-page <% if (page.active){ %><%= pagination_active %><% } %>\" data-page=\"<%= page.number %>\"><%= page.number %></a>\n        </li>\n        <% }); %>\n        <li>\n            <a href=\"#\" class=\"pagination-next next <% if(next_disabled){ %><%= pagination_disabled %><% } %>\">Next</a>\n        </li>\n    </ul>\n</div>";
+    PaginationView.prototype.template = "<div class=\" <%= pagination_class %>\">\n    <ul>\n        <li>\n            <a href=\"#\" class=\"pagination-previous previous <% if (prev_disabled){ %><%= pagination_disabled %><% } %>\">\n                <span class=\"left\"></span>\n                Previous\n            </a>\n        </li>\n        <% _.each(pages, function(page) { %>\n        <li>\n            <a href=\"#\" class=\"pagination-page <% if (page.active){ %><%= pagination_active %><% } %>\" data-page=\"<%= page.number %>\"><%= page.number %></a>\n        </li>\n        <% }); %>\n        <li>\n            <a href=\"#\" class=\"pagination-next next <% if(next_disabled){ %><%= pagination_disabled %><% } %>\">\n                Next\n                <span class=\"right\"></span>\n            </a>\n        </li>\n    </ul>\n</div>";
 
     PaginationView.prototype.initialize = function() {
       this.collection.bind('destroy', this.remove, this);
