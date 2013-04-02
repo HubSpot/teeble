@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.0 - 2013-04-01
+* teeble - v0.2.0 - 2013-04-02
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -591,6 +591,9 @@
         this.$el.html(this.renderer.render_row(this.model.toJSON({
           teeble: true
         })));
+        if (this.options.sortColumnIndex != null) {
+          this.$el.find('td').eq(this.options.sortColumnIndex).addClass(this.options.sortableClass);
+        }
       }
       return this;
     };
@@ -637,7 +640,8 @@
       sorting: {
         sortable_class: 'sorting',
         sorted_desc_class: 'sorting_desc',
-        sorted_asc_class: 'sorting_asc'
+        sorted_asc_class: 'sorting_asc',
+        sortable_cell: 'sorting_1'
       },
       pagination: {
         pagination_class: 'pagination',
@@ -656,12 +660,23 @@
     };
 
     TableView.prototype.initialize = function() {
+      var i, partial, partial_name, _ref;
       this.subviews = _.extend({}, this.subviews, this.options.subviews);
       this.setOptions();
       TableView.__super__.initialize.apply(this, arguments);
       this.collection.on('add', this.addOne, this);
       this.collection.on('reset', this.renderBody, this);
       this.collection.on('reset', this.renderPagination, this);
+      this.sortIndex = {};
+      i = 0;
+      _ref = this.options.partials;
+      for (partial_name in _ref) {
+        partial = _ref[partial_name];
+        if (partial.sortable) {
+          this.sortIndex[partial.sortable] = i;
+        }
+        i++;
+      }
       return this.renderer = new this.subviews.renderer({
         partials: this.options.partials,
         table_class: this.options.table_class,
@@ -756,10 +771,15 @@
     };
 
     TableView.prototype.addOne = function(item) {
-      var view;
+      var sortColumnIndex, view;
+      if (this.collection.sortColumn) {
+        sortColumnIndex = this.sortIndex[this.collection.sortColumn];
+      }
       view = new this.subviews.row({
         model: item,
-        renderer: this.renderer
+        renderer: this.renderer,
+        sortColumnIndex: sortColumnIndex,
+        sortableClass: this.classes.sorting.sortable_cell
       });
       this.body.append(view.render().el);
       return this.trigger('row.render', view);

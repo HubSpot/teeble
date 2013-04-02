@@ -1,4 +1,4 @@
-#! teeble - v0.2.0 - # 2013-04-01
+#! teeble - v0.2.0 - # 2013-04-02
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -373,6 +373,10 @@ class @Teeble.RowView extends Backbone.View
                     teeble: true
                 )
             ))
+
+            if @options.sortColumnIndex?
+                @$el.find('td').eq(@options.sortColumnIndex).addClass(@options.sortableClass)
+
         @
 # =require '/../table-renderer'
 # =require './row_view'
@@ -390,6 +394,7 @@ class @Teeble.TableView extends Backbone.View
             sortable_class: 'sorting'
             sorted_desc_class: 'sorting_desc'
             sorted_asc_class: 'sorting_asc'
+            sortable_cell: 'sorting_1'
         pagination:
             pagination_class: 'pagination'
             pagination_active: 'active'
@@ -413,6 +418,13 @@ class @Teeble.TableView extends Backbone.View
         @collection.on('add', @addOne, @)
         @collection.on('reset', @renderBody, @)
         @collection.on('reset', @renderPagination, @)
+
+        @sortIndex = {}
+        i = 0
+        for partial_name, partial of @options.partials
+            if partial.sortable
+                @sortIndex[partial.sortable] = i
+            i++
 
         @renderer = new @subviews.renderer
             partials: @options.partials
@@ -489,16 +501,21 @@ class @Teeble.TableView extends Backbone.View
         )
         @empty = new @subviews.empty options
 
-
         @body.append(@empty.render().el)
 
         @trigger('empty.render', @)
 
 
     addOne : ( item ) =>
+        if @collection.sortColumn
+            sortColumnIndex = @sortIndex[@collection.sortColumn]
+
+
         view = new @subviews.row
             model: item
             renderer: @renderer
+            sortColumnIndex: sortColumnIndex
+            sortableClass: @classes.sorting.sortable_cell
 
         @body.append(view.render().el)
 
