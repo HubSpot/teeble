@@ -1,4 +1,4 @@
-#! teeble - v0.2.0 - # 2013-04-02
+#! teeble - v0.2.0 - # 2013-04-05
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -396,6 +396,7 @@ class @Teeble.RowView extends Backbone.View
 class @Teeble.TableView extends Backbone.View
 
     tagName : 'div'
+    rendered: false
 
     classes:
         sorting:
@@ -448,11 +449,13 @@ class @Teeble.TableView extends Backbone.View
 
     render: =>
         if not @collection.origModels
-            @collection.pager()
+            @collection.pager?()
 
         @$el.empty().append("<table><tbody></tbody></table")
         @table = @$('table').addClass(@options.table_class)
         @body = @$('tbody')
+
+        @rendered = true
 
         @renderHeader()
         @renderBody()
@@ -462,7 +465,7 @@ class @Teeble.TableView extends Backbone.View
         @
 
     renderPagination : =>
-        if @options.pagination
+        if @options.pagination and @rendered
             @pagination?.remove()
             @pagination = new @subviews.pagination
                 collection: @collection
@@ -473,18 +476,19 @@ class @Teeble.TableView extends Backbone.View
             @trigger('pagination.render', @)
 
     renderHeader : =>
-        @header?.remove()
-        @header = new @subviews.header
-            renderer: @renderer
-            collection: @collection
-            classes: @classes
+        if @rendered
+            @header?.remove()
+            @header = new @subviews.header
+                renderer: @renderer
+                collection: @collection
+                classes: @classes
 
-        @table.prepend(@header.render().el)
+            @table.prepend(@header.render().el)
 
-        @trigger('header.render', @)
+            @trigger('header.render', @)
 
     renderFooter : =>
-        if @options.footer
+        if @options.footer and @rendered
             @footer?.remove()
 
             if @collection.length > 0
@@ -497,24 +501,26 @@ class @Teeble.TableView extends Backbone.View
                 @trigger('footer.render', @)
 
     renderBody : =>
-        @body.empty()
+        if @rendered
+            @body.empty()
 
-        if @collection.length > 0
-            @collection.each(@addOne)
-            @trigger('body.render', @)
-        else
-            @renderEmpty()
+            if @collection.length > 0
+                @collection.each(@addOne)
+                @trigger('body.render', @)
+            else
+                @renderEmpty()
 
     renderEmpty : =>
-        options = _.extend({}, @options,
-            renderer: @renderer
-            collection: @collection
-        )
-        @empty = new @subviews.empty options
+        if @rendered
+            options = _.extend({}, @options,
+                renderer: @renderer
+                collection: @collection
+            )
+            @empty = new @subviews.empty options
 
-        @body.append(@empty.render().el)
+            @body.append(@empty.render().el)
 
-        @trigger('empty.render', @)
+            @trigger('empty.render', @)
 
 
     addOne : ( item ) =>
@@ -615,3 +621,5 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
             @lastSortColumn = @sortColumn
 
         super
+
+        @info()

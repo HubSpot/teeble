@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.0 - 2013-04-02
+* teeble - v0.2.0 - 2013-04-05
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -639,6 +639,8 @@
 
     TableView.prototype.tagName = 'div';
 
+    TableView.prototype.rendered = false;
+
     TableView.prototype.classes = {
       sorting: {
         sortable_class: 'sorting',
@@ -695,12 +697,16 @@
     };
 
     TableView.prototype.render = function() {
+      var _base;
       if (!this.collection.origModels) {
-        this.collection.pager();
+        if (typeof (_base = this.collection).pager === "function") {
+          _base.pager();
+        }
       }
       this.$el.empty().append("<table><tbody></tbody></table");
       this.table = this.$('table').addClass(this.options.table_class);
       this.body = this.$('tbody');
+      this.rendered = true;
       this.renderHeader();
       this.renderBody();
       this.renderFooter();
@@ -711,7 +717,7 @@
 
     TableView.prototype.renderPagination = function() {
       var _ref;
-      if (this.options.pagination) {
+      if (this.options.pagination && this.rendered) {
         if ((_ref = this.pagination) != null) {
           _ref.remove();
         }
@@ -726,21 +732,23 @@
 
     TableView.prototype.renderHeader = function() {
       var _ref;
-      if ((_ref = this.header) != null) {
-        _ref.remove();
+      if (this.rendered) {
+        if ((_ref = this.header) != null) {
+          _ref.remove();
+        }
+        this.header = new this.subviews.header({
+          renderer: this.renderer,
+          collection: this.collection,
+          classes: this.classes
+        });
+        this.table.prepend(this.header.render().el);
+        return this.trigger('header.render', this);
       }
-      this.header = new this.subviews.header({
-        renderer: this.renderer,
-        collection: this.collection,
-        classes: this.classes
-      });
-      this.table.prepend(this.header.render().el);
-      return this.trigger('header.render', this);
     };
 
     TableView.prototype.renderFooter = function() {
       var _ref;
-      if (this.options.footer) {
+      if (this.options.footer && this.rendered) {
         if ((_ref = this.footer) != null) {
           _ref.remove();
         }
@@ -756,24 +764,28 @@
     };
 
     TableView.prototype.renderBody = function() {
-      this.body.empty();
-      if (this.collection.length > 0) {
-        this.collection.each(this.addOne);
-        return this.trigger('body.render', this);
-      } else {
-        return this.renderEmpty();
+      if (this.rendered) {
+        this.body.empty();
+        if (this.collection.length > 0) {
+          this.collection.each(this.addOne);
+          return this.trigger('body.render', this);
+        } else {
+          return this.renderEmpty();
+        }
       }
     };
 
     TableView.prototype.renderEmpty = function() {
       var options;
-      options = _.extend({}, this.options, {
-        renderer: this.renderer,
-        collection: this.collection
-      });
-      this.empty = new this.subviews.empty(options);
-      this.body.append(this.empty.render().el);
-      return this.trigger('empty.render', this);
+      if (this.rendered) {
+        options = _.extend({}, this.options, {
+          renderer: this.renderer,
+          collection: this.collection
+        });
+        this.empty = new this.subviews.empty(options);
+        this.body.append(this.empty.render().el);
+        return this.trigger('empty.render', this);
+      }
     };
 
     TableView.prototype.addOne = function(item) {
@@ -936,7 +948,8 @@
         this.currentPage = 1;
         this.lastSortColumn = this.sortColumn;
       }
-      return ServerCollection.__super__.pager.apply(this, arguments);
+      ServerCollection.__super__.pager.apply(this, arguments);
+      return this.info();
     };
 
     return ServerCollection;
