@@ -1,4 +1,4 @@
-#! teeble - v0.2.0 - # 2013-04-05
+#! teeble - v0.2.1 - # 2013-05-15
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -596,6 +596,7 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
         @paginator_ui = _.extend( {}, @default_paginator_ui, @paginator_ui )
         @paginator_core = _.extend( {}, @default_paginator_core, @paginator_core )
         @server_api = _.extend( {}, @default_server_api, @server_api )
+        @on 'reset', @info
         super
 
     nextPage: ( options ) =>
