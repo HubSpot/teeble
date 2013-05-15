@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.0 - 2013-04-05
+* teeble - v0.2.1 - 2013-05-15
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -918,6 +918,7 @@
       this.paginator_ui = _.extend({}, this.default_paginator_ui, this.paginator_ui);
       this.paginator_core = _.extend({}, this.default_paginator_core, this.paginator_core);
       this.server_api = _.extend({}, this.default_server_api, this.server_api);
+      this.on('reset', this.info);
       return ServerCollection.__super__.initialize.apply(this, arguments);
     };
 
