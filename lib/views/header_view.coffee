@@ -26,6 +26,9 @@ class @Teeble.HeaderView extends Backbone.View
 
         currentSort = $this.attr('data-sort')
 
+        if not $this.hasClass(@classes.sorting.sorted_desc_class) and not $this.hasClass(@classes.sorting.sorted_asc_class)
+            direction = @collection.sortDirections[currentSort] ? direction
+
         @collection.setSort(currentSort, direction)
 
     sort: (e) =>

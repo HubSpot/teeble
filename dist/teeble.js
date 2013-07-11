@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.1 - 2013-05-15
+* teeble - v0.2.1 - 2013-07-11
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -417,13 +417,16 @@
     };
 
     HeaderView.prototype._sort = function(e, direction) {
-      var $this, currentSort;
+      var $this, currentSort, _ref;
       e.preventDefault();
       $this = this.$(e.target);
       if (!$this.hasClass(this.classes.sorting.sortable_class)) {
         $this = $this.parents("." + this.classes.sorting.sortable_class);
       }
       currentSort = $this.attr('data-sort');
+      if (!$this.hasClass(this.classes.sorting.sorted_desc_class) && !$this.hasClass(this.classes.sorting.sorted_asc_class)) {
+        direction = (_ref = this.collection.sortDirections[currentSort]) != null ? _ref : direction;
+      }
       return this.collection.setSort(currentSort, direction);
     };
 
