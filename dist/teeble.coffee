@@ -1,4 +1,4 @@
-#! teeble - v0.2.1 - # 2013-05-15
+#! teeble - v0.2.1 - # 2013-07-11
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -259,6 +259,9 @@ class @Teeble.HeaderView extends Backbone.View
             $this = $this.parents(".#{@classes.sorting.sortable_class}")
 
         currentSort = $this.attr('data-sort')
+
+        if not $this.hasClass(@classes.sorting.sorted_desc_class) and not $this.hasClass(@classes.sorting.sorted_asc_class)
+            direction = @collection.sortDirections[currentSort] ? direction
 
         @collection.setSort(currentSort, direction)
 
