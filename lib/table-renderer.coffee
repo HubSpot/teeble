@@ -28,7 +28,7 @@ class @Teeble.TableRenderer
         ]
 
         for option in validOptions
-            if @options[option]
+            if @options[option]?
                 @[option] = @options[option]
 
         if @partials
