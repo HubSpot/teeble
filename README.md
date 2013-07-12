@@ -68,6 +68,7 @@ _Also, please don't edit files in the "dist" subdirectory as they are generated 
 * Abstract the table renderer for other templating languages
 
 ## Release History
+* 0.3.1: Attach falsey options in the constructor
 * 0.3.0: Allow for multiple sort rules and override default sort on click
 * 0.2.1: Bug fix for pagination on ServerSideCollections
 * 0.2.0: Documentation, grunt, bug fixes
