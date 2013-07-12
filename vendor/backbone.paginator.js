@@ -215,7 +215,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
               results.push( this.sorting[i].column );
             }
             return results;
-          });
+          })();
 
           sort = sorting.length ? {column: '', direction: 'desc'} : sorting[0];
 
