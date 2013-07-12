@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.0 - 2013-07-11
+* teeble - v0.3.0 - 2013-07-12
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -828,6 +828,8 @@
       return ClientCollection.__super__.constructor.apply(this, arguments);
     }
 
+    ClientCollection.prototype.sortDirections = {};
+
     ClientCollection.prototype.default_paginator_core = {
       dataType: 'json',
       url: function() {
@@ -893,6 +895,8 @@
       this.initialize = __bind(this.initialize, this);
       return ServerCollection.__super__.constructor.apply(this, arguments);
     }
+
+    ServerCollection.prototype.sortDirections = {};
 
     ServerCollection.prototype.default_paginator_core = {
       dataType: 'json',

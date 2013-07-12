@@ -2,6 +2,8 @@
 
 class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
 
+    sortDirections: {}
+
     default_paginator_core:
         dataType: 'json'
         url: ->
