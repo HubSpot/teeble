@@ -1,4 +1,4 @@
-#! teeble - v0.3.1 - # 2013-07-12
+#! teeble - v0.3.2 - # 2013-07-12
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -22,9 +22,7 @@ class @Teeble.TableRenderer
 
     compile: _.template
 
-    _initialize: (options) =>
-        @options = options
-
+    _initialize: =>
         validOptions = [
             'table_class'
             'partials'
@@ -36,7 +34,7 @@ class @Teeble.TableRenderer
         ]
 
         for option in validOptions
-            if @options[option]
+            if @options[option]?
                 @[option] = @options[option]
 
         if @partials
@@ -56,8 +54,8 @@ class @Teeble.TableRenderer
             data = _.extend {}, @_getExtraData(), data
             return template(data)
 
-    constructor: (options) ->
-        @_initialize(options)
+    constructor: (@options) ->
+        @_initialize()
         @
 
     render_row: (data) =>

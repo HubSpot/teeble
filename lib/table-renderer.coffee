@@ -16,9 +16,7 @@ class @Teeble.TableRenderer
 
     compile: _.template
 
-    _initialize: (options) =>
-        @options = options
-
+    _initialize: =>
         validOptions = [
             'table_class'
             'partials'
@@ -30,7 +28,7 @@ class @Teeble.TableRenderer
         ]
 
         for option in validOptions
-            if @options[option]
+            if @options[option]?
                 @[option] = @options[option]
 
         if @partials
@@ -50,8 +48,8 @@ class @Teeble.TableRenderer
             data = _.extend {}, @_getExtraData(), data
             return template(data)
 
-    constructor: (options) ->
-        @_initialize(options)
+    constructor: (@options) ->
+        @_initialize()
         @
 
     render_row: (data) =>
