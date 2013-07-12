@@ -1,4 +1,4 @@
-#! teeble - v0.3.0 - # 2013-07-11
+#! teeble - v0.3.1 - # 2013-07-12
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -545,6 +545,8 @@ class @Teeble.TableView extends Backbone.View
 
 class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
 
+    sortDirections: {}
+
     default_paginator_core:
         dataType: 'json'
         url: ->
@@ -575,6 +577,8 @@ class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
 # =require '../backbone.paginator'
 
 class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
+
+    sortDirections: {}
 
     default_paginator_core:
         dataType: 'json'
