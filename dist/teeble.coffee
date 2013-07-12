@@ -543,6 +543,8 @@ class @Teeble.TableView extends Backbone.View
 
 class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
 
+    sortDirections: {}
+
     default_paginator_core:
         dataType: 'json'
         url: ->
@@ -573,6 +575,8 @@ class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
 # =require '../backbone.paginator'
 
 class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
+
+    sortDirections: {}
 
     default_paginator_core:
         dataType: 'json'
