@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.0 - 2013-07-11
+* teeble - v0.3.0 - 2013-07-12
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -44,9 +44,8 @@
 
     TableRenderer.prototype.compile = _.template;
 
-    TableRenderer.prototype._initialize = function(options) {
+    TableRenderer.prototype._initialize = function() {
       var option, validOptions, _i, _len;
-      this.options = options;
       validOptions = ['table_class', 'partials', 'hasFooter', 'empty_message', 'cid', 'classes', 'compile'];
       for (_i = 0, _len = validOptions.length; _i < _len; _i++) {
         option = validOptions[_i];
@@ -78,6 +77,7 @@
     };
 
     function TableRenderer(options) {
+      this.options = options;
       this.update_template = __bind(this.update_template, this);
 
       this.generate_columns = __bind(this.generate_columns, this);
@@ -95,7 +95,8 @@
       this._getExtraData = __bind(this._getExtraData, this);
 
       this._initialize = __bind(this._initialize, this);
-      this._initialize(options);
+
+      this._initialize();
       this;
 
     }
