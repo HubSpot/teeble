@@ -49,7 +49,7 @@
       validOptions = ['table_class', 'partials', 'hasFooter', 'empty_message', 'cid', 'classes', 'compile'];
       for (_i = 0, _len = validOptions.length; _i < _len; _i++) {
         option = validOptions[_i];
-        if (this.options[option]) {
+        if (this.options[option] != null) {
           this[option] = this.options[option];
         }
       }
