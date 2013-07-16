@@ -1,3 +1,6 @@
+/*! backbone.paginator - v0.9.0-dev - 7/16/2013
+* http://github.com/addyosmani/backbone.paginator
+* Copyright (c) 2013 Addy Osmani; Licensed MIT */
 /*globals Backbone:true, _:true, jQuery:true*/
 Backbone.Paginator = (function ( Backbone, _, $ ) {
   "use strict";
@@ -9,7 +12,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
   });
 
   var Paginator = {};
-  Paginator.version = "<%= pkg.version %>";
+  Paginator.version = "0.9.0-dev";
 
   // @name: clientPager
   //
@@ -209,13 +212,14 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
           this.sortColumn = sorting;
           this.sortDirection = direction;
         } else {  // We're using multi-sort
-          this.lastSorting = (function() {
+          this.lastSorting = (function(parent) {
             results = [];
-            for (i = 0; i < this.sorting.length; i++) {
-              results.push( this.sorting[i].column );
+
+            for (i = 0; i < parent.sorting.length; i++) {
+              results.push( parent.sorting[i].column );
             }
             return results;
-          })();
+          })(this);
 
           sort = sorting.length ? {column: '', direction: 'desc'} : sorting[0];
 
@@ -329,9 +333,9 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
 
       self.models = self.origModels.slice();
 
-      if ( this.sorting.length ) {  // Handle our old sorting format
+      if ( this.sorting.length ) {  // Check if sorting was set using setSort
         self.models = self._sort(self.models, this.sorting);
-      } else if ( this.sortColumn !== "" ) {  // Check if sorting was set using setSort.
+      } else if ( this.sortColumn !== "" ) {  // Handle our old sorting format
         self.models = self._sort(self.models, [{
           column: this.sortColumn,
           direction: this.sortDirection
@@ -376,12 +380,23 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
     _sort: function ( models, sorting ) {
       var i, sort, result;
 
-      var sortByColumn = function (a, b, sort, direction) {
+      // Returns null when both a and b should fall through to the
+      // next sorting rule.
+      function sortByColumn(a, b, sort, direction) {
         var ac = a.get(sort),
-        bc = b.get(sort);
+            bc = b.get(sort),
+            isDescending = direction === 'desc';
 
-        if ( _.isUndefined(ac) || _.isUndefined(bc) || ac === null || bc === null ) {
-          return 0;
+        function isUndefined(obj) {
+          return _.isUndefined(obj) || obj === null;
+        }
+
+        // By letting single null comparisons fall through, we can
+        // compare them using the subsequent comparators
+        if ( isUndefined(ac) ) {
+          return isUndefined(bc) ? null : 1;
+        } else if ( isUndefined(bc) ) {
+          return -1;
         } else {
           /* Make sure that both ac and bc are lowercase strings.
            * .toString() first so we don't have to worry if ac or bc
@@ -391,7 +406,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
           bc = bc.toString().toLowerCase();
         }
 
-        if (direction === 'desc') {
+        if ( isDescending ) {
 
           // We need to know if there aren't any non-number characters
           // and that there are numbers-only characters and maybe a dot
@@ -437,9 +452,9 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         }
 
         return null;
-      };
+      }
 
-      var sortById = function (a, b) {
+      function sortById(a, b) {
         if (a.cid && b.cid){
           var aId = a.cid,
           bId = b.cid;
@@ -450,15 +465,16 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
           if (aId > bId) {
             return 1;
           }
+          return 0;
         }
-      };
+      }
 
       models = models.sort(function (a, b) {
         for (i = 0; i < sorting.length; i++) {
           sort = sorting[i];
           result = sortByColumn(a, b, sort.column, sort.direction);
 
-          if (result !== null) {
+          if ( result !== null ) {
             return result;
           }
         }
