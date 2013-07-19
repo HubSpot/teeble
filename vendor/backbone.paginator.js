@@ -353,7 +353,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
       }
 
       // If the sorting or the filtering was changed go to the first page
-      if ( !(this.lastSorting < this.sorting || this.sorting < this.lastSorting) || this.lastFilterExpression !== this.filterExpression || !_.isEqual(this.fieldFilterRules, this.lastFieldFilterRules) ) {
+      if ( !_.isEqual(this.lastSorting, this.sorting) || this.lastFilterExpression !== this.filterExpression || !_.isEqual(this.fieldFilterRules, this.lastFieldFilterRules) ) {
         start = 0;
         stop = start + disp;
         self.currentPage = 1;
