@@ -31,3 +31,10 @@ class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
                 if value isnt model.get(key)
                     return false
             return true
+
+    getFromAll: (obj) =>
+        unless obj?
+            return undefined
+
+        id = obj.id or obj.cid or obj
+        @_byId[id] or _.findWhere(@origModels, {id})
