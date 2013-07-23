@@ -1,4 +1,4 @@
-#! teeble - v0.3.2 - # 2013-07-12
+#! teeble - v0.3.2 - # 2013-07-23
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -572,6 +572,13 @@ class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
                 if value isnt model.get(key)
                     return false
             return true
+
+    get: (id) =>
+        if id?.length
+            return _.findWhere @origModels, {id}
+        else
+            return undefined
+
 # =require '../backbone.paginator'
 
 class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
