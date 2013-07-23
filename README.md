@@ -68,6 +68,7 @@ _Also, please don't edit files in the "dist" subdirectory as they are generated 
 * Abstract the table renderer for other templating languages
 
 ## Release History
+* 0.3.3: Add get() function to the client collection to use origModels
 * 0.3.2: Attach falsey options in the constructor
 * 0.3.1: Updating backbone paginator to the latest public version
 * 0.3.0: Allow for multiple sort rules and override default sort on click
