@@ -823,7 +823,7 @@
     __extends(ClientCollection, _super);
 
     function ClientCollection() {
-      this.get = __bind(this.get, this);
+      this.getFromAll = __bind(this.getFromAll, this);
 
       this.whereAll = __bind(this.whereAll, this);
 
@@ -871,14 +871,15 @@
       });
     };
 
-    ClientCollection.prototype.get = function(id) {
-      if (id != null ? id.length : void 0) {
-        return _.findWhere(this.origModels, {
-          id: id
-        });
-      } else {
+    ClientCollection.prototype.getFromAll = function(obj) {
+      var id;
+      if (obj == null) {
         return void 0;
       }
+      id = obj.id || obj.cid || obj;
+      return this._byId[id] || _.findWhere(this.origModels, {
+        id: id
+      });
     };
 
     return ClientCollection;

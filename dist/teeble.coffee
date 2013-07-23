@@ -573,11 +573,12 @@ class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
                     return false
             return true
 
-    get: (id) =>
-        if id?.length
-            return _.findWhere @origModels, {id}
-        else
+    getFromAll: (obj) =>
+        unless obj?
             return undefined
+
+        id = obj.id or obj.cid or obj
+        @_byId[id] or _.findWhere(@origModels, {id})
 
 # =require '../backbone.paginator'
 
