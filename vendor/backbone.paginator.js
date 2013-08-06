@@ -1,4 +1,5 @@
-/*! backbone.paginator - v0.9.0-dev - 7/16/2013
+/*! backbone.paginator - based on v0.9.0-dev (7/16/2013)
+* Changes by HubSpotDev made 8/6/2013, pending upstream merge
 * http://github.com/addyosmani/backbone.paginator
 * Copyright (c) 2013 Addy Osmani; Licensed MIT */
 /*globals Backbone:true, _:true, jQuery:true*/
