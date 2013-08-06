@@ -1,4 +1,5 @@
-/*! backbone.paginator - v0.9.0-dev - 7/16/2013
+/*! backbone.paginator - based on v0.9.0-dev (7/16/2013)
+* Changes by HubSpotDev made 8/6/2013, pending upstream merge
 * http://github.com/addyosmani/backbone.paginator
 * Copyright (c) 2013 Addy Osmani; Licensed MIT */
 /*globals Backbone:true, _:true, jQuery:true*/
@@ -130,6 +131,8 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
                                    bbVer[1] === 9 &&
                                    bbVer[2] === 10);
 
+      var isBeforeBackbone_1_0 = bbVer[0] === 0;
+
       var success = queryOptions.success;
       queryOptions.success = function ( resp, status, xhr ) {
         if ( success ) {
@@ -140,7 +143,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
             success( model, resp, queryOptions );
           }
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'sync', model, resp, queryOptions );
         }
       };
@@ -150,7 +153,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         if ( error ) {
           error( model, xhr, queryOptions );
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'error', model, xhr, queryOptions );
         }
       };
@@ -903,6 +906,8 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
                                    bbVer[1] === 9 &&
                                    bbVer[2] === 10);
 
+      var isBeforeBackbone_1_0 = bbVer[0] === 0;
+
       var success = queryOptions.success;
       queryOptions.success = function ( resp, status, xhr ) {
 
@@ -914,7 +919,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
             success( model, resp, queryOptions );
           }
         }
-        if (bbVer[0] < 1 && model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'sync', model, resp, queryOptions );
         }
       };
@@ -924,7 +929,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         if ( error ) {
           error( xhr );
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'error', model, xhr, queryOptions );
         }
       };
