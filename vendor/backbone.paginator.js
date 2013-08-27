@@ -1,9 +1,19 @@
+/*! backbone.paginator - based on v0.9.0-dev (7/16/2013)
+* Changes by HubSpotDev made 8/6/2013, pending upstream merge
+* http://github.com/addyosmani/backbone.paginator
+* Copyright (c) 2013 Addy Osmani; Licensed MIT */
 /*globals Backbone:true, _:true, jQuery:true*/
 Backbone.Paginator = (function ( Backbone, _, $ ) {
   "use strict";
 
+  var ajax = Backbone.ajax === undefined ? $.ajax : Backbone.ajax;
+
+  var bbVer = _.map(Backbone.VERSION.split('.'), function(digit) {
+    return parseInt(digit, 10);
+  });
+
   var Paginator = {};
-  Paginator.version = "<%= pkg.version %>";
+  Paginator.version = "0.9.0-dev";
 
   // @name: clientPager
   //
@@ -19,9 +29,15 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
     // DEFAULTS FOR SORTING & FILTERING
     useDiacriticsPlugin: true, // use diacritics plugin if available
     useLevenshteinPlugin: true, // use levenshtein plugin if available
+
+    // Keeping for backwards compatibility
     sortColumn: "",
     sortDirection: "desc",
-    lastSortColumn: "",
+
+    // New sorting format
+    sorting: [],
+    lastSorting: [],
+
     fieldFilterRules: [],
     lastFieldFilterRules: [],
     filterFields: "",
@@ -54,6 +70,11 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
 
       //UPDATE GLOBAL UI SETTINGS
       _.defaults(this, options);
+
+      if ( this.sorting.length ) {
+        this.sortColumn = this.sorting[0].column;
+        this.sortDirection = this.sorting[0].direction;
+      }
     },
 
     addModel: function(model) {
@@ -106,22 +127,23 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         url: _.result(queryOptions, 'url')
       }, options);
 
-      var bbVer = Backbone.VERSION.split('.');
-      var oldSuccessFormat = (parseInt(bbVer[0], 10) === 0 &&
-                              parseInt(bbVer[1], 10) === 9 &&
-                              parseInt(bbVer[2], 10) <= 9);
+      var promiseSuccessFormat = !(bbVer[0] === 0 &&
+                                   bbVer[1] === 9 &&
+                                   bbVer[2] === 10);
+
+      var isBeforeBackbone_1_0 = bbVer[0] === 0;
 
       var success = queryOptions.success;
       queryOptions.success = function ( resp, status, xhr ) {
         if ( success ) {
-          // This is to keep compatibility with Backbone older than 0.9.10
-          if (oldSuccessFormat) {
+          // This is to keep compatibility with Backbone 0.9.10
+          if (promiseSuccessFormat) {
             success( resp, status, xhr );
           } else {
             success( model, resp, queryOptions );
           }
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'sync', model, resp, queryOptions );
         }
       };
@@ -131,12 +153,12 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         if ( error ) {
           error( model, xhr, queryOptions );
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'error', model, xhr, queryOptions );
         }
       };
 
-      var xhr = queryOptions.xhr = $.ajax( queryOptions );
+      var xhr = queryOptions.xhr = ajax( queryOptions );
       if ( model && model.trigger ) {
         model.trigger('request', model, xhr, queryOptions);
       }
@@ -179,11 +201,36 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
     // to filter and 'direction', which is the direction
     // desired for the ordering ('asc' or 'desc'), pager()
     // and info() will be called automatically.
-    setSort: function ( column, direction ) {
-      if(column !== undefined && direction !== undefined){
-        this.lastSortColumn = this.sortColumn;
-        this.sortColumn = column;
-        this.sortDirection = direction;
+    setSort: function ( sorting, direction ) {
+      var results, sort, i;
+
+      if(sorting !== undefined){
+
+        if (direction !== undefined) {  // We're using the old sorting
+          this.lastSorting = [this.sortColumn];
+          this.sorting = [{
+            column: sorting,
+            direction: direction
+          }];
+          this.sortColumn = sorting;
+          this.sortDirection = direction;
+        } else {  // We're using multi-sort
+          this.lastSorting = (function(parent) {
+            results = [];
+
+            for (i = 0; i < parent.sorting.length; i++) {
+              results.push( parent.sorting[i].column );
+            }
+            return results;
+          })(this);
+
+          sort = sorting.length ? {column: '', direction: 'desc'} : sorting[0];
+
+          this.sorting = sorting;
+          this.sortColumn = sort.column;
+          this.sortDirection = sort.direction;
+        }
+
         this.pager();
         this.info();
       }
@@ -289,9 +336,13 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
 
       self.models = self.origModels.slice();
 
-      // Check if sorting was set using setSort.
-      if ( this.sortColumn !== "" ) {
-        self.models = self._sort(self.models, this.sortColumn, this.sortDirection);
+      if ( this.sorting.length ) {  // Check if sorting was set using setSort
+        self.models = self._sort(self.models, this.sorting);
+      } else if ( this.sortColumn !== "" ) {  // Handle our old sorting format
+        self.models = self._sort(self.models, [{
+          column: this.sortColumn,
+          direction: this.sortDirection
+        }]);
       }
 
       // Check if field-filtering was set using setFieldFilter
@@ -305,12 +356,12 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
       }
 
       // If the sorting or the filtering was changed go to the first page
-      if ( this.lastSortColumn !== this.sortColumn || this.lastFilterExpression !== this.filterExpression || !_.isEqual(this.fieldFilterRules, this.lastFieldFilterRules) ) {
+      if ( !_.isEqual(this.lastSorting, this.sorting) || this.lastFilterExpression !== this.filterExpression || !_.isEqual(this.fieldFilterRules, this.lastFieldFilterRules) ) {
         start = 0;
         stop = start + disp;
         self.currentPage = 1;
 
-        this.lastSortColumn = this.sortColumn;
+        this.lastSorting = this.sorting;
         this.lastFieldFilterRules = this.fieldFilterRules;
         this.lastFilterExpression = this.filterExpression;
       }
@@ -329,13 +380,26 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
 
     // The actual place where the collection is sorted.
     // Check setSort for arguments explicacion.
-    _sort: function ( models, sort, direction ) {
-      models = models.sort(function (a, b) {
-        var ac = a.get(sort),
-        bc = b.get(sort);
+    _sort: function ( models, sorting ) {
+      var i, sort, result;
 
-        if ( _.isUndefined(ac) || _.isUndefined(bc) ) {
-          return 0;
+      // Returns null when both a and b should fall through to the
+      // next sorting rule.
+      function sortByColumn(a, b, sort, direction) {
+        var ac = a.get(sort),
+            bc = b.get(sort),
+            isDescending = direction === 'desc';
+
+        function isUndefined(obj) {
+          return _.isUndefined(obj) || obj === null;
+        }
+
+        // By letting single null comparisons fall through, we can
+        // compare them using the subsequent comparators
+        if ( isUndefined(ac) ) {
+          return isUndefined(bc) ? null : 1;
+        } else if ( isUndefined(bc) ) {
+          return -1;
         } else {
           /* Make sure that both ac and bc are lowercase strings.
            * .toString() first so we don't have to worry if ac or bc
@@ -345,54 +409,55 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
           bc = bc.toString().toLowerCase();
         }
 
-        if (direction === 'desc') {
+        if ( isDescending ) {
 
           // We need to know if there aren't any non-number characters
           // and that there are numbers-only characters and maybe a dot
           // if we have a float.
           // Oh, also a '-' for negative numbers!
           if((!ac.match(/[^\-\d\.]/) && ac.match(/-?[\d\.]+/)) &&
-          (!bc.match(/[^\-\d\.]/) && bc.match(/-?[\d\.]+/))
-            ){
+               (!bc.match(/[^\-\d\.]/) && bc.match(/-?[\d\.]+/))){
 
-              if( (ac - 0) < (bc - 0) ) {
-                return 1;
-              }
-              if( (ac - 0) > (bc - 0) ) {
-                return -1;
-              }
-            } else {
-              if (ac < bc) {
-                return 1;
-              }
-              if (ac > bc) {
-                return -1;
-              }
+            if( (ac - 0) < (bc - 0) ) {
+              return 1;
             }
+            if( (ac - 0) > (bc - 0) ) {
+              return -1;
+            }
+          } else {
+            if (ac < bc) {
+              return 1;
+            }
+            if (ac > bc) {
+              return -1;
+            }
+          }
 
         } else {
 
           //Same as the regexp check in the 'if' part.
           if((!ac.match(/[^\-\d\.]/) && ac.match(/-?[\d\.]+/)) &&
-          (!bc.match(/[^\-\d\.]/) && bc.match(/-?[\d\.]+/))
-            ){
-              if( (ac - 0) < (bc - 0) ) {
-                return -1;
-              }
-              if( (ac - 0) > (bc - 0) ) {
-                return 1;
-              }
-            } else {
-              if (ac < bc) {
-                return -1;
-              }
-              if (ac > bc) {
-                return 1;
-              }
+             (!bc.match(/[^\-\d\.]/) && bc.match(/-?[\d\.]+/))){
+            if( (ac - 0) < (bc - 0) ) {
+              return -1;
             }
-
+            if( (ac - 0) > (bc - 0) ) {
+              return 1;
+            }
+          } else {
+            if (ac < bc) {
+              return -1;
+            }
+            if (ac > bc) {
+              return 1;
+            }
+          }
         }
 
+        return null;
+      }
+
+      function sortById(a, b) {
         if (a.cid && b.cid){
           var aId = a.cid,
           bId = b.cid;
@@ -403,9 +468,21 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
           if (aId > bId) {
             return 1;
           }
+          return 0;
+        }
+      }
+
+      models = models.sort(function (a, b) {
+        for (i = 0; i < sorting.length; i++) {
+          sort = sorting[i];
+          result = sortByColumn(a, b, sort.column, sort.direction);
+
+          if ( result !== null ) {
+            return result;
+          }
         }
 
-        return 0;
+        return sortById(a, b);
       });
 
       return models;
@@ -517,11 +594,10 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
 
           }else if(rule.type === "containsAllOf"){
             if( _.isArray( rule.value ) &&
-               _.isArray(model.get(rule.field)) &&
-                 _.intersection( rule.value, model.get(rule.field)).length === rule.value.length
-              ) {
-                should_push = true;
-              }
+                _.isArray(model.get(rule.field)) &&
+                _.intersection( rule.value, model.get(rule.field)).length === rule.value.length) {
+              should_push = true;
+            }
 
               // The field's value is required to match the regular expression
           }else if(rule.type === "pattern"){
@@ -761,6 +837,13 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
   // function aliasing
   Paginator.clientPager.prototype.prevPage = Paginator.clientPager.prototype.previousPage;
 
+  // Helper function to generate rejected Deferred
+  var reject = function () {
+    var response = new $.Deferred();
+    response.reject();
+    return response.promise();
+  };
+
   // @name: requestPager
   //
   // Paginator for server-side data being requested from a backend/API
@@ -819,23 +902,24 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         url: _.result(queryOptions, 'url')
       }, options);
 
-      var bbVer = Backbone.VERSION.split('.');
-      var oldSuccessFormat = (parseInt(bbVer[0], 10) === 0 &&
-                              parseInt(bbVer[1], 10) === 9 &&
-                              parseInt(bbVer[2], 10) <= 9);
+      var promiseSuccessFormat = !(bbVer[0] === 0 &&
+                                   bbVer[1] === 9 &&
+                                   bbVer[2] === 10);
+
+      var isBeforeBackbone_1_0 = bbVer[0] === 0;
 
       var success = queryOptions.success;
       queryOptions.success = function ( resp, status, xhr ) {
 
         if ( success ) {
-          // This is to keep compatibility with Backbone older than 0.9.10
-          if (oldSuccessFormat) {
+          // This is to keep compatibility with Backbone 0.9.10
+          if (promiseSuccessFormat) {
             success( resp, status, xhr );
           } else {
             success( model, resp, queryOptions );
           }
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'sync', model, resp, queryOptions );
         }
       };
@@ -843,14 +927,14 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
       var error = queryOptions.error;
       queryOptions.error = function ( xhr ) {
         if ( error ) {
-          error( model, xhr, queryOptions );
+          error( xhr );
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'error', model, xhr, queryOptions );
         }
       };
 
-      var xhr = queryOptions.xhr = $.ajax( queryOptions );
+      var xhr = queryOptions.xhr = ajax( queryOptions );
       if ( model && model.trigger ) {
         model.trigger('request', model, xhr, queryOptions);
       }
@@ -882,9 +966,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         this.currentPage += 1;
         return this.pager( options );
       } else {
-        var response = new $.Deferred();
-        response.reject();
-        return response.promise();
+        return reject();
       }
     },
 
@@ -893,18 +975,17 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         this.currentPage -= 1;
         return this.pager( options );
       } else {
-        var response = new $.Deferred();
-        response.reject();
-        return response.promise();
+        return reject();
       }
     },
 
-    updateOrder: function ( column ) {
+    updateOrder: function ( column, options ) {
       if (column !== undefined) {
         this.sortField = column;
-        this.pager();
+        return this.pager( options );
+      } else {
+        return reject();
       }
-
     },
 
     goTo: function ( page, options ) {
@@ -912,17 +993,17 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         this.currentPage = parseInt(page, 10);
         return this.pager( options );
       } else {
-        var response = new $.Deferred();
-        response.reject();
-        return response.promise();
+        return reject();
       }
     },
 
-    howManyPer: function ( count ) {
-      if( count !== undefined ){
+    howManyPer: function ( count, options ) {
+      if ( count !== undefined ) {
         this.currentPage = this.firstPage;
         this.perPage = count;
-        this.pager();
+        return this.pager( options );
+      } else {
+        return reject();
       }
     },
 

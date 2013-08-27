@@ -13,7 +13,10 @@ class @Teeble.PaginationView extends Backbone.View
         <div class=" <%= pagination_class %>">
             <ul>
                 <li>
-                    <a href="#" class="pagination-previous previous <% if (prev_disabled){ %><%= pagination_disabled %><% } %>">Previous</a>
+                    <a href="#" class="pagination-previous previous <% if (prev_disabled){ %><%= pagination_disabled %><% } %>">
+                        <span class="left"></span>
+                        Previous
+                    </a>
                 </li>
                 <% _.each(pages, function(page) { %>
                 <li>
@@ -21,7 +24,10 @@ class @Teeble.PaginationView extends Backbone.View
                 </li>
                 <% }); %>
                 <li>
-                    <a href="#" class="pagination-next next <% if(next_disabled){ %><%= pagination_disabled %><% } %>">Next</a>
+                    <a href="#" class="pagination-next next <% if(next_disabled){ %><%= pagination_disabled %><% } %>">
+                        Next
+                        <span class="right"></span>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -33,8 +39,10 @@ class @Teeble.PaginationView extends Backbone.View
         super
 
     render : =>
+        if not @collection.information
+            @collection.pager()
 
-        info = @collection.info()
+        info = @collection.information
         if info.totalPages > 1
             pages = for page in info.pageSet
                 p =

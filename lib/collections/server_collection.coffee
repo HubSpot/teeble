@@ -2,6 +2,8 @@
 
 class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
 
+    sortDirections: {}
+
     default_paginator_core:
         dataType: 'json'
         url: ->
@@ -25,6 +27,7 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
         @paginator_ui = _.extend( {}, @default_paginator_ui, @paginator_ui )
         @paginator_core = _.extend( {}, @default_paginator_core, @paginator_core )
         @server_api = _.extend( {}, @default_server_api, @server_api )
+        @on 'reset', @info
         super
 
     nextPage: ( options ) =>
@@ -50,3 +53,5 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
             @lastSortColumn = @sortColumn
 
         super
+
+        @info()

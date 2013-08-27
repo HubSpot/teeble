@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.2.0 - 2013-03-12
+* teeble - v0.3.3 - 2013-07-23
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -44,13 +44,12 @@
 
     TableRenderer.prototype.compile = _.template;
 
-    TableRenderer.prototype._initialize = function(options) {
+    TableRenderer.prototype._initialize = function() {
       var option, validOptions, _i, _len;
-      this.options = options;
       validOptions = ['table_class', 'partials', 'hasFooter', 'empty_message', 'cid', 'classes', 'compile'];
       for (_i = 0, _len = validOptions.length; _i < _len; _i++) {
         option = validOptions[_i];
-        if (this.options[option]) {
+        if (this.options[option] != null) {
           this[option] = this.options[option];
         }
       }
@@ -78,6 +77,7 @@
     };
 
     function TableRenderer(options) {
+      this.options = options;
       this.update_template = __bind(this.update_template, this);
 
       this.generate_columns = __bind(this.generate_columns, this);
@@ -95,7 +95,8 @@
       this._getExtraData = __bind(this._getExtraData, this);
 
       this._initialize = __bind(this._initialize, this);
-      this._initialize(options);
+
+      this._initialize();
       this;
 
     }
@@ -338,13 +339,31 @@
     FooterView.prototype.tagName = 'tfoot';
 
     FooterView.prototype.initialize = function() {
+      var _this = this;
       this.renderer = this.options.renderer;
-      return this.collection.bind('destroy', this.remove, this);
+      this.collection.bind('destroy', this.remove, this);
+      if (this.collection.footer) {
+        if (this.collection.footer instanceof Backbone.Model) {
+          this.collection.footer.on('change', function() {
+            return _this.render();
+          });
+        }
+        this.data = this.collection.footer;
+      } else {
+        this.data = this.options;
+      }
+      return this.collection.footer;
     };
 
     FooterView.prototype.render = function() {
+      var data;
       if (this.renderer) {
-        this.$el.html(this.renderer.render_footer(this.options));
+        if (this.data.toJSON) {
+          data = this.data.toJSON();
+        } else {
+          data = this.data;
+        }
+        this.$el.html(this.renderer.render_footer(data));
       }
       return this;
     };
@@ -399,13 +418,16 @@
     };
 
     HeaderView.prototype._sort = function(e, direction) {
-      var $this, currentSort;
+      var $this, currentSort, _ref;
       e.preventDefault();
       $this = this.$(e.target);
       if (!$this.hasClass(this.classes.sorting.sortable_class)) {
         $this = $this.parents("." + this.classes.sorting.sortable_class);
       }
       currentSort = $this.attr('data-sort');
+      if (!$this.hasClass(this.classes.sorting.sorted_desc_class) && !$this.hasClass(this.classes.sorting.sorted_asc_class)) {
+        direction = (_ref = this.collection.sortDirections[currentSort]) != null ? _ref : direction;
+      }
       return this.collection.setSort(currentSort, direction);
     };
 
@@ -473,7 +495,7 @@
       'click a.pagination-page': 'gotoPage'
     };
 
-    PaginationView.prototype.template = "<div class=\" <%= pagination_class %>\">\n    <ul>\n        <li>\n            <a href=\"#\" class=\"pagination-previous previous <% if (prev_disabled){ %><%= pagination_disabled %><% } %>\">Previous</a>\n        </li>\n        <% _.each(pages, function(page) { %>\n        <li>\n            <a href=\"#\" class=\"pagination-page <% if (page.active){ %><%= pagination_active %><% } %>\" data-page=\"<%= page.number %>\"><%= page.number %></a>\n        </li>\n        <% }); %>\n        <li>\n            <a href=\"#\" class=\"pagination-next next <% if(next_disabled){ %><%= pagination_disabled %><% } %>\">Next</a>\n        </li>\n    </ul>\n</div>";
+    PaginationView.prototype.template = "<div class=\" <%= pagination_class %>\">\n    <ul>\n        <li>\n            <a href=\"#\" class=\"pagination-previous previous <% if (prev_disabled){ %><%= pagination_disabled %><% } %>\">\n                <span class=\"left\"></span>\n                Previous\n            </a>\n        </li>\n        <% _.each(pages, function(page) { %>\n        <li>\n            <a href=\"#\" class=\"pagination-page <% if (page.active){ %><%= pagination_active %><% } %>\" data-page=\"<%= page.number %>\"><%= page.number %></a>\n        </li>\n        <% }); %>\n        <li>\n            <a href=\"#\" class=\"pagination-next next <% if(next_disabled){ %><%= pagination_disabled %><% } %>\">\n                Next\n                <span class=\"right\"></span>\n            </a>\n        </li>\n    </ul>\n</div>";
 
     PaginationView.prototype.initialize = function() {
       this.collection.bind('destroy', this.remove, this);
@@ -482,7 +504,10 @@
 
     PaginationView.prototype.render = function() {
       var html, info, p, page, pages;
-      info = this.collection.info();
+      if (!this.collection.information) {
+        this.collection.pager();
+      }
+      info = this.collection.information;
       if (info.totalPages > 1) {
         pages = (function() {
           var _i, _len, _ref, _results;
@@ -573,6 +598,9 @@
         this.$el.html(this.renderer.render_row(this.model.toJSON({
           teeble: true
         })));
+        if (this.options.sortColumnIndex != null) {
+          this.$el.find('td').eq(this.options.sortColumnIndex).addClass(this.options.sortableClass);
+        }
       }
       return this;
     };
@@ -615,11 +643,14 @@
 
     TableView.prototype.tagName = 'div';
 
+    TableView.prototype.rendered = false;
+
     TableView.prototype.classes = {
       sorting: {
         sortable_class: 'sorting',
         sorted_desc_class: 'sorting_desc',
-        sorted_asc_class: 'sorting_asc'
+        sorted_asc_class: 'sorting_asc',
+        sortable_cell: 'sorting_1'
       },
       pagination: {
         pagination_class: 'pagination',
@@ -638,12 +669,23 @@
     };
 
     TableView.prototype.initialize = function() {
+      var i, partial, partial_name, _ref;
       this.subviews = _.extend({}, this.subviews, this.options.subviews);
       this.setOptions();
       TableView.__super__.initialize.apply(this, arguments);
       this.collection.on('add', this.addOne, this);
       this.collection.on('reset', this.renderBody, this);
       this.collection.on('reset', this.renderPagination, this);
+      this.sortIndex = {};
+      i = 0;
+      _ref = this.options.partials;
+      for (partial_name in _ref) {
+        partial = _ref[partial_name];
+        if (partial.sortable) {
+          this.sortIndex[partial.sortable] = i;
+        }
+        i++;
+      }
       return this.renderer = new this.subviews.renderer({
         partials: this.options.partials,
         table_class: this.options.table_class,
@@ -659,9 +701,16 @@
     };
 
     TableView.prototype.render = function() {
+      var _base;
+      if (!this.collection.origModels) {
+        if (typeof (_base = this.collection).pager === "function") {
+          _base.pager();
+        }
+      }
       this.$el.empty().append("<table><tbody></tbody></table");
       this.table = this.$('table').addClass(this.options.table_class);
       this.body = this.$('tbody');
+      this.rendered = true;
       this.renderHeader();
       this.renderBody();
       this.renderFooter();
@@ -672,7 +721,7 @@
 
     TableView.prototype.renderPagination = function() {
       var _ref;
-      if (this.options.pagination) {
+      if (this.options.pagination && this.rendered) {
         if ((_ref = this.pagination) != null) {
           _ref.remove();
         }
@@ -687,21 +736,23 @@
 
     TableView.prototype.renderHeader = function() {
       var _ref;
-      if ((_ref = this.header) != null) {
-        _ref.remove();
+      if (this.rendered) {
+        if ((_ref = this.header) != null) {
+          _ref.remove();
+        }
+        this.header = new this.subviews.header({
+          renderer: this.renderer,
+          collection: this.collection,
+          classes: this.classes
+        });
+        this.table.prepend(this.header.render().el);
+        return this.trigger('header.render', this);
       }
-      this.header = new this.subviews.header({
-        renderer: this.renderer,
-        collection: this.collection,
-        classes: this.classes
-      });
-      this.table.prepend(this.header.render().el);
-      return this.trigger('header.render', this);
     };
 
     TableView.prototype.renderFooter = function() {
       var _ref;
-      if (this.options.footer) {
+      if (this.options.footer && this.rendered) {
         if ((_ref = this.footer) != null) {
           _ref.remove();
         }
@@ -717,31 +768,40 @@
     };
 
     TableView.prototype.renderBody = function() {
-      this.body.empty();
-      if (this.collection.length > 0) {
-        this.collection.each(this.addOne);
-        return this.trigger('body.render', this);
-      } else {
-        return this.renderEmpty();
+      if (this.rendered) {
+        this.body.empty();
+        if (this.collection.length > 0) {
+          this.collection.each(this.addOne);
+          return this.trigger('body.render', this);
+        } else {
+          return this.renderEmpty();
+        }
       }
     };
 
     TableView.prototype.renderEmpty = function() {
       var options;
-      options = _.extend({}, this.options, {
-        renderer: this.renderer,
-        collection: this.collection
-      });
-      this.empty = new this.subviews.empty(options);
-      this.body.append(this.empty.render().el);
-      return this.trigger('empty.render', this);
+      if (this.rendered) {
+        options = _.extend({}, this.options, {
+          renderer: this.renderer,
+          collection: this.collection
+        });
+        this.empty = new this.subviews.empty(options);
+        this.body.append(this.empty.render().el);
+        return this.trigger('empty.render', this);
+      }
     };
 
     TableView.prototype.addOne = function(item) {
-      var view;
+      var sortColumnIndex, view;
+      if (this.collection.sortColumn) {
+        sortColumnIndex = this.sortIndex[this.collection.sortColumn];
+      }
       view = new this.subviews.row({
         model: item,
-        renderer: this.renderer
+        renderer: this.renderer,
+        sortColumnIndex: sortColumnIndex,
+        sortableClass: this.classes.sorting.sortable_cell
       });
       this.body.append(view.render().el);
       return this.trigger('row.render', view);
@@ -763,11 +823,15 @@
     __extends(ClientCollection, _super);
 
     function ClientCollection() {
+      this.getFromAll = __bind(this.getFromAll, this);
+
       this.whereAll = __bind(this.whereAll, this);
 
       this.initialize = __bind(this.initialize, this);
       return ClientCollection.__super__.constructor.apply(this, arguments);
     }
+
+    ClientCollection.prototype.sortDirections = {};
 
     ClientCollection.prototype.default_paginator_core = {
       dataType: 'json',
@@ -807,6 +871,17 @@
       });
     };
 
+    ClientCollection.prototype.getFromAll = function(obj) {
+      var id;
+      if (obj == null) {
+        return void 0;
+      }
+      id = obj.id || obj.cid || obj;
+      return this._byId[id] || _.findWhere(this.origModels, {
+        id: id
+      });
+    };
+
     return ClientCollection;
 
   })(Backbone.Paginator.clientPager);
@@ -835,6 +910,8 @@
       return ServerCollection.__super__.constructor.apply(this, arguments);
     }
 
+    ServerCollection.prototype.sortDirections = {};
+
     ServerCollection.prototype.default_paginator_core = {
       dataType: 'json',
       url: function() {
@@ -862,6 +939,7 @@
       this.paginator_ui = _.extend({}, this.default_paginator_ui, this.paginator_ui);
       this.paginator_core = _.extend({}, this.default_paginator_core, this.paginator_core);
       this.server_api = _.extend({}, this.default_server_api, this.server_api);
+      this.on('reset', this.info);
       return ServerCollection.__super__.initialize.apply(this, arguments);
     };
 
@@ -892,7 +970,8 @@
         this.currentPage = 1;
         this.lastSortColumn = this.sortColumn;
       }
-      return ServerCollection.__super__.pager.apply(this, arguments);
+      ServerCollection.__super__.pager.apply(this, arguments);
+      return this.info();
     };
 
     return ServerCollection;

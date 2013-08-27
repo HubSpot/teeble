@@ -14,4 +14,8 @@ class @Teeble.RowView extends Backbone.View
                     teeble: true
                 )
             ))
+
+            if @options.sortColumnIndex?
+                @$el.find('td').eq(@options.sortColumnIndex).addClass(@options.sortableClass)
+
         @
