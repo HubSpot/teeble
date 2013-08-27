@@ -74,9 +74,7 @@
 
     compile: _.template
 
-    _initialize: (options) =&gt;
-        <span class="property">@options</span> = options
-
+    _initialize: =&gt;
         validOptions = [
             <span class="string">'table_class'</span>
             <span class="string">'partials'</span>
@@ -88,7 +86,7 @@
         ]
 
         <span class="keyword">for</span> option <span class="keyword">in</span> validOptions
-            <span class="keyword">if</span> <span class="property">@options</span>[option]
+            <span class="keyword">if</span> <span class="property">@options</span>[option]?
                 @[option] = <span class="property">@options</span>[option]
 
         <span class="keyword">if</span> <span class="property">@partials</span>
@@ -108,8 +106,8 @@
             data = _.extend {}, <span class="property">@_getExtraData</span>(), data
             <span class="keyword">return</span> template(data)
 
-    constructor: (options) -&gt;
-        <span class="property">@_initialize</span>(options)
+    constructor: (<span class="property">@options</span>) -&gt;
+        <span class="property">@_initialize</span>()
         @
 
     render_row: (data) =&gt;
