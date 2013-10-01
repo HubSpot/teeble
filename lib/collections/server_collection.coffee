@@ -52,6 +52,4 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
 
             @lastSortColumn = @sortColumn
 
-        super
-
         @info()

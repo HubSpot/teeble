@@ -1,1 +1,2 @@
 source: "lib/*.coffee"
+resources: "examples/**"
