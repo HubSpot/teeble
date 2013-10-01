@@ -1,2 +1,2 @@
 source: "lib/*.coffee"
-docs: "examples/**/*.js"
+resources: "examples/**"
