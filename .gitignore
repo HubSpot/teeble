@@ -1,3 +1,4 @@
+.DS_*
 *.coffee.js
 *.test.js
 .npmignore
