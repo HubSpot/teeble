@@ -54,9 +54,7 @@ Teeble's table-renderer builds templates from partial definitions and renders th
 * [Client-side paging](http://github.hubspot.com/teeble/examples/netflix-client-paging/index.html)
 * [Custom Extension example: Sortbar](http://github.hubspot.com/teeble/examples/sortbar/index.html)
 
-Netflix has shut down their OData API, so this example doesn't work:
-
-* [Server-side paging](http://github.hubspot.com/teeble/examples/netflix-request-paging/index.html)
+Netflix has shut down their OData API, so our [Server-side paging example](http://github.hubspot.com/teeble/examples/netflix-request-paging/index.html) doesn't work.
 
 ## Contributing
 In lieu of a formal style-guide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [grunt](http://gruntjs.com/).
