@@ -1,2 +1,2 @@
 source: "lib/*.coffee"
-assets: "examples/**/*"
+assets: "{examples/**/*,vendor/*.js,dist/teeble.js}"
