@@ -1,4 +1,4 @@
-#! teeble - v0.3.3 - # 2013-07-23
+#! teeble - v0.3.3 - # 2013-10-08
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -633,7 +633,5 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
             @currentPage = 1;
 
             @lastSortColumn = @sortColumn
-
-        super
 
         @info()
