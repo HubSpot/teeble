@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.3 - 2013-10-10
+* teeble - v0.3.4 - 2013-10-10
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -291,6 +291,45 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+  this.Teeble.CellView = (function(_super) {
+
+    __extends(CellView, _super);
+
+    function CellView() {
+      this.render = __bind(this.render, this);
+
+      this.initialize = __bind(this.initialize, this);
+      return CellView.__super__.constructor.apply(this, arguments);
+    }
+
+    CellView.prototype.tagName = 'td';
+
+    CellView.prototype.initialize = function() {
+      this.renderer = this.options.renderer;
+      this.model.bind('change', this.render, this);
+      return this.model.bind('destroy', this.remove, this);
+    };
+
+    CellView.prototype.render = function() {
+      if (this.renderer) {
+        this.$el.html(this.renderer.render_row(this.model.toJSON({
+          teeble: true
+        })));
+      }
+      return this;
+    };
+
+    return CellView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
   this.Teeble.EmptyView = (function(_super) {
 
     __extends(EmptyView, _super);
@@ -371,6 +410,26 @@
     return FooterView;
 
   })(Backbone.View);
+
+}).call(this);
+
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  this.Teeble.HeaderCellView = (function(_super) {
+
+    __extends(HeaderCellView, _super);
+
+    function HeaderCellView() {
+      return HeaderCellView.__super__.constructor.apply(this, arguments);
+    }
+
+    HeaderCellView.prototype.tagName = 'th';
+
+    return HeaderCellView;
+
+  })(this.Teeble.CellView);
 
 }).call(this);
 
