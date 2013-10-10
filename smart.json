@@ -3,7 +3,7 @@
     "description": "A tiny table plugin.",
     "homepage": "https://github.com/HubSpot/teeble",
     "author": "Marc Neuwirth, Jonathan Kim",
-    "version": "0.2.0",
+    "version": "0.3.4",
     "git": "https://github.com/HubSpot/teeble.git",
     "packages": {}
 }
