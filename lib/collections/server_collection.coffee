@@ -47,9 +47,10 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
             @info()
 
     pager: =>
-        if @lastSortColumn isnt @sortColumn
+        if @lastSortColumn isnt @sortColumn and @sortColumn?
             @currentPage = 1;
-
             @lastSortColumn = @sortColumn
+
+        super
 
         @info()
