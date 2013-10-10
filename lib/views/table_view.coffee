@@ -60,7 +60,8 @@ class @Teeble.TableView extends Backbone.View
 
 
     render: =>
-        if not @collection.origModels
+         # Make sure this is only called for a ClientCollection
+        if not @collection.origModels and @collection.whereAll?
             @collection.pager?()
 
         @$el.empty().append("<table><tbody></tbody></table")

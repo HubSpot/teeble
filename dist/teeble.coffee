@@ -1,4 +1,4 @@
-#! teeble - v0.3.3 - # 2013-10-08
+#! teeble - v0.3.3 - # 2013-10-10
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -449,7 +449,8 @@ class @Teeble.TableView extends Backbone.View
 
 
     render: =>
-        if not @collection.origModels
+         # Make sure this is only called for a ClientCollection
+        if not @collection.origModels and @collection.whereAll?
             @collection.pager?()
 
         @$el.empty().append("<table><tbody></tbody></table")
@@ -629,9 +630,10 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
             @info()
 
     pager: =>
-        if @lastSortColumn isnt @sortColumn
+        if @lastSortColumn isnt @sortColumn and @sortColumn?
             @currentPage = 1;
-
             @lastSortColumn = @sortColumn
+
+        super
 
         @info()

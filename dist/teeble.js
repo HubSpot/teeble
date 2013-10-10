@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.3 - 2013-10-08
+* teeble - v0.3.3 - 2013-10-10
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -702,7 +702,7 @@
 
     TableView.prototype.render = function() {
       var _base;
-      if (!this.collection.origModels) {
+      if (!this.collection.origModels && (this.collection.whereAll != null)) {
         if (typeof (_base = this.collection).pager === "function") {
           _base.pager();
         }
@@ -966,10 +966,11 @@
     };
 
     ServerCollection.prototype.pager = function() {
-      if (this.lastSortColumn !== this.sortColumn) {
+      if (this.lastSortColumn !== this.sortColumn && (this.sortColumn != null)) {
         this.currentPage = 1;
         this.lastSortColumn = this.sortColumn;
       }
+      ServerCollection.__super__.pager.apply(this, arguments);
       return this.info();
     };
 
