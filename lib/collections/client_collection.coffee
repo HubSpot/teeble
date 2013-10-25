@@ -38,3 +38,6 @@ class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
 
         id = obj.id or obj.cid or obj
         @_byId[id] or _.findWhere(@origModels, {id})
+
+    eachAll: =>
+        _.each.call _, (@origModels ? @models), arguments...

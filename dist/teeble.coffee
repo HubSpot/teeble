@@ -1,4 +1,4 @@
-#! teeble - v0.3.4 - # 2013-10-10
+#! teeble - v0.3.4 - # 2013-10-25
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -580,6 +580,9 @@ class @Teeble.ClientCollection extends Backbone.Paginator.clientPager
 
         id = obj.id or obj.cid or obj
         @_byId[id] or _.findWhere(@origModels, {id})
+
+    eachAll: =>
+        _.each.call _, (@origModels ? @models), arguments...
 
 # =require '../backbone.paginator'
 
