@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.3 - 2013-07-23
+* teeble - v0.3.4 - 2013-10-25
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -702,7 +702,7 @@
 
     TableView.prototype.render = function() {
       var _base;
-      if (!this.collection.origModels) {
+      if (!this.collection.origModels && (this.collection.whereAll != null)) {
         if (typeof (_base = this.collection).pager === "function") {
           _base.pager();
         }
@@ -816,13 +816,16 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __slice = [].slice;
 
   this.Teeble.ClientCollection = (function(_super) {
 
     __extends(ClientCollection, _super);
 
     function ClientCollection() {
+      this.eachAll = __bind(this.eachAll, this);
+
       this.getFromAll = __bind(this.getFromAll, this);
 
       this.whereAll = __bind(this.whereAll, this);
@@ -880,6 +883,11 @@
       return this._byId[id] || _.findWhere(this.origModels, {
         id: id
       });
+    };
+
+    ClientCollection.prototype.eachAll = function() {
+      var _ref, _ref1;
+      return (_ref1 = _.each).call.apply(_ref1, [_, (_ref = this.origModels) != null ? _ref : this.models].concat(__slice.call(arguments)));
     };
 
     return ClientCollection;
@@ -966,7 +974,7 @@
     };
 
     ServerCollection.prototype.pager = function() {
-      if (this.lastSortColumn !== this.sortColumn) {
+      if (this.lastSortColumn !== this.sortColumn && (this.sortColumn != null)) {
         this.currentPage = 1;
         this.lastSortColumn = this.sortColumn;
       }
