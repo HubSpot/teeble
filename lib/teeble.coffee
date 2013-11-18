@@ -1,5 +1,5 @@
 # = require './setup'
-# = require './lib/backbone.paginator'
-# = require './lib/handlebars'
+# = require '../vendor/backbone.paginator'
+# = require '../vendor/handlebars'
 # = require './table-renderer'
 # = require './views/table_view'
