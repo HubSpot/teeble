@@ -64,7 +64,7 @@ class @Teeble.TableView extends Backbone.View
         if not @collection.origModels and @collection.whereAll?
             @collection.pager?()
 
-        @$el.empty().append("<table><tbody></tbody></table")
+        @$el.empty().append("<table><tbody></tbody></table>")
         @table = @$('table').addClass(@options.table_class)
         @body = @$('tbody')
 
