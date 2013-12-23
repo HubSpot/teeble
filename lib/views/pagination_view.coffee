@@ -45,18 +45,18 @@ class @Teeble.PaginationView extends Backbone.View
         info = @collection.information
         if info.totalPages > 1
             pages = for page in info.pageSet
-                p =
+                {
                     active: if page is info.currentPage then @options.pagination.pagination_active
                     number: page
-                p
+                }
 
 
             html = _.template @template,
                 pagination_class: @options.pagination.pagination_class
                 pagination_disabled: @options.pagination.pagination_disabled
                 pagination_active: @options.pagination.pagination_active
-                prev_disabled: info.previous is false or info.hasPrevious is false
-                next_disabled: info.next is false or info.hasNext is false
+                prev_disabled: info.previous is false
+                next_disabled: info.next is false
                 pages: pages
 
             @$el.html(html)
@@ -76,7 +76,7 @@ class @Teeble.PaginationView extends Backbone.View
 
     gotoLast: (e) =>
         e.preventDefault()
-        @collection.goTo(this.collection.information.lastPage)
+        @collection.goTo(@collection.information.lastPage)
 
     gotoPage: (e) =>
         e.preventDefault()
