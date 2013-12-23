@@ -1,4 +1,4 @@
-#! teeble - v0.3.4 - # 2013-10-25
+#! teeble - v0.3.6 - # 2013-12-23
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -329,18 +329,18 @@ class @Teeble.PaginationView extends Backbone.View
         info = @collection.information
         if info.totalPages > 1
             pages = for page in info.pageSet
-                p =
+                {
                     active: if page is info.currentPage then @options.pagination.pagination_active
                     number: page
-                p
+                }
 
 
             html = _.template @template,
                 pagination_class: @options.pagination.pagination_class
                 pagination_disabled: @options.pagination.pagination_disabled
                 pagination_active: @options.pagination.pagination_active
-                prev_disabled: info.previous is false or info.hasPrevious is false
-                next_disabled: info.next is false or info.hasNext is false
+                prev_disabled: info.previous is false
+                next_disabled: info.next is false
                 pages: pages
 
             @$el.html(html)
@@ -360,12 +360,13 @@ class @Teeble.PaginationView extends Backbone.View
 
     gotoLast: (e) =>
         e.preventDefault()
-        @collection.goTo(this.collection.information.lastPage)
+        @collection.goTo(@collection.information.lastPage)
 
     gotoPage: (e) =>
         e.preventDefault()
         page = @$(e.target).text()
         @collection.goTo(page)
+
 class @Teeble.RowView extends Backbone.View
 
     tagName : 'tr'
@@ -453,7 +454,7 @@ class @Teeble.TableView extends Backbone.View
         if not @collection.origModels and @collection.whereAll?
             @collection.pager?()
 
-        @$el.empty().append("<table><tbody></tbody></table")
+        @$el.empty().append("<table><tbody></tbody></table>")
         @table = @$('table').addClass(@options.table_class)
         @body = @$('tbody')
 
