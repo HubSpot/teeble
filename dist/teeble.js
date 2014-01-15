@@ -1,7 +1,7 @@
 /*!
-* teeble - v0.3.6 - 2013-12-23
+* teeble - v0.3.7 - 2014-01-15
 * https://github.com/HubSpot/teeble
-* Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
+* Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
 */
 
@@ -330,6 +330,8 @@
     __extends(FooterView, _super);
 
     function FooterView() {
+      this.stopListening = __bind(this.stopListening, this);
+
       this.render = __bind(this.render, this);
 
       this.initialize = __bind(this.initialize, this);
@@ -366,6 +368,14 @@
         this.$el.html(this.renderer.render_footer(data));
       }
       return this;
+    };
+
+    FooterView.prototype.stopListening = function() {
+      var _ref;
+      if ((_ref = this.collection.footer) != null) {
+        _ref.off('change');
+      }
+      return FooterView.__super__.stopListening.apply(this, arguments);
     };
 
     return FooterView;
@@ -674,6 +684,7 @@
       TableView.__super__.initialize.apply(this, arguments);
       this.collection.on('add', this.addOne, this);
       this.collection.on('reset', this.renderBody, this);
+      this.collection.on('reset', this.renderFooter, this);
       this.collection.on('reset', this.renderPagination, this);
       this.sortIndex = {};
       i = 0;

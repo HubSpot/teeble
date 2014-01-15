@@ -26,3 +26,7 @@ class @Teeble.FooterView extends Backbone.View
 
             @$el.html(@renderer.render_footer(data))
         @
+
+    stopListening: =>
+        @collection.footer?.off('change')
+        super

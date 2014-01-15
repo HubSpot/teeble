@@ -38,6 +38,7 @@ class @Teeble.TableView extends Backbone.View
 
         @collection.on('add', @addOne, @)
         @collection.on('reset', @renderBody, @)
+        @collection.on('reset', @renderFooter, @)
         @collection.on('reset', @renderPagination, @)
 
         @sortIndex = {}
