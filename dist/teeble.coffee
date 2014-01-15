@@ -1,6 +1,6 @@
-#! teeble - v0.3.6 - # 2013-12-23
+#! teeble - v0.3.7 - # 2014-01-15
 #  https://github.com/HubSpot/teeble
-# Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
+# Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
 
 @Teeble = {}
@@ -230,6 +230,10 @@ class @Teeble.FooterView extends Backbone.View
 
             @$el.html(@renderer.render_footer(data))
         @
+
+    stopListening: =>
+        @collection.footer?.off('change')
+        super
 class @Teeble.HeaderView extends Backbone.View
 
     events:
@@ -428,6 +432,7 @@ class @Teeble.TableView extends Backbone.View
 
         @collection.on('add', @addOne, @)
         @collection.on('reset', @renderBody, @)
+        @collection.on('reset', @renderFooter, @)
         @collection.on('reset', @renderPagination, @)
 
         @sortIndex = {}
