@@ -530,7 +530,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
               should_push = true;
             }
 
-            // The field's value is required to be greater tan N (numbers only)
+            // The field's value is required to be greater than N (numbers only)
           }else if(rule.type === "min"){
             if( !_.isNaN( Number( model.get(rule.field) ) ) &&
                !_.isNaN( Number( rule.value ) ) &&
@@ -538,7 +538,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
               should_push = true;
             }
 
-            // The field's value is required to be smaller tan N (numbers only)
+            // The field's value is required to be smaller than N (numbers only)
           }else if(rule.type === "max"){
             if( !_.isNaN( Number( model.get(rule.field) ) ) &&
                !_.isNaN( Number( rule.value ) ) &&
@@ -602,6 +602,17 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
               // The field's value is required to match the regular expression
           }else if(rule.type === "pattern"){
             if( model.get(rule.field).toString().match(rule.value) ) {
+              should_push = true;
+            }
+
+            // The field's value will be applied to the model, which should
+            // return true (if model should be included) or false (model should be ignored)
+          }else if(rule.type === "custom"){
+            var attr = model.toJSON();
+            var f = _.wrap(rule.value, function(func){
+              return func( attr );
+            });
+            if( f() ){
               should_push = true;
             }
 
