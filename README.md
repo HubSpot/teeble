@@ -67,6 +67,7 @@ _Also, please don't edit files in the "dist" subdirectory as they are generated 
 * Abstract the table renderer for other templating languages
 
 ## Release History
+* 0.3.8: Add paginator filter for filtering on the entire model
 * 0.3.7: Render footer on collection reset
 * 0.3.5: Add eachAll() function to the client collection to use origModels
 * 0.3.4: Fix ServerCollection Bug

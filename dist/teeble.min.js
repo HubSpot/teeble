@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.7 - 2014-01-15
+* teeble - v0.3.8 - 2014-03-17
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
