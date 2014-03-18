@@ -1,7 +1,7 @@
 /*!
-* teeble - v0.3.4 - 2013-10-25
+* teeble - v0.3.8 - 2014-03-17
 * https://github.com/HubSpot/teeble
-* Copyright (c) 2013 HubSpot, Marc Neuwirth, Jonathan Kim;
+* Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
 */
 
@@ -330,6 +330,8 @@
     __extends(FooterView, _super);
 
     function FooterView() {
+      this.stopListening = __bind(this.stopListening, this);
+
       this.render = __bind(this.render, this);
 
       this.initialize = __bind(this.initialize, this);
@@ -366,6 +368,14 @@
         this.$el.html(this.renderer.render_footer(data));
       }
       return this;
+    };
+
+    FooterView.prototype.stopListening = function() {
+      var _ref;
+      if ((_ref = this.collection.footer) != null) {
+        _ref.off('change');
+      }
+      return FooterView.__super__.stopListening.apply(this, arguments);
     };
 
     return FooterView;
@@ -503,7 +513,7 @@
     };
 
     PaginationView.prototype.render = function() {
-      var html, info, p, page, pages;
+      var html, info, page, pages;
       if (!this.collection.information) {
         this.collection.pager();
       }
@@ -515,11 +525,10 @@
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             page = _ref[_i];
-            p = {
+            _results.push({
               active: page === info.currentPage ? this.options.pagination.pagination_active : void 0,
               number: page
-            };
-            _results.push(p);
+            });
           }
           return _results;
         }).call(this);
@@ -527,8 +536,8 @@
           pagination_class: this.options.pagination.pagination_class,
           pagination_disabled: this.options.pagination.pagination_disabled,
           pagination_active: this.options.pagination.pagination_active,
-          prev_disabled: info.previous === false || info.hasPrevious === false,
-          next_disabled: info.next === false || info.hasNext === false,
+          prev_disabled: info.previous === false,
+          next_disabled: info.next === false,
           pages: pages
         });
         this.$el.html(html);
@@ -675,6 +684,7 @@
       TableView.__super__.initialize.apply(this, arguments);
       this.collection.on('add', this.addOne, this);
       this.collection.on('reset', this.renderBody, this);
+      this.collection.on('reset', this.renderFooter, this);
       this.collection.on('reset', this.renderPagination, this);
       this.sortIndex = {};
       i = 0;
@@ -707,7 +717,7 @@
           _base.pager();
         }
       }
-      this.$el.empty().append("<table><tbody></tbody></table");
+      this.$el.empty().append("<table><tbody></tbody></table>");
       this.table = this.$('table').addClass(this.options.table_class);
       this.body = this.$('tbody');
       this.rendered = true;
