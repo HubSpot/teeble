@@ -4,7 +4,6 @@ class @Teeble.FooterView extends Backbone.View
 
     initialize: =>
         @renderer = @options.renderer
-        @collection.bind('destroy', @remove, @);
         if @collection.footer
             if @collection.footer instanceof Backbone.Model
                 @collection.footer.on('change', =>

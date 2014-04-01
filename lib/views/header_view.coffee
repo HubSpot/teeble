@@ -8,8 +8,7 @@ class @Teeble.HeaderView extends Backbone.View
     initialize: =>
         @renderer = @options.renderer
         @classes = @options.classes
-        @collection.bind('destroy', @remove, @);
-        @collection.bind('reset', @setSort, @);
+        @collection.bind('reset', @setSort, @)
 
     render : =>
         if @renderer
