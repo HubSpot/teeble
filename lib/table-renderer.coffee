@@ -176,10 +176,4 @@ class @Teeble.TableRenderer
         @header_template = @_generate_template('header', columns, 'tr', 'th')
         @footer_template = @_generate_template('footer', columns, 'tr')
         @row_template = @_generate_template('cell', columns)
-        @table_empty_template = """<td valign="top" colspan="#{columns.length}" class="teeble_empty">{{message}}</td>"""
-
-
-
-
-
-
+        @table_empty_template = """<td valign="top" colspan="#{columns.length}" class="teeble_empty">{{{message}}}</td>"""
