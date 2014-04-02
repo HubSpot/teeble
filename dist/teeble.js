@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.8 - 2014-03-17
+* teeble - v0.3.9 - 2014-04-01
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -277,7 +277,7 @@
       this.header_template = this._generate_template('header', columns, 'tr', 'th');
       this.footer_template = this._generate_template('footer', columns, 'tr');
       this.row_template = this._generate_template('cell', columns);
-      return this.table_empty_template = "<td valign=\"top\" colspan=\"" + columns.length + "\" class=\"teeble_empty\">{{message}}</td>";
+      return this.table_empty_template = "<td valign=\"top\" colspan=\"" + columns.length + "\" class=\"teeble_empty\">{{{message}}}</td>";
     };
 
     return TableRenderer;
@@ -303,8 +303,7 @@
     }
 
     EmptyView.prototype.initialize = function() {
-      this.renderer = this.options.renderer;
-      return this.collection.bind('destroy', this.remove, this);
+      return this.renderer = this.options.renderer;
     };
 
     EmptyView.prototype.render = function() {
@@ -343,7 +342,6 @@
     FooterView.prototype.initialize = function() {
       var _this = this;
       this.renderer = this.options.renderer;
-      this.collection.bind('destroy', this.remove, this);
       if (this.collection.footer) {
         if (this.collection.footer instanceof Backbone.Model) {
           this.collection.footer.on('change', function() {
@@ -415,7 +413,6 @@
     HeaderView.prototype.initialize = function() {
       this.renderer = this.options.renderer;
       this.classes = this.options.classes;
-      this.collection.bind('destroy', this.remove, this);
       return this.collection.bind('reset', this.setSort, this);
     };
 
@@ -490,8 +487,6 @@
       this.gotoFirst = __bind(this.gotoFirst, this);
 
       this.render = __bind(this.render, this);
-
-      this.initialize = __bind(this.initialize, this);
       return PaginationView.__super__.constructor.apply(this, arguments);
     }
 
@@ -506,11 +501,6 @@
     };
 
     PaginationView.prototype.template = "<div class=\" <%= pagination_class %>\">\n    <ul>\n        <li>\n            <a href=\"#\" class=\"pagination-previous previous <% if (prev_disabled){ %><%= pagination_disabled %><% } %>\">\n                <span class=\"left\"></span>\n                Previous\n            </a>\n        </li>\n        <% _.each(pages, function(page) { %>\n        <li>\n            <a href=\"#\" class=\"pagination-page <% if (page.active){ %><%= pagination_active %><% } %>\" data-page=\"<%= page.number %>\"><%= page.number %></a>\n        </li>\n        <% }); %>\n        <li>\n            <a href=\"#\" class=\"pagination-next next <% if(next_disabled){ %><%= pagination_disabled %><% } %>\">\n                Next\n                <span class=\"right\"></span>\n            </a>\n        </li>\n    </ul>\n</div>";
-
-    PaginationView.prototype.initialize = function() {
-      this.collection.bind('destroy', this.remove, this);
-      return PaginationView.__super__.initialize.apply(this, arguments);
-    };
 
     PaginationView.prototype.render = function() {
       var html, info, page, pages;
@@ -988,7 +978,9 @@
         this.currentPage = 1;
         this.lastSortColumn = this.sortColumn;
       }
-      ServerCollection.__super__.pager.apply(this, arguments);
+      ServerCollection.__super__.pager.call(this, {
+        reset: true
+      });
       return this.info();
     };
 

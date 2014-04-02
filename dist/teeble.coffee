@@ -1,4 +1,4 @@
-#! teeble - v0.3.8 - # 2014-03-17
+#! teeble - v0.3.9 - # 2014-04-01
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -182,25 +182,17 @@ class @Teeble.TableRenderer
         @header_template = @_generate_template('header', columns, 'tr', 'th')
         @footer_template = @_generate_template('footer', columns, 'tr')
         @row_template = @_generate_template('cell', columns)
-        @table_empty_template = """<td valign="top" colspan="#{columns.length}" class="teeble_empty">{{message}}</td>"""
-
-
-
-
-
-
+        @table_empty_template = """<td valign="top" colspan="#{columns.length}" class="teeble_empty">{{{message}}}</td>"""
 
 class @Teeble.EmptyView extends Backbone.View
 
     initialize: =>
         @renderer = @options.renderer
-        @collection.bind('destroy', @remove, @);
 
     render : =>
         if @renderer
             @el = @renderer.render_empty(@options)
         @
-
 
 class @Teeble.FooterView extends Backbone.View
 
@@ -208,7 +200,6 @@ class @Teeble.FooterView extends Backbone.View
 
     initialize: =>
         @renderer = @options.renderer
-        @collection.bind('destroy', @remove, @);
         if @collection.footer
             if @collection.footer instanceof Backbone.Model
                 @collection.footer.on('change', =>
@@ -234,6 +225,7 @@ class @Teeble.FooterView extends Backbone.View
     stopListening: =>
         @collection.footer?.off('change')
         super
+
 class @Teeble.HeaderView extends Backbone.View
 
     events:
@@ -244,8 +236,7 @@ class @Teeble.HeaderView extends Backbone.View
     initialize: =>
         @renderer = @options.renderer
         @classes = @options.classes
-        @collection.bind('destroy', @remove, @);
-        @collection.bind('reset', @setSort, @);
+        @collection.bind('reset', @setSort, @)
 
     render : =>
         if @renderer
@@ -286,6 +277,7 @@ class @Teeble.HeaderView extends Backbone.View
                 .removeClass("#{@classes.sorting.sorted_desc_class} #{@classes.sorting.sorted_asc_class}")
                 .filter(""".sorting[data-sort="#{@collection.sortColumn}"]""")
                     .addClass("#{@classes.sorting[classDirection]}")
+
 class @Teeble.PaginationView extends Backbone.View
 
     tagName : 'div'
@@ -321,11 +313,7 @@ class @Teeble.PaginationView extends Backbone.View
         </div>
         """
 
-    initialize: =>
-        @collection.bind('destroy', @remove, @);
-
-        super
-
+        
     render : =>
         if not @collection.information
             @collection.pager()
@@ -643,6 +631,6 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
             @currentPage = 1;
             @lastSortColumn = @sortColumn
 
-        super
+        super({reset: true})
 
         @info()

@@ -67,6 +67,10 @@ _Also, please don't edit files in the "dist" subdirectory as they are generated 
 * Abstract the table renderer for other templating languages
 
 ## Release History
+* 0.3.9:
+  - Allow HTML in empty message
+  - Don't remove the views on destroy since destroy bubbles up from any model that is destroyed
+  - Pass `{reset: true}` to Backbone when calling `pager()` on server-side collections.
 * 0.3.8: Add paginator filter for filtering on the entire model
 * 0.3.7: Render footer on collection reset
 * 0.3.5: Add eachAll() function to the client collection to use origModels
