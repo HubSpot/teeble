@@ -33,11 +33,7 @@ class @Teeble.PaginationView extends Backbone.View
         </div>
         """
 
-    initialize: =>
-        @collection.bind('destroy', @remove, @);
-
-        super
-
+        
     render : =>
         if not @collection.information
             @collection.pager()
