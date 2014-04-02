@@ -43,15 +43,14 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
             @lastSortColumn = @sortColumn
             @sortColumn = column
             @sortDirection = direction
-            @pager(reset: true)
+            @pager()
             @info()
 
-    pager: (options = {}) =>
+    pager: =>
         if @lastSortColumn isnt @sortColumn and @sortColumn?
             @currentPage = 1;
             @lastSortColumn = @sortColumn
 
-        options.reset = true
-        super(options)
+        super({reset: true})
 
         @info()
