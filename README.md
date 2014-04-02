@@ -67,6 +67,7 @@ _Also, please don't edit files in the "dist" subdirectory as they are generated 
 * Abstract the table renderer for other templating languages
 
 ## Release History
+* 0.3.10: Allow overrides in `pager()` arguments for server-side collections
 * 0.3.9:
   - Allow HTML in empty message
   - Don't remove the views on destroy since destroy bubbles up from any model that is destroyed

@@ -1,4 +1,4 @@
-#! teeble - v0.3.9 - # 2014-04-01
+#! teeble - v0.3.10 - # 2014-04-02
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -626,11 +626,12 @@ class @Teeble.ServerCollection extends Backbone.Paginator.requestPager
             @pager()
             @info()
 
-    pager: =>
+    pager: ( options = {} ) =>
         if @lastSortColumn isnt @sortColumn and @sortColumn?
             @currentPage = 1;
             @lastSortColumn = @sortColumn
 
-        super({reset: true})
+        options.reset ?= true
+        super(options)
 
         @info()
