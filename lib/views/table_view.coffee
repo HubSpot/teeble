@@ -60,6 +60,10 @@ class @Teeble.TableView extends Backbone.View
 
     undelegateEvents: ->
         super
+
+        @header?.undelegateEvents()
+        @footer?.undelegateEvents()
+
         @collection.off('add', @addOne)
         @collection.off('reset', @renderBody)
         @collection.off('reset', @renderFooter)

@@ -412,8 +412,17 @@
 
     HeaderView.prototype.initialize = function() {
       this.renderer = this.options.renderer;
-      this.classes = this.options.classes;
-      return this.collection.bind('reset', this.setSort, this);
+      return this.classes = this.options.classes;
+    };
+
+    HeaderView.prototype.delegateEvents = function() {
+      HeaderView.__super__.delegateEvents.apply(this, arguments);
+      return this.collection.on('reset', this.setSort, this);
+    };
+
+    HeaderView.prototype.undelegateEvents = function() {
+      HeaderView.__super__.undelegateEvents.apply(this, arguments);
+      return this.collection.off('reset', this.setSort);
     };
 
     HeaderView.prototype.render = function() {
@@ -701,7 +710,14 @@
     };
 
     TableView.prototype.undelegateEvents = function() {
+      var _ref, _ref1;
       TableView.__super__.undelegateEvents.apply(this, arguments);
+      if ((_ref = this.header) != null) {
+        _ref.undelegateEvents();
+      }
+      if ((_ref1 = this.footer) != null) {
+        _ref1.undelegateEvents();
+      }
       this.collection.off('add', this.addOne);
       this.collection.off('reset', this.renderBody);
       this.collection.off('reset', this.renderFooter);
