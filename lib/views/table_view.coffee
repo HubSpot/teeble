@@ -36,11 +36,6 @@ class @Teeble.TableView extends Backbone.View
 
         super
 
-        @collection.on('add', @addOne, @)
-        @collection.on('reset', @renderBody, @)
-        @collection.on('reset', @renderFooter, @)
-        @collection.on('reset', @renderPagination, @)
-
         @sortIndex = {}
         i = 0
         for partial_name, partial of @options.partials
@@ -55,6 +50,24 @@ class @Teeble.TableView extends Backbone.View
             classes: @classes
             collection: @collection
             compile: @options.compile
+
+    delegateEvents: ->
+        super
+        @collection.on('add', @addOne, @)
+        @collection.on('reset', @renderBody, @)
+        @collection.on('reset', @renderFooter, @)
+        @collection.on('reset', @renderPagination, @)
+
+    undelegateEvents: ->
+        super
+
+        @header?.undelegateEvents()
+        @footer?.undelegateEvents()
+
+        @collection.off('add', @addOne)
+        @collection.off('reset', @renderBody)
+        @collection.off('reset', @renderFooter)
+        @collection.off('reset', @renderPagination)
 
     setOptions: =>
         @

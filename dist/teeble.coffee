@@ -1,4 +1,4 @@
-#! teeble - v0.3.10 - # 2014-04-02
+#! teeble - v0.3.11 - # 2014-04-14
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -236,7 +236,14 @@ class @Teeble.HeaderView extends Backbone.View
     initialize: =>
         @renderer = @options.renderer
         @classes = @options.classes
-        @collection.bind('reset', @setSort, @)
+
+    delegateEvents: ->
+        super
+        @collection.on('reset', @setSort, @)
+
+    undelegateEvents: ->
+        super
+        @collection.off('reset', @setSort)
 
     render : =>
         if @renderer
@@ -280,7 +287,7 @@ class @Teeble.HeaderView extends Backbone.View
 
 class @Teeble.PaginationView extends Backbone.View
 
-    tagName : 'div'
+    tagName: 'div'
 
     events:
         'click a.first': 'gotoFirst'
@@ -313,8 +320,8 @@ class @Teeble.PaginationView extends Backbone.View
         </div>
         """
 
-        
-    render : =>
+
+    render: =>
         if not @collection.information
             @collection.pager()
 
@@ -325,7 +332,6 @@ class @Teeble.PaginationView extends Backbone.View
                     active: if page is info.currentPage then @options.pagination.pagination_active
                     number: page
                 }
-
 
             html = _.template @template,
                 pagination_class: @options.pagination.pagination_class
@@ -365,8 +371,8 @@ class @Teeble.RowView extends Backbone.View
 
     initialize: =>
         @renderer = @options.renderer
-        @model.bind('change', @render, @);
-        @model.bind('destroy', @remove, @);
+        @model.bind('change', @render, @)
+        @model.bind('destroy', @remove, @)
 
     render : =>
         if @renderer
@@ -380,6 +386,7 @@ class @Teeble.RowView extends Backbone.View
                 @$el.find('td').eq(@options.sortColumnIndex).addClass(@options.sortableClass)
 
         @
+
 # =require '/../table-renderer'
 # =require './row_view'
 # =require './header_view'
@@ -418,11 +425,6 @@ class @Teeble.TableView extends Backbone.View
 
         super
 
-        @collection.on('add', @addOne, @)
-        @collection.on('reset', @renderBody, @)
-        @collection.on('reset', @renderFooter, @)
-        @collection.on('reset', @renderPagination, @)
-
         @sortIndex = {}
         i = 0
         for partial_name, partial of @options.partials
@@ -437,6 +439,24 @@ class @Teeble.TableView extends Backbone.View
             classes: @classes
             collection: @collection
             compile: @options.compile
+
+    delegateEvents: ->
+        super
+        @collection.on('add', @addOne, @)
+        @collection.on('reset', @renderBody, @)
+        @collection.on('reset', @renderFooter, @)
+        @collection.on('reset', @renderPagination, @)
+
+    undelegateEvents: ->
+        super
+
+        @header?.undelegateEvents()
+        @footer?.undelegateEvents()
+
+        @collection.off('add', @addOne)
+        @collection.off('reset', @renderBody)
+        @collection.off('reset', @renderFooter)
+        @collection.off('reset', @renderPagination)
 
     setOptions: =>
         @

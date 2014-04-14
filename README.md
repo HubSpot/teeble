@@ -67,6 +67,7 @@ _Also, please don't edit files in the "dist" subdirectory as they are generated 
 * Abstract the table renderer for other templating languages
 
 ## Release History
+* 0.3.11: Add proper un/delegating of table events
 * 0.3.10: Allow overrides in `pager()` arguments for server-side collections
 * 0.3.9:
   - Allow HTML in empty message
@@ -85,5 +86,5 @@ _Also, please don't edit files in the "dist" subdirectory as they are generated 
 * 0.1.0: Initial Release
 
 ## License
-Copyright (c) 2013 HubSpot
+Copyright (c) 2014 HubSpot
 Licensed under the MIT license.

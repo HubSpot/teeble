@@ -1,6 +1,6 @@
 class @Teeble.PaginationView extends Backbone.View
 
-    tagName : 'div'
+    tagName: 'div'
 
     events:
         'click a.first': 'gotoFirst'
@@ -33,8 +33,8 @@ class @Teeble.PaginationView extends Backbone.View
         </div>
         """
 
-        
-    render : =>
+
+    render: =>
         if not @collection.information
             @collection.pager()
 
@@ -45,7 +45,6 @@ class @Teeble.PaginationView extends Backbone.View
                     active: if page is info.currentPage then @options.pagination.pagination_active
                     number: page
                 }
-
 
             html = _.template @template,
                 pagination_class: @options.pagination.pagination_class

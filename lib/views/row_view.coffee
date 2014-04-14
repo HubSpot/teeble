@@ -4,8 +4,8 @@ class @Teeble.RowView extends Backbone.View
 
     initialize: =>
         @renderer = @options.renderer
-        @model.bind('change', @render, @);
-        @model.bind('destroy', @remove, @);
+        @model.bind('change', @render, @)
+        @model.bind('destroy', @remove, @)
 
     render : =>
         if @renderer
