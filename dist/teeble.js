@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.10 - 2014-04-02
+* teeble - v0.3.11 - 2014-04-14
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -672,10 +672,6 @@
       this.subviews = _.extend({}, this.subviews, this.options.subviews);
       this.setOptions();
       TableView.__super__.initialize.apply(this, arguments);
-      this.collection.on('add', this.addOne, this);
-      this.collection.on('reset', this.renderBody, this);
-      this.collection.on('reset', this.renderFooter, this);
-      this.collection.on('reset', this.renderPagination, this);
       this.sortIndex = {};
       i = 0;
       _ref = this.options.partials;
@@ -694,6 +690,22 @@
         collection: this.collection,
         compile: this.options.compile
       });
+    };
+
+    TableView.prototype.delegateEvents = function() {
+      TableView.__super__.delegateEvents.apply(this, arguments);
+      this.collection.on('add', this.addOne, this);
+      this.collection.on('reset', this.renderBody, this);
+      this.collection.on('reset', this.renderFooter, this);
+      return this.collection.on('reset', this.renderPagination, this);
+    };
+
+    TableView.prototype.undelegateEvents = function() {
+      TableView.__super__.undelegateEvents.apply(this, arguments);
+      this.collection.off('add', this.addOne);
+      this.collection.off('reset', this.renderBody);
+      this.collection.off('reset', this.renderFooter);
+      return this.collection.off('reset', this.renderPagination);
     };
 
     TableView.prototype.setOptions = function() {
