@@ -1,5 +1,5 @@
 /*global require:true */
-var teeble = require('../dist/teeble.test.js');
+// var teeble = require('../dist/teeble.test.js');
 
 /*
   ======== A Handy Little Nodeunit Reference ========
