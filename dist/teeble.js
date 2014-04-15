@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.8 - 2014-03-17
+* teeble - v0.3.11 - 2014-04-14
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -277,7 +277,7 @@
       this.header_template = this._generate_template('header', columns, 'tr', 'th');
       this.footer_template = this._generate_template('footer', columns, 'tr');
       this.row_template = this._generate_template('cell', columns);
-      return this.table_empty_template = "<td valign=\"top\" colspan=\"" + columns.length + "\" class=\"teeble_empty\">{{message}}</td>";
+      return this.table_empty_template = "<td valign=\"top\" colspan=\"" + columns.length + "\" class=\"teeble_empty\">{{{message}}}</td>";
     };
 
     return TableRenderer;
@@ -303,8 +303,7 @@
     }
 
     EmptyView.prototype.initialize = function() {
-      this.renderer = this.options.renderer;
-      return this.collection.bind('destroy', this.remove, this);
+      return this.renderer = this.options.renderer;
     };
 
     EmptyView.prototype.render = function() {
@@ -343,7 +342,6 @@
     FooterView.prototype.initialize = function() {
       var _this = this;
       this.renderer = this.options.renderer;
-      this.collection.bind('destroy', this.remove, this);
       if (this.collection.footer) {
         if (this.collection.footer instanceof Backbone.Model) {
           this.collection.footer.on('change', function() {
@@ -414,9 +412,17 @@
 
     HeaderView.prototype.initialize = function() {
       this.renderer = this.options.renderer;
-      this.classes = this.options.classes;
-      this.collection.bind('destroy', this.remove, this);
-      return this.collection.bind('reset', this.setSort, this);
+      return this.classes = this.options.classes;
+    };
+
+    HeaderView.prototype.delegateEvents = function() {
+      HeaderView.__super__.delegateEvents.apply(this, arguments);
+      return this.collection.on('reset', this.setSort, this);
+    };
+
+    HeaderView.prototype.undelegateEvents = function() {
+      HeaderView.__super__.undelegateEvents.apply(this, arguments);
+      return this.collection.off('reset', this.setSort);
     };
 
     HeaderView.prototype.render = function() {
@@ -490,8 +496,6 @@
       this.gotoFirst = __bind(this.gotoFirst, this);
 
       this.render = __bind(this.render, this);
-
-      this.initialize = __bind(this.initialize, this);
       return PaginationView.__super__.constructor.apply(this, arguments);
     }
 
@@ -506,11 +510,6 @@
     };
 
     PaginationView.prototype.template = "<div class=\" <%= pagination_class %>\">\n    <ul>\n        <li>\n            <a href=\"#\" class=\"pagination-previous previous <% if (prev_disabled){ %><%= pagination_disabled %><% } %>\">\n                <span class=\"left\"></span>\n                Previous\n            </a>\n        </li>\n        <% _.each(pages, function(page) { %>\n        <li>\n            <a href=\"#\" class=\"pagination-page <% if (page.active){ %><%= pagination_active %><% } %>\" data-page=\"<%= page.number %>\"><%= page.number %></a>\n        </li>\n        <% }); %>\n        <li>\n            <a href=\"#\" class=\"pagination-next next <% if(next_disabled){ %><%= pagination_disabled %><% } %>\">\n                Next\n                <span class=\"right\"></span>\n            </a>\n        </li>\n    </ul>\n</div>";
-
-    PaginationView.prototype.initialize = function() {
-      this.collection.bind('destroy', this.remove, this);
-      return PaginationView.__super__.initialize.apply(this, arguments);
-    };
 
     PaginationView.prototype.render = function() {
       var html, info, page, pages;
@@ -682,10 +681,6 @@
       this.subviews = _.extend({}, this.subviews, this.options.subviews);
       this.setOptions();
       TableView.__super__.initialize.apply(this, arguments);
-      this.collection.on('add', this.addOne, this);
-      this.collection.on('reset', this.renderBody, this);
-      this.collection.on('reset', this.renderFooter, this);
-      this.collection.on('reset', this.renderPagination, this);
       this.sortIndex = {};
       i = 0;
       _ref = this.options.partials;
@@ -704,6 +699,29 @@
         collection: this.collection,
         compile: this.options.compile
       });
+    };
+
+    TableView.prototype.delegateEvents = function() {
+      TableView.__super__.delegateEvents.apply(this, arguments);
+      this.collection.on('add', this.addOne, this);
+      this.collection.on('reset', this.renderBody, this);
+      this.collection.on('reset', this.renderFooter, this);
+      return this.collection.on('reset', this.renderPagination, this);
+    };
+
+    TableView.prototype.undelegateEvents = function() {
+      var _ref, _ref1;
+      TableView.__super__.undelegateEvents.apply(this, arguments);
+      if ((_ref = this.header) != null) {
+        _ref.undelegateEvents();
+      }
+      if ((_ref1 = this.footer) != null) {
+        _ref1.undelegateEvents();
+      }
+      this.collection.off('add', this.addOne);
+      this.collection.off('reset', this.renderBody);
+      this.collection.off('reset', this.renderFooter);
+      return this.collection.off('reset', this.renderPagination);
     };
 
     TableView.prototype.setOptions = function() {
@@ -983,12 +1001,19 @@
       }
     };
 
-    ServerCollection.prototype.pager = function() {
+    ServerCollection.prototype.pager = function(options) {
+      var _ref;
+      if (options == null) {
+        options = {};
+      }
       if (this.lastSortColumn !== this.sortColumn && (this.sortColumn != null)) {
         this.currentPage = 1;
         this.lastSortColumn = this.sortColumn;
       }
-      ServerCollection.__super__.pager.apply(this, arguments);
+      if ((_ref = options.reset) == null) {
+        options.reset = true;
+      }
+      ServerCollection.__super__.pager.call(this, options);
       return this.info();
     };
 
