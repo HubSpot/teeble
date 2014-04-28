@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.11 - 2014-04-14
+* teeble - v0.3.11 - 2014-04-28
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -228,14 +228,14 @@
     };
 
     TableRenderer.prototype.generate_columns = function(partials, clear) {
-      var column, i, partial, partial_name;
+      var column, i, partial, partial_name, _ref;
       if (partials == null) {
         partials = this.partials;
       }
       if (clear == null) {
         clear = false;
       }
-      if (this.columns && !clear) {
+      if (((_ref = this.columns) != null ? _ref.length : void 0) && !clear) {
         return this.columns;
       } else {
         i = 0;
@@ -275,8 +275,11 @@
       }
       columns = this.generate_columns();
       this.header_template = this._generate_template('header', columns, 'tr', 'th');
+      delete this.header_template_compiled;
       this.footer_template = this._generate_template('footer', columns, 'tr');
+      delete this.footer_template_compiled;
       this.row_template = this._generate_template('cell', columns);
+      delete this.row_template_compiled;
       return this.table_empty_template = "<td valign=\"top\" colspan=\"" + columns.length + "\" class=\"teeble_empty\">{{{message}}}</td>";
     };
 

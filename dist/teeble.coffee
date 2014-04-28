@@ -1,4 +1,4 @@
-#! teeble - v0.3.11 - # 2014-04-14
+#! teeble - v0.3.11 - # 2014-04-28
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -150,7 +150,7 @@ class @Teeble.TableRenderer
         str
 
     generate_columns: (partials = @partials, clear = false) =>
-        if @columns and not clear
+        if @columns?.length and not clear
             return @columns
         else
             i = 0
@@ -180,8 +180,11 @@ class @Teeble.TableRenderer
         columns = @generate_columns()
 
         @header_template = @_generate_template('header', columns, 'tr', 'th')
+        delete @header_template_compiled
         @footer_template = @_generate_template('footer', columns, 'tr')
+        delete @footer_template_compiled
         @row_template = @_generate_template('cell', columns)
+        delete @row_template_compiled
         @table_empty_template = """<td valign="top" colspan="#{columns.length}" class="teeble_empty">{{{message}}}</td>"""
 
 class @Teeble.EmptyView extends Backbone.View
