@@ -2,7 +2,7 @@ class @Teeble.RowView extends Backbone.View
 
     tagName : 'tr'
 
-    initialize: =>
+    initialize: (@options) =>
         @renderer = @options.renderer
         @model.bind('change', @render, @)
         @model.bind('destroy', @remove, @)

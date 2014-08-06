@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.11 - 2014-04-14
+* teeble - v0.3.11 - 2014-08-06
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -302,7 +302,8 @@
       return EmptyView.__super__.constructor.apply(this, arguments);
     }
 
-    EmptyView.prototype.initialize = function() {
+    EmptyView.prototype.initialize = function(options) {
+      this.options = options;
       return this.renderer = this.options.renderer;
     };
 
@@ -339,8 +340,9 @@
 
     FooterView.prototype.tagName = 'tfoot';
 
-    FooterView.prototype.initialize = function() {
+    FooterView.prototype.initialize = function(options) {
       var _this = this;
+      this.options = options;
       this.renderer = this.options.renderer;
       if (this.collection.footer) {
         if (this.collection.footer instanceof Backbone.Model) {
@@ -410,7 +412,8 @@
 
     HeaderView.prototype.tagName = 'thead';
 
-    HeaderView.prototype.initialize = function() {
+    HeaderView.prototype.initialize = function(options) {
+      this.options = options;
       this.renderer = this.options.renderer;
       return this.classes = this.options.classes;
     };
@@ -595,7 +598,8 @@
 
     RowView.prototype.tagName = 'tr';
 
-    RowView.prototype.initialize = function() {
+    RowView.prototype.initialize = function(options) {
+      this.options = options;
       this.renderer = this.options.renderer;
       this.model.bind('change', this.render, this);
       return this.model.bind('destroy', this.remove, this);
@@ -676,8 +680,9 @@
       empty: Teeble.EmptyView
     };
 
-    TableView.prototype.initialize = function() {
+    TableView.prototype.initialize = function(options) {
       var i, partial, partial_name, _ref;
+      this.options = options;
       this.subviews = _.extend({}, this.subviews, this.options.subviews);
       this.setOptions();
       TableView.__super__.initialize.apply(this, arguments);

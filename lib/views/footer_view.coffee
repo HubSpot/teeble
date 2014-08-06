@@ -2,7 +2,7 @@ class @Teeble.FooterView extends Backbone.View
 
     tagName : 'tfoot'
 
-    initialize: =>
+    initialize: (@options) =>
         @renderer = @options.renderer
         if @collection.footer
             if @collection.footer instanceof Backbone.Model
