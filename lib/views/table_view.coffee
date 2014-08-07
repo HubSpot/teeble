@@ -29,7 +29,7 @@ class @Teeble.TableView extends Backbone.View
         renderer: Teeble.TableRenderer
         empty: Teeble.EmptyView
 
-    initialize : =>
+    initialize: (@options) =>
         @subviews = _.extend {}, @subviews, @options.subviews
 
         @setOptions()

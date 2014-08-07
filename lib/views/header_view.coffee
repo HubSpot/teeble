@@ -5,7 +5,7 @@ class @Teeble.HeaderView extends Backbone.View
 
     tagName : 'thead'
 
-    initialize: =>
+    initialize: (@options) =>
         @renderer = @options.renderer
         @classes = @options.classes
 

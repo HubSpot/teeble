@@ -1,6 +1,6 @@
 class @Teeble.EmptyView extends Backbone.View
 
-    initialize: =>
+    initialize: (@options) =>
         @renderer = @options.renderer
 
     render : =>

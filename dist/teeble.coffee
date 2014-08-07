@@ -1,4 +1,4 @@
-#! teeble - v0.3.11 - # 2014-04-14
+#! teeble - v0.3.12 - # 2014-08-06
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -186,7 +186,7 @@ class @Teeble.TableRenderer
 
 class @Teeble.EmptyView extends Backbone.View
 
-    initialize: =>
+    initialize: (@options) =>
         @renderer = @options.renderer
 
     render : =>
@@ -198,7 +198,7 @@ class @Teeble.FooterView extends Backbone.View
 
     tagName : 'tfoot'
 
-    initialize: =>
+    initialize: (@options) =>
         @renderer = @options.renderer
         if @collection.footer
             if @collection.footer instanceof Backbone.Model
@@ -233,7 +233,7 @@ class @Teeble.HeaderView extends Backbone.View
 
     tagName : 'thead'
 
-    initialize: =>
+    initialize: (@options) =>
         @renderer = @options.renderer
         @classes = @options.classes
 
@@ -369,7 +369,7 @@ class @Teeble.RowView extends Backbone.View
 
     tagName : 'tr'
 
-    initialize: =>
+    initialize: (@options) =>
         @renderer = @options.renderer
         @model.bind('change', @render, @)
         @model.bind('destroy', @remove, @)
@@ -418,7 +418,7 @@ class @Teeble.TableView extends Backbone.View
         renderer: Teeble.TableRenderer
         empty: Teeble.EmptyView
 
-    initialize : =>
+    initialize: (@options) =>
         @subviews = _.extend {}, @subviews, @options.subviews
 
         @setOptions()

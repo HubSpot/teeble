@@ -1,7 +1,7 @@
 {
   "name": "teeble",
   "description": "A tiny table",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "homepage": "https://github.com/HubSpot/teeble",
   "author": {
     "name": "HubSpot, Marc Neuwirth, Jonathan Kim",
