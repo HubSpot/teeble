@@ -1,5 +1,7 @@
 class @Teeble.PaginationView extends Backbone.View
 
+    initialize: (@options) ->
+
     tagName: 'div'
 
     events:
