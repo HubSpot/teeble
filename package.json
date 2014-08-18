@@ -3,11 +3,15 @@
   "description": "A tiny table",
   "version": "0.3.12",
   "homepage": "https://github.com/HubSpot/teeble",
-  "author": {
-    "name": "HubSpot, Marc Neuwirth, Jonathan Kim",
+  "contributors": [{
+    "name": "Bryan Ash",
+    "email": "bash@hubspot.com",
+    "url": "http://bry.io"
+  },{
+    "name": "Marc Neuwirth",
     "email": "mneuwirth@hubspot.com",
     "url": "http://marcneuwirth.com"
-  },
+  }],
   "repository": {
     "type": "git",
     "url": "git://github.com/HubSpot/teeble.git"
