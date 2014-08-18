@@ -1,4 +1,4 @@
-#! teeble - v0.3.12 - # 2014-08-06
+#! teeble - v0.3.12 - # 2014-08-18
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -286,6 +286,8 @@ class @Teeble.HeaderView extends Backbone.View
                     .addClass("#{@classes.sorting[classDirection]}")
 
 class @Teeble.PaginationView extends Backbone.View
+
+    initialize: (@options) ->
 
     tagName: 'div'
 
