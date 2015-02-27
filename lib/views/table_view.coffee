@@ -9,6 +9,7 @@ class @Teeble.TableView extends Backbone.View
 
     tagName : 'div'
     rendered: false
+    rows: []
 
     classes:
         sorting:
@@ -161,6 +162,16 @@ class @Teeble.TableView extends Backbone.View
             sortColumnIndex: sortColumnIndex
             sortableClass: @classes.sorting.sortable_cell
 
+        @rows.push view
         @body.append(view.render().el)
 
         @trigger('row.render', view)
+
+    remove : =>
+        super
+        for row in @rows
+            row.undelegateEvents()
+            row.remove()
+        @rows = []
+        @header?.remove()
+        @footer?.remove()

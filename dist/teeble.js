@@ -1,7 +1,7 @@
 /*!
-* teeble - v0.3.13 - 2014-08-18
+* teeble - v0.3.13 - 2015-02-27
 * https://github.com/HubSpot/teeble
-* Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
+* Copyright (c) 2015 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
 */
 
@@ -596,6 +596,10 @@
     function RowView() {
       this.render = __bind(this.render, this);
 
+      this.undelegateEvents = __bind(this.undelegateEvents, this);
+
+      this.delegateEvents = __bind(this.delegateEvents, this);
+
       this.initialize = __bind(this.initialize, this);
       return RowView.__super__.constructor.apply(this, arguments);
     }
@@ -604,9 +608,19 @@
 
     RowView.prototype.initialize = function(options) {
       this.options = options;
-      this.renderer = this.options.renderer;
+      return this.renderer = this.options.renderer;
+    };
+
+    RowView.prototype.delegateEvents = function() {
+      RowView.__super__.delegateEvents.apply(this, arguments);
       this.model.bind('change', this.render, this);
       return this.model.bind('destroy', this.remove, this);
+    };
+
+    RowView.prototype.undelegateEvents = function() {
+      RowView.__super__.undelegateEvents.apply(this, arguments);
+      this.model.unbind('change', this.render, this);
+      return this.model.unbind('destroy', this.remove, this);
     };
 
     RowView.prototype.render = function() {
@@ -637,6 +651,8 @@
     __extends(TableView, _super);
 
     function TableView() {
+      this.remove = __bind(this.remove, this);
+
       this.addOne = __bind(this.addOne, this);
 
       this.renderEmpty = __bind(this.renderEmpty, this);
@@ -660,6 +676,8 @@
     TableView.prototype.tagName = 'div';
 
     TableView.prototype.rendered = false;
+
+    TableView.prototype.rows = [];
 
     TableView.prototype.classes = {
       sorting: {
@@ -840,8 +858,25 @@
         sortColumnIndex: sortColumnIndex,
         sortableClass: this.classes.sorting.sortable_cell
       });
+      this.rows.push(view);
       this.body.append(view.render().el);
       return this.trigger('row.render', view);
+    };
+
+    TableView.prototype.remove = function() {
+      var row, _i, _len, _ref, _ref1, _ref2;
+      TableView.__super__.remove.apply(this, arguments);
+      _ref = this.rows;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        row = _ref[_i];
+        row.undelegateEvents();
+        row.remove();
+      }
+      this.rows = [];
+      if ((_ref1 = this.header) != null) {
+        _ref1.remove();
+      }
+      return (_ref2 = this.footer) != null ? _ref2.remove() : void 0;
     };
 
     return TableView;

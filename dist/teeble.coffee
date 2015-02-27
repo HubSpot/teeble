@@ -1,6 +1,6 @@
-#! teeble - v0.3.13 - # 2014-08-18
+#! teeble - v0.3.13 - # 2015-02-27
 #  https://github.com/HubSpot/teeble
-# Copyright (c) 2014 HubSpot, Marc Neuwirth, Jonathan Kim;
+# Copyright (c) 2015 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
 
 @Teeble = {}
@@ -373,8 +373,16 @@ class @Teeble.RowView extends Backbone.View
 
     initialize: (@options) =>
         @renderer = @options.renderer
+
+    delegateEvents: =>
+        super
         @model.bind('change', @render, @)
         @model.bind('destroy', @remove, @)
+
+    undelegateEvents: =>
+        super
+        @model.unbind('change', @render, @)
+        @model.unbind('destroy', @remove, @)
 
     render : =>
         if @renderer
@@ -400,6 +408,7 @@ class @Teeble.TableView extends Backbone.View
 
     tagName : 'div'
     rendered: false
+    rows: []
 
     classes:
         sorting:
@@ -552,9 +561,19 @@ class @Teeble.TableView extends Backbone.View
             sortColumnIndex: sortColumnIndex
             sortableClass: @classes.sorting.sortable_cell
 
+        @rows.push view
         @body.append(view.render().el)
 
         @trigger('row.render', view)
+
+    remove : =>
+        super
+        for row in @rows
+            row.undelegateEvents()
+            row.remove()
+        @rows = []
+        @header?.remove()
+        @footer?.remove()
 
 # =require '../backbone.paginator'
 
