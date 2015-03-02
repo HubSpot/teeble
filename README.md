@@ -67,6 +67,7 @@ _Also, please don't edit files in the "dist" subdirectory as they are generated 
 * Abstract the table renderer for other templating languages
 
 ## Release History
+* 0.3.14: Properly remove rows along with the table
 * 0.3.13: Pagination View has `options` manually attacehd as  `this.options`
 * 0.3.12: Backbone Views `options` manually attached as `this.options`
 * 0.3.11: Add proper un/delegating of table events
