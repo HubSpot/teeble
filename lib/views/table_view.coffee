@@ -9,7 +9,6 @@ class @Teeble.TableView extends Backbone.View
 
     tagName : 'div'
     rendered: false
-    rows: []
 
     classes:
         sorting:
@@ -31,6 +30,7 @@ class @Teeble.TableView extends Backbone.View
         empty: Teeble.EmptyView
 
     initialize: (@options) =>
+        @rows = []
         @subviews = _.extend {}, @subviews, @options.subviews
 
         @setOptions()

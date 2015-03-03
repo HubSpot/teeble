@@ -1,4 +1,4 @@
-#! teeble - v0.3.14 - # 2015-03-02
+#! teeble - v0.3.15 - # 2015-03-03
 #  https://github.com/HubSpot/teeble
 # Copyright (c) 2015 HubSpot, Marc Neuwirth, Jonathan Kim;
 # Licensed MIT
@@ -408,7 +408,6 @@ class @Teeble.TableView extends Backbone.View
 
     tagName : 'div'
     rendered: false
-    rows: []
 
     classes:
         sorting:
@@ -430,6 +429,7 @@ class @Teeble.TableView extends Backbone.View
         empty: Teeble.EmptyView
 
     initialize: (@options) =>
+        @rows = []
         @subviews = _.extend {}, @subviews, @options.subviews
 
         @setOptions()
