@@ -1,5 +1,5 @@
 /*!
-* teeble - v0.3.14 - 2015-03-02
+* teeble - v0.3.14 - 2015-03-03
 * https://github.com/HubSpot/teeble
 * Copyright (c) 2015 HubSpot, Marc Neuwirth, Jonathan Kim;
 * Licensed MIT 
@@ -677,8 +677,6 @@
 
     TableView.prototype.rendered = false;
 
-    TableView.prototype.rows = [];
-
     TableView.prototype.classes = {
       sorting: {
         sortable_class: 'sorting',
@@ -705,6 +703,7 @@
     TableView.prototype.initialize = function(options) {
       var i, partial, partial_name, _ref;
       this.options = options;
+      this.rows = [];
       this.subviews = _.extend({}, this.subviews, this.options.subviews);
       this.setOptions();
       TableView.__super__.initialize.apply(this, arguments);
